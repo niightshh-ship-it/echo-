@@ -107,7 +107,7 @@ export default function SignInPage() {
         ) : (
           <>
             <p className="text-zinc-400 mb-8">
-              Код отправлен на <span className="text-white">{email}</span>. Введи 6 цифр из письма.
+              Код отправлен на <span className="text-white">{email}</span>. Введи цифры из письма.
             </p>
             <form onSubmit={verifyCode} className="space-y-4">
               <div>
@@ -119,9 +119,9 @@ export default function SignInPage() {
                   autoComplete="one-time-code"
                   required
                   value={code}
-                  onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
-                  placeholder="123456"
-                  className="mt-2 bg-zinc-900 border-zinc-800 text-white text-center text-2xl tracking-[0.5em] font-mono"
+                  onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 10))}
+                  placeholder="12345678"
+                  className="mt-2 bg-zinc-900 border-zinc-800 text-white text-center text-2xl tracking-[0.3em] font-mono"
                   disabled={status === "verifying"}
                 />
               </div>
