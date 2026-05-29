@@ -136,7 +136,12 @@ export async function MarketingSections({ isLoggedIn }: { isLoggedIn: boolean })
               <span className="text-xl font-bold lowercase tracking-tighter text-gradient-echo">echo</span>
               <p className="text-xs text-zinc-500 mt-1">{t.home.footerTagline}</p>
             </div>
-            <p className="text-xs text-zinc-600">{t.home.footerRights}</p>
+            <div className="flex flex-col items-center sm:items-end gap-1">
+              <Link href="/install" className="text-xs text-echo-bright hover:underline">
+                📱 {t.install.cta}
+              </Link>
+              <p className="text-xs text-zinc-600">{t.home.footerRights}</p>
+            </div>
           </div>
         </footer>
       </div>
