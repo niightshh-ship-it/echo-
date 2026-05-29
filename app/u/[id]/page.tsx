@@ -27,18 +27,19 @@ export default async function UserProfilePage({
 
   if (id === user.id) redirect("/profile");
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("id, name, city, bio, skills, wants, avatar_url, verified")
-    .eq("id", id)
-    .maybeSingle();
+  const [{ data: profile }, { data: reviews }] = await Promise.all([
+    supabase
+      .from("profiles")
+      .select("id, name, city, bio, skills, wants, avatar_url, verified")
+      .eq("id", id)
+      .maybeSingle(),
+    supabase
+      .from("reviews")
+      .select("id, reviewer_id, rating, body, created_at")
+      .eq("reviewee_id", id)
+      .order("created_at", { ascending: false }),
+  ]);
   if (!profile) notFound();
-
-  const { data: reviews } = await supabase
-    .from("reviews")
-    .select("id, reviewer_id, rating, body, created_at")
-    .eq("reviewee_id", id)
-    .order("created_at", { ascending: false });
 
   const reviewerIds = Array.from(new Set((reviews ?? []).map((r) => r.reviewer_id)));
   const { data: reviewers } = reviewerIds.length

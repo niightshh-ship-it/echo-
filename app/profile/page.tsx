@@ -16,19 +16,17 @@ export default async function ProfilePage() {
 
   if (!user) redirect("/sign-in");
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", user.id)
-    .single();
+  // Параллелим — раньше шло друг за другом
+  const [{ data: profile }, { data: videos }] = await Promise.all([
+    supabase.from("profiles").select("*").eq("id", user.id).single(),
+    supabase
+      .from("videos")
+      .select("id, skill, storage_path, created_at")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false }),
+  ]);
 
   if (!profile) redirect("/onboarding");
-
-  const { data: videos } = await supabase
-    .from("videos")
-    .select("id, skill, storage_path, created_at")
-    .eq("user_id", user.id)
-    .order("created_at", { ascending: false });
 
   const videosWithUrl = (videos ?? []).map((v) => ({
     ...v,

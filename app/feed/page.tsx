@@ -7,22 +7,24 @@ export default async function FeedPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/sign-in");
 
-  // 1. Все чужие видео
-  const { data: videos, error: videosError } = await supabase
-    .from("videos")
-    .select("id, user_id, skill, storage_path, created_at")
-    .neq("user_id", user.id)
-    .order("created_at", { ascending: false });
+  // Параллелим всё что не зависит друг от друга
+  const [videosRes, blocksRes, likedRes] = await Promise.all([
+    supabase
+      .from("videos")
+      .select("id, user_id, skill, storage_path, created_at")
+      .neq("user_id", user.id)
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("blocks")
+      .select("blocker_id, blocked_id")
+      .or(`blocker_id.eq.${user.id},blocked_id.eq.${user.id}`),
+    supabase.from("likes").select("video_id").eq("liker_id", user.id),
+  ]);
 
-  if (videosError) {
-    console.error("[feed] videos query error:", videosError);
-  }
+  const videos = videosRes.data;
+  const blocks = blocksRes.data;
+  const likedRows = likedRes.data;
 
-  // Блокировки в обе стороны — скрываем такие видео
-  const { data: blocks } = await supabase
-    .from("blocks")
-    .select("blocker_id, blocked_id")
-    .or(`blocker_id.eq.${user.id},blocked_id.eq.${user.id}`);
   const hidden = new Set<string>();
   (blocks ?? []).forEach((b) =>
     hidden.add(b.blocker_id === user.id ? b.blocked_id : b.blocker_id)
@@ -30,19 +32,11 @@ export default async function FeedPage() {
 
   const visibleVideos = (videos ?? []).filter((v) => !hidden.has(v.user_id));
 
-  // 2. Профили авторов отдельным запросом
   const authorIds = Array.from(new Set(visibleVideos.map((v) => v.user_id)));
-  const { data: profiles, error: profilesError } =
+  const { data: profiles } =
     authorIds.length > 0
-      ? await supabase
-          .from("profiles")
-          .select("id, name, city, avatar_url")
-          .in("id", authorIds)
-      : { data: [], error: null };
-
-  if (profilesError) {
-    console.error("[feed] profiles query error:", profilesError);
-  }
+      ? await supabase.from("profiles").select("id, name, city, avatar_url").in("id", authorIds)
+      : { data: [] };
 
   const profileMap = new Map((profiles ?? []).map((p) => [p.id, p]));
 
@@ -58,12 +52,6 @@ export default async function FeedPage() {
       url: supabase.storage.from("videos").getPublicUrl(v.storage_path).data.publicUrl,
     };
   });
-
-  // 3. Что юзер уже лайкнул
-  const { data: likedRows } = await supabase
-    .from("likes")
-    .select("video_id")
-    .eq("liker_id", user.id);
 
   const initiallyLiked = (likedRows ?? []).map((r) => r.video_id);
 

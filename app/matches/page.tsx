@@ -25,20 +25,28 @@ export default async function MatchesPage() {
     m.user_a === user.id ? m.user_b : m.user_a
   );
 
-  const { data: profiles } =
+  // 3 параллельных запроса вместо очереди
+  const [profilesRes, ratingsRes, unreadRes] = await Promise.all([
     otherIds.length > 0
-      ? await supabase
+      ? supabase
           .from("profiles")
           .select("id, name, city, skills, avatar_url")
           .in("id", otherIds)
-      : { data: [] };
-
+      : Promise.resolve({ data: [] as { id: string; name: string; city: string; skills: string[]; avatar_url: string | null }[] }),
+    otherIds.length > 0
+      ? supabase.from("reviews").select("reviewee_id, rating").in("reviewee_id", otherIds)
+      : Promise.resolve({ data: [] as { reviewee_id: string; rating: number }[] }),
+    supabase
+      .from("messages")
+      .select("match_user_a, match_user_b")
+      .neq("sender_id", user.id)
+      .is("read_at", null),
+  ]);
+  const profiles = profilesRes.data;
+  const revs = ratingsRes.data;
+  const unread = unreadRes.data;
   const profileMap = new Map((profiles ?? []).map((p) => [p.id, p]));
 
-  // Рейтинги собеседников
-  const { data: revs } = otherIds.length
-    ? await supabase.from("reviews").select("reviewee_id, rating").in("reviewee_id", otherIds)
-    : { data: [] };
   const ratingMap = new Map<string, { sum: number; n: number }>();
   (revs ?? []).forEach((r) => {
     const cur = ratingMap.get(r.reviewee_id) ?? { sum: 0, n: 0 };
@@ -46,13 +54,6 @@ export default async function MatchesPage() {
     cur.n += 1;
     ratingMap.set(r.reviewee_id, cur);
   });
-
-  // 3. Непрочитанные сообщения — где я получатель и read_at пуст
-  const { data: unread } = await supabase
-    .from("messages")
-    .select("match_user_a, match_user_b")
-    .neq("sender_id", user.id)
-    .is("read_at", null);
 
   const unreadByPair = new Map<string, number>();
   (unread ?? []).forEach((m) => {
