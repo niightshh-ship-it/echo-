@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { getDictionary } from "@/lib/i18n/server";
@@ -16,8 +16,15 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Echo — обмен навыками",
-  description: "Echo — соцсеть для обмена навыками в Нидерландах",
+  title: "Echo — skill exchange",
+  description: "Trade skills with people near you. No money, just skills.",
+  manifest: "/manifest.webmanifest",
+  icons: { icon: "/icon.svg", apple: "/icon.svg" },
+  appleWebApp: { capable: true, title: "Echo", statusBarStyle: "black-translucent" },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#000000",
 };
 
 export default async function RootLayout({
