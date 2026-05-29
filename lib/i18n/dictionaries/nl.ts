@@ -156,6 +156,9 @@ const nl: Dictionary = {
     cancel: "Annuleren",
     rejectConfirm: "Afwijzen",
     defaultReason: "Niet geschikt",
+    reportsTitle: "Meldingen",
+    reportsEmpty: "Geen meldingen.",
+    reportArrow: "meldde",
   },
   safety: {
     report: "Rapporteren",

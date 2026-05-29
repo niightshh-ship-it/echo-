@@ -156,6 +156,9 @@ const uk: Dictionary = {
     cancel: "Скасувати",
     rejectConfirm: "Відхилити",
     defaultReason: "Не підходить",
+    reportsTitle: "Скарги",
+    reportsEmpty: "Скарг немає.",
+    reportArrow: "на",
   },
   safety: {
     report: "Поскаржитися",

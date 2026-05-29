@@ -156,6 +156,9 @@ const ru: Dictionary = {
     cancel: "Отмена",
     rejectConfirm: "Отклонить",
     defaultReason: "Не подходит",
+    reportsTitle: "Жалобы",
+    reportsEmpty: "Жалоб нет.",
+    reportArrow: "на",
   },
   safety: {
     report: "Пожаловаться",

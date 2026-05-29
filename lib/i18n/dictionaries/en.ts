@@ -154,6 +154,9 @@ const en = {
     cancel: "Cancel",
     rejectConfirm: "Reject",
     defaultReason: "Not suitable",
+    reportsTitle: "Reports",
+    reportsEmpty: "No reports.",
+    reportArrow: "reported",
   },
   safety: {
     report: "Report",

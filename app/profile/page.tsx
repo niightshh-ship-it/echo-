@@ -117,12 +117,19 @@ export default async function ProfilePage() {
         </div>
 
         {profile.is_admin && (
-          <Link href="/admin/verifications" className="block mb-6">
-            <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 hover:bg-amber-500/15 transition-colors">
-              <p className="text-amber-400 text-sm font-semibold">⚡ {t.profile.adminTitle}</p>
-              <p className="text-amber-200/70 text-xs">{t.profile.adminSubtitle}</p>
-            </div>
-          </Link>
+          <div className="grid grid-cols-2 gap-3 mb-6">
+            <Link href="/admin/verifications">
+              <div className="h-full rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 hover:bg-amber-500/15 transition-colors">
+                <p className="text-amber-400 text-sm font-semibold">⚡ {t.profile.adminTitle}</p>
+                <p className="text-amber-200/70 text-xs">{t.profile.adminSubtitle}</p>
+              </div>
+            </Link>
+            <Link href="/admin/reports">
+              <div className="h-full rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 hover:bg-amber-500/15 transition-colors">
+                <p className="text-amber-400 text-sm font-semibold">🚩 {t.admin.reportsTitle}</p>
+              </div>
+            </Link>
+          </div>
         )}
 
         <div className="flex items-center justify-between mb-4">
