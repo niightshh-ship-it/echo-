@@ -27,7 +27,7 @@ export default async function MatchesPage() {
     otherIds.length > 0
       ? await supabase
           .from("profiles")
-          .select("id, name, city, skills")
+          .select("id, name, city, skills, avatar_url")
           .in("id", otherIds)
       : { data: [] };
 
@@ -101,7 +101,16 @@ export default async function MatchesPage() {
                   className="block rounded-2xl glass border border-white/10 p-5 hover:bg-white/[0.06] transition-colors"
                 >
                   <div className="flex items-start justify-between mb-2">
-                    <div>
+                    <div className="flex items-start gap-3">
+                      <div className="relative h-12 w-12 shrink-0 rounded-full overflow-hidden border border-white/15 bg-white/5 flex items-center justify-center">
+                        {other.avatar_url ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={other.avatar_url} alt={other.name} className="h-full w-full object-cover" />
+                        ) : (
+                          <span className="text-lg">{other.name?.[0]?.toUpperCase() ?? "?"}</span>
+                        )}
+                      </div>
+                      <div>
                       <div className="flex items-center gap-2">
                         <p className="text-xl font-semibold">{other.name}</p>
                         {unread > 0 && (
@@ -123,6 +132,7 @@ export default async function MatchesPage() {
                           </p>
                         );
                       })()}
+                      </div>
                     </div>
                     <p className="text-xs text-zinc-600">
                       {new Date(matched_at).toLocaleDateString()}
