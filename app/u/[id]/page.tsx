@@ -3,6 +3,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getDictionary } from "@/lib/i18n/server";
 import { Badge } from "@/components/ui/badge";
+import { ProfileActions } from "@/components/profile-actions";
 
 function Stars({ value }: { value: number }) {
   return (
@@ -53,8 +54,9 @@ export default async function UserProfilePage({
       <div className="pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 h-[280px] w-[460px] rounded-full bg-echo opacity-10 blur-[130px]" />
 
       <div className="relative z-10 w-full max-w-md">
-        <div className="mb-6">
+        <div className="mb-6 flex items-center justify-between">
           <Link href="/matches" className="text-zinc-400 hover:text-white text-sm">{t.nav.back}</Link>
+          <ProfileActions targetId={id} />
         </div>
 
         <div className="rounded-3xl glass border border-white/10 p-8 mb-6">

@@ -18,8 +18,20 @@ export default async function FeedPage() {
     console.error("[feed] videos query error:", videosError);
   }
 
+  // Блокировки в обе стороны — скрываем такие видео
+  const { data: blocks } = await supabase
+    .from("blocks")
+    .select("blocker_id, blocked_id")
+    .or(`blocker_id.eq.${user.id},blocked_id.eq.${user.id}`);
+  const hidden = new Set<string>();
+  (blocks ?? []).forEach((b) =>
+    hidden.add(b.blocker_id === user.id ? b.blocked_id : b.blocker_id)
+  );
+
+  const visibleVideos = (videos ?? []).filter((v) => !hidden.has(v.user_id));
+
   // 2. Профили авторов отдельным запросом
-  const authorIds = Array.from(new Set((videos ?? []).map((v) => v.user_id)));
+  const authorIds = Array.from(new Set(visibleVideos.map((v) => v.user_id)));
   const { data: profiles, error: profilesError } =
     authorIds.length > 0
       ? await supabase
@@ -34,7 +46,7 @@ export default async function FeedPage() {
 
   const profileMap = new Map((profiles ?? []).map((p) => [p.id, p]));
 
-  const items: FeedItem[] = (videos ?? []).map((v) => {
+  const items: FeedItem[] = visibleVideos.map((v) => {
     const author = profileMap.get(v.user_id);
     return {
       id: v.id,

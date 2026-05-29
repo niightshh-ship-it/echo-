@@ -21,6 +21,7 @@ export default function SearchPage() {
   const [city, setCity] = useState("");
   const [query, setQuery] = useState("");
   const [all, setAll] = useState<Row[]>([]);
+  const [hidden, setHidden] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
@@ -32,18 +33,30 @@ export default function SearchPage() {
   useEffect(() => {
     if (!myId) return;
     (async () => {
-      const { data } = await supabase
-        .from("profiles")
-        .select("id, name, city, skills, avatar_url")
-        .neq("id", myId)
-        .limit(100);
+      const [{ data }, { data: blocks }] = await Promise.all([
+        supabase
+          .from("profiles")
+          .select("id, name, city, skills, avatar_url")
+          .neq("id", myId)
+          .limit(100),
+        supabase
+          .from("blocks")
+          .select("blocker_id, blocked_id")
+          .or(`blocker_id.eq.${myId},blocked_id.eq.${myId}`),
+      ]);
       setAll((data ?? []) as Row[]);
+      const h = new Set<string>();
+      (blocks ?? []).forEach((b) =>
+        h.add(b.blocker_id === myId ? b.blocked_id : b.blocker_id)
+      );
+      setHidden(h);
     })();
   }, [myId, supabase]);
 
   const ql = query.trim().toLowerCase();
   const cl = city.trim().toLowerCase();
   const results = all.filter((p) => {
+    if (hidden.has(p.id)) return false;
     const matchesText =
       !ql ||
       p.name.toLowerCase().includes(ql) ||

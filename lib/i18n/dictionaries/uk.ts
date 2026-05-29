@@ -157,6 +157,13 @@ const uk: Dictionary = {
     rejectConfirm: "Відхилити",
     defaultReason: "Не підходить",
   },
+  safety: {
+    report: "Поскаржитися",
+    block: "Заблокувати",
+    reportPrompt: "Причина скарги (необов'язково):",
+    reportSent: "Скаргу надіслано. Дякуємо.",
+    blockConfirm: "Заблокувати цього користувача? Ви перестанете бачити одне одного.",
+  },
   search: {
     title: "Пошук",
     placeholder: "Навичка або ім'я...",

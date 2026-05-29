@@ -155,6 +155,13 @@ const en = {
     rejectConfirm: "Reject",
     defaultReason: "Not suitable",
   },
+  safety: {
+    report: "Report",
+    block: "Block",
+    reportPrompt: "Reason for the report (optional):",
+    reportSent: "Report sent. Thank you.",
+    blockConfirm: "Block this user? You won't see each other anymore.",
+  },
   search: {
     title: "Search",
     placeholder: "Skill or name...",

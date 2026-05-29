@@ -157,6 +157,13 @@ const ru: Dictionary = {
     rejectConfirm: "Отклонить",
     defaultReason: "Не подходит",
   },
+  safety: {
+    report: "Пожаловаться",
+    block: "Заблокировать",
+    reportPrompt: "Причина жалобы (необязательно):",
+    reportSent: "Жалоба отправлена. Спасибо.",
+    blockConfirm: "Заблокировать этого пользователя? Вы перестанете видеть друг друга.",
+  },
   search: {
     title: "Поиск",
     placeholder: "Навык или имя...",

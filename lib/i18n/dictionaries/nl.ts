@@ -157,6 +157,13 @@ const nl: Dictionary = {
     rejectConfirm: "Afwijzen",
     defaultReason: "Niet geschikt",
   },
+  safety: {
+    report: "Rapporteren",
+    block: "Blokkeren",
+    reportPrompt: "Reden voor melding (optioneel):",
+    reportSent: "Melding verstuurd. Bedankt.",
+    blockConfirm: "Deze gebruiker blokkeren? Jullie zien elkaar niet meer.",
+  },
   search: {
     title: "Zoeken",
     placeholder: "Vaardigheid of naam...",
