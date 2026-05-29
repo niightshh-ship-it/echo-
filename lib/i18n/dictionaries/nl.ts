@@ -157,6 +157,12 @@ const nl: Dictionary = {
     rejectConfirm: "Afwijzen",
     defaultReason: "Niet geschikt",
   },
+  search: {
+    title: "Zoeken",
+    placeholder: "Vaardigheid of naam...",
+    allCities: "Alle steden",
+    noResults: "Niets gevonden",
+  },
   home: {
     scrollHint: "scroll naar beneden",
     howTitle: "Hoe Echo werkt",

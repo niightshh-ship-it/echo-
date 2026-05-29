@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getDictionary } from "@/lib/i18n/server";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Search } from "lucide-react";
 import { SignOutButton } from "./sign-out-button";
 import { DeleteVideoButton } from "./delete-video-button";
 import { LanguageSwitcher } from "@/components/language-switcher";
@@ -42,14 +43,9 @@ export default async function ProfilePage() {
         <div className="flex items-center justify-between mb-8">
           <Link href="/" className="text-2xl font-bold lowercase text-gradient-echo">echo</Link>
           <div className="flex items-center gap-1">
-            <Link href="/feed">
-              <Button variant="ghost" className="text-zinc-400 hover:text-white hover:bg-white/5 rounded-full">
-                {t.nav.feed}
-              </Button>
-            </Link>
-            <Link href="/matches">
-              <Button variant="ghost" className="text-zinc-400 hover:text-white hover:bg-white/5 rounded-full">
-                {t.nav.matches}
+            <Link href="/search">
+              <Button variant="ghost" className="text-zinc-400 hover:text-white hover:bg-white/5 rounded-full h-9 w-9 p-0">
+                <Search className="w-5 h-5" />
               </Button>
             </Link>
             <LanguageSwitcher className="ml-1" />

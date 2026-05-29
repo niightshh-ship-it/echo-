@@ -2,8 +2,10 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getDictionary } from "@/lib/i18n/server";
+import { Search } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { LanguageSwitcher } from "@/components/language-switcher";
 
 export default async function MatchesPage() {
   const supabase = await createClient();
@@ -75,11 +77,14 @@ export default async function MatchesPage() {
       <div className="relative z-10 w-full max-w-md">
         <div className="flex items-center justify-between mb-8">
           <Link href="/" className="text-2xl font-bold lowercase text-gradient-echo">echo</Link>
-          <Link href="/feed">
-            <Button variant="ghost" className="text-zinc-400 hover:text-white hover:bg-white/5 rounded-full">
-              {t.matches.backFeed}
-            </Button>
-          </Link>
+          <div className="flex items-center gap-1">
+            <Link href="/search">
+              <Button variant="ghost" className="text-zinc-400 hover:text-white hover:bg-white/5 rounded-full h-9 w-9 p-0">
+                <Search className="w-5 h-5" />
+              </Button>
+            </Link>
+            <LanguageSwitcher />
+          </div>
         </div>
 
         <h1 className="text-3xl font-bold mb-2 lowercase">{t.matches.title}</h1>

@@ -157,6 +157,12 @@ const uk: Dictionary = {
     rejectConfirm: "Відхилити",
     defaultReason: "Не підходить",
   },
+  search: {
+    title: "Пошук",
+    placeholder: "Навичка або ім'я...",
+    allCities: "Усі міста",
+    noResults: "Нічого не знайдено",
+  },
   home: {
     scrollHint: "гортай вниз",
     howTitle: "Як працює Echo",

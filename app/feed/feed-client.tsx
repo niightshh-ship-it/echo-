@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { Heart } from "lucide-react";
+import { Heart, Search } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useT } from "@/lib/i18n/provider";
 
@@ -167,11 +167,9 @@ export function FeedClient({
           />
 
           <div className="absolute top-0 left-0 right-0 p-4 flex items-center justify-between bg-gradient-to-b from-black/60 to-transparent">
-            <Link href="/profile" className="text-white text-sm">
-              {t.feed.profile}
-            </Link>
-            <Link href="/matches" className="text-white text-sm">
-              {t.feed.matches}
+            <Link href="/" className="text-xl font-bold lowercase text-gradient-echo">echo</Link>
+            <Link href="/search" className="text-white">
+              <Search className="w-5 h-5" />
             </Link>
           </div>
 

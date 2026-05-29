@@ -157,6 +157,12 @@ const ru: Dictionary = {
     rejectConfirm: "Отклонить",
     defaultReason: "Не подходит",
   },
+  search: {
+    title: "Поиск",
+    placeholder: "Навык или имя...",
+    allCities: "Все города",
+    noResults: "Ничего не найдено",
+  },
   home: {
     scrollHint: "листай вниз",
     howTitle: "Как работает Echo",

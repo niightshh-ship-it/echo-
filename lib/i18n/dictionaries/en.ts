@@ -155,6 +155,12 @@ const en = {
     rejectConfirm: "Reject",
     defaultReason: "Not suitable",
   },
+  search: {
+    title: "Search",
+    placeholder: "Skill or name...",
+    allCities: "All cities",
+    noResults: "Nothing found",
+  },
   home: {
     scrollHint: "scroll to explore",
     howTitle: "How Echo works",

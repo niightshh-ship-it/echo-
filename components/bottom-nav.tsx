@@ -6,7 +6,7 @@ import { Play, Heart, User, Plus } from "lucide-react";
 import { useT } from "@/lib/i18n/provider";
 
 // Показываем только на основных экранах приложения
-const SHOW_ON = ["/feed", "/matches", "/profile", "/upload"];
+const SHOW_ON = ["/feed", "/matches", "/profile", "/upload", "/search"];
 
 export function BottomNav() {
   const pathname = usePathname();
