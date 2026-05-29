@@ -175,7 +175,7 @@ export function FeedClient({
             </Link>
           </div>
 
-          <div className="absolute bottom-0 left-0 right-16 p-6 bg-gradient-to-t from-black/80 to-transparent">
+          <div className="absolute bottom-16 left-0 right-16 p-6 bg-gradient-to-t from-black/80 to-transparent">
             <div className="flex items-center gap-2.5">
               <span className="relative h-10 w-10 shrink-0 rounded-full overflow-hidden border border-white/25 bg-white/10 flex items-center justify-center">
                 {item.authorAvatar ? (
@@ -197,7 +197,7 @@ export function FeedClient({
 
           <button
             onClick={() => toggleLike(item)}
-            className="absolute right-4 bottom-32 flex flex-col items-center gap-1"
+            className="absolute right-4 bottom-44 flex flex-col items-center gap-1"
           >
             <div
               className={`rounded-full p-3 transition-colors ${
