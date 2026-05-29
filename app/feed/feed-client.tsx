@@ -11,6 +11,7 @@ export type FeedItem = {
   skill: string;
   authorName: string;
   authorCity: string;
+  authorAvatar: string | null;
   url: string;
 };
 
@@ -175,8 +176,20 @@ export function FeedClient({
           </div>
 
           <div className="absolute bottom-0 left-0 right-16 p-6 bg-gradient-to-t from-black/80 to-transparent">
-            <p className="text-white font-semibold text-lg">{item.authorName}</p>
-            <p className="text-zinc-300 text-sm">{item.authorCity}</p>
+            <div className="flex items-center gap-2.5">
+              <span className="relative h-10 w-10 shrink-0 rounded-full overflow-hidden border border-white/25 bg-white/10 flex items-center justify-center">
+                {item.authorAvatar ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={item.authorAvatar} alt="" className="h-full w-full object-cover" />
+                ) : (
+                  <span className="text-base">{item.authorName?.[0]?.toUpperCase() ?? "?"}</span>
+                )}
+              </span>
+              <div>
+                <p className="text-white font-semibold text-lg leading-tight">{item.authorName}</p>
+                <p className="text-zinc-300 text-sm">{item.authorCity}</p>
+              </div>
+            </div>
             <p className="text-white text-sm mt-2 bg-white/10 inline-block px-2 py-0.5 rounded">
               {item.skill}
             </p>

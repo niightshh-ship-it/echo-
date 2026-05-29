@@ -24,7 +24,7 @@ export default async function FeedPage() {
     authorIds.length > 0
       ? await supabase
           .from("profiles")
-          .select("id, name, city")
+          .select("id, name, city, avatar_url")
           .in("id", authorIds)
       : { data: [], error: null };
 
@@ -41,6 +41,7 @@ export default async function FeedPage() {
       skill: v.skill,
       authorName: author?.name ?? "?",
       authorCity: author?.city ?? "",
+      authorAvatar: author?.avatar_url ?? null,
       url: supabase.storage.from("videos").getPublicUrl(v.storage_path).data.publicUrl,
     };
   });
