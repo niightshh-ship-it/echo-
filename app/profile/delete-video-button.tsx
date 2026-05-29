@@ -13,16 +13,22 @@ export function DeleteVideoButton({ videoId }: { videoId: string }) {
   async function onDelete() {
     if (!confirm(t.profile.deleteConfirm)) return;
     setBusy(true);
-    const res = await fetch("/api/video/delete", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ videoId }),
-    });
-    if (res.ok) {
-      router.refresh();
-    } else {
-      setBusy(false);
+    try {
+      const res = await fetch("/api/video/delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ videoId }),
+      });
+      if (res.ok) {
+        router.refresh();
+        return;
+      }
+      const data = await res.json().catch(() => ({}));
+      alert(`Не удалось удалить: ${data.error ?? res.status}`);
+    } catch (e) {
+      alert(`Ошибка сети: ${e instanceof Error ? e.message : String(e)}`);
     }
+    setBusy(false);
   }
 
   return (
