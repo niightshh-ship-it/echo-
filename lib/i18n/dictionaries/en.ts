@@ -64,6 +64,7 @@ const en = {
     available: "Available",
     reviewsTitle: "Reviews",
     noReviews: "No reviews yet",
+    deleteConfirm: "Delete this video?",
   },
   profileEdit: {
     title: "edit profile",

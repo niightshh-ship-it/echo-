@@ -66,6 +66,7 @@ const nl: Dictionary = {
     available: "Beschikbaar",
     reviewsTitle: "Reviews",
     noReviews: "Nog geen reviews",
+    deleteConfirm: "Deze video verwijderen?",
   },
   profileEdit: {
     title: "profiel bewerken",

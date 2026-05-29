@@ -66,6 +66,7 @@ const ru: Dictionary = {
     available: "Доступен",
     reviewsTitle: "Отзывы",
     noReviews: "Пока нет отзывов",
+    deleteConfirm: "Удалить это видео?",
   },
   profileEdit: {
     title: "редактировать профиль",

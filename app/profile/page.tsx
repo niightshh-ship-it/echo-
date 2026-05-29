@@ -5,6 +5,7 @@ import { getDictionary } from "@/lib/i18n/server";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { SignOutButton } from "./sign-out-button";
+import { DeleteVideoButton } from "./delete-video-button";
 import { LanguageSwitcher } from "@/components/language-switcher";
 
 export default async function ProfilePage() {
@@ -144,7 +145,8 @@ export default async function ProfilePage() {
         ) : (
           <div className="grid grid-cols-2 gap-3">
             {videosWithUrl.map((v) => (
-              <div key={v.id} className="rounded-2xl overflow-hidden border border-white/10 bg-zinc-950">
+              <div key={v.id} className="relative rounded-2xl overflow-hidden border border-white/10 bg-zinc-950">
+                <DeleteVideoButton videoId={v.id} />
                 <video src={v.url} controls className="w-full aspect-[9/16] object-cover" />
                 <p className="text-xs text-zinc-400 px-3 py-2">{v.skill}</p>
               </div>

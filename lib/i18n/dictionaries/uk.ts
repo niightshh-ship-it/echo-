@@ -66,6 +66,7 @@ const uk: Dictionary = {
     available: "Доступний",
     reviewsTitle: "Відгуки",
     noReviews: "Поки немає відгуків",
+    deleteConfirm: "Видалити це відео?",
   },
   profileEdit: {
     title: "редагувати профіль",
