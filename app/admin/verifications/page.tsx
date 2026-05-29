@@ -1,10 +1,12 @@
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { getDictionary } from "@/lib/i18n/server";
 import { ReviewActions } from "./review-actions";
 
 export default async function AdminVerificationsPage() {
   const supabase = await createClient();
+  const { dict: t } = await getDictionary();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/sign-in");
 
@@ -53,29 +55,31 @@ export default async function AdminVerificationsPage() {
     <div className="min-h-screen bg-black text-white px-4 py-8">
       <div className="max-w-2xl mx-auto">
         <div className="flex items-center justify-between mb-8">
-          <Link href="/" className="text-2xl font-bold lowercase">echo</Link>
-          <span className="text-xs text-zinc-500 uppercase tracking-wider">admin</span>
+          <Link href="/" className="text-2xl font-bold lowercase text-gradient-echo">echo</Link>
+          <span className="text-xs text-amber-400 uppercase tracking-wider">{t.admin.badge}</span>
         </div>
 
-        <h1 className="text-3xl font-bold mb-2 lowercase">верификации на проверке</h1>
+        <h1 className="text-3xl font-bold mb-2 lowercase">{t.admin.title}</h1>
         <p className="text-zinc-400 text-sm mb-8">
-          {items.length === 0 ? "Очередь пуста." : `${items.length} в очереди.`}
+          {items.length === 0
+            ? t.admin.queueEmpty
+            : t.admin.inQueue.replace("{n}", String(items.length))}
         </p>
 
         <div className="space-y-6">
           {items.map(({ verification, profile, videoUrl }) => (
             <div
               key={verification.id}
-              className="rounded-2xl border border-zinc-800 bg-zinc-950 overflow-hidden"
+              className="rounded-3xl border border-white/10 bg-zinc-950 overflow-hidden"
             >
-              <div className="p-4 border-b border-zinc-900">
+              <div className="p-4 border-b border-white/10">
                 <p className="text-xl font-semibold">{profile?.name ?? "?"}</p>
                 <p className="text-zinc-400 text-sm">{profile?.city}</p>
                 <p className="text-zinc-500 text-xs mt-1">
-                  Навыки: {profile?.skills?.join(", ") || "нет"}
+                  {t.admin.skills.replace("{list}", profile?.skills?.join(", ") || t.admin.none)}
                 </p>
                 <p className="text-zinc-600 text-xs mt-1">
-                  Отправлено: {new Date(verification.submitted_at).toLocaleString("ru-RU")}
+                  {t.admin.submitted.replace("{date}", new Date(verification.submitted_at).toLocaleString())}
                 </p>
               </div>
 
@@ -89,7 +93,7 @@ export default async function AdminVerificationsPage() {
                   />
                 </div>
               ) : (
-                <p className="text-red-400 text-sm p-4">Не удалось получить видео</p>
+                <p className="text-red-400 text-sm p-4">{t.admin.videoError}</p>
               )}
 
               <div className="p-4">

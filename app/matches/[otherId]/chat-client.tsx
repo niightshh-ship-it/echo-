@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Send } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import type { RealtimeChannel } from "@supabase/supabase-js";
+import { useT } from "@/lib/i18n/provider";
 
 export type Message = {
   id: string;
@@ -29,6 +30,7 @@ export function ChatClient({
   other: Other;
   initialMessages: Message[];
 }) {
+  const t = useT();
   const supabase = useRef(createClient()).current;
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [input, setInput] = useState("");
@@ -195,7 +197,7 @@ export function ChatClient({
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-2">
         {messages.length === 0 && (
           <p className="text-zinc-600 text-sm text-center py-8">
-            Начните разговор — напишите первым.
+            {t.chat.empty}
           </p>
         )}
         {messages.map((m) => {
@@ -208,21 +210,21 @@ export function ChatClient({
               <div
                 className={`max-w-[75%] rounded-2xl px-4 py-2 ${
                   mine
-                    ? "bg-white text-black rounded-br-sm"
+                    ? "bg-echo text-white rounded-br-sm"
                     : "bg-zinc-800 text-white rounded-bl-sm"
                 }`}
               >
                 <p className="whitespace-pre-wrap break-words">{m.body}</p>
                 <p
                   className={`text-[10px] mt-1 ${
-                    mine ? "text-zinc-500" : "text-zinc-400"
+                    mine ? "text-white/60" : "text-zinc-400"
                   }`}
                 >
-                  {new Date(m.created_at).toLocaleTimeString("ru-RU", {
+                  {new Date(m.created_at).toLocaleTimeString([], {
                     hour: "2-digit",
                     minute: "2-digit",
                   })}
-                  {mine && m.read_at && " · прочитано"}
+                  {mine && m.read_at && ` · ${t.chat.read}`}
                 </p>
               </div>
             </div>
@@ -231,7 +233,7 @@ export function ChatClient({
         {otherTyping && (
           <div className="flex justify-start">
             <div className="bg-zinc-800 rounded-2xl rounded-bl-sm px-4 py-2">
-              <p className="text-zinc-400 text-sm italic">печатает...</p>
+              <p className="text-zinc-400 text-sm italic">{t.chat.typing}</p>
             </div>
           </div>
         )}
@@ -247,14 +249,14 @@ export function ChatClient({
             setInput(e.target.value);
             if (e.target.value) emitTyping();
           }}
-          placeholder="Сообщение..."
-          className="flex-1 bg-zinc-900 border border-zinc-800 rounded-full px-4 py-2 text-white placeholder:text-zinc-500 focus:outline-none focus:border-zinc-600"
+          placeholder={t.chat.placeholder}
+          className="flex-1 bg-white/5 border border-white/10 rounded-full px-4 py-2 text-white placeholder:text-zinc-500 focus:outline-none focus:border-echo/60"
           disabled={sending}
         />
         <button
           type="submit"
           disabled={!input.trim() || sending}
-          className="bg-white text-black rounded-full w-10 h-10 flex items-center justify-center disabled:bg-zinc-700 disabled:text-zinc-500"
+          className="bg-echo text-white rounded-full w-10 h-10 flex items-center justify-center disabled:bg-zinc-700 disabled:text-zinc-500"
         >
           <Send className="w-4 h-4" />
         </button>

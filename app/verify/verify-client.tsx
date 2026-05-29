@@ -5,18 +5,12 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
+import { useT } from "@/lib/i18n/provider";
+import { LanguageSwitcher } from "@/components/language-switcher";
 
 type Step = "intro" | "ready" | "recording" | "review" | "submitting" | "done" | "error";
 
 const RECORD_SECONDS = 8;
-
-// Подсказки во время записи (по 2 секунды каждая)
-const PROMPTS = [
-  "Смотри прямо в камеру",
-  "Поверни голову налево ←",
-  "Теперь направо →",
-  "И вниз ↓",
-];
 
 export function VerifyClient({
   userId,
@@ -26,7 +20,11 @@ export function VerifyClient({
   previousRejection: string | null;
 }) {
   const router = useRouter();
+  const t = useT();
   const supabase = useRef(createClient()).current;
+
+  // Подсказки во время записи (по 2 секунды каждая)
+  const PROMPTS = [t.verify.prompt0, t.verify.prompt1, t.verify.prompt2, t.verify.prompt3];
 
   const [step, setStep] = useState<Step>("intro");
   const [error, setError] = useState<string>("");
@@ -43,7 +41,7 @@ export function VerifyClient({
   // Освобождаем камеру и blob URL при уходе
   useEffect(() => {
     return () => {
-      streamRef.current?.getTracks().forEach((t) => t.stop());
+      streamRef.current?.getTracks().forEach((track) => track.stop());
       if (reviewUrl) URL.revokeObjectURL(reviewUrl);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -76,8 +74,8 @@ export function VerifyClient({
       const msg = e instanceof Error ? e.message : String(e);
       setError(
         msg.includes("Permission") || msg.includes("denied")
-          ? "Доступ к камере не разрешён. Разреши в настройках браузера."
-          : `Не получилось включить камеру: ${msg}`
+          ? t.verify.cameraDenied
+          : t.verify.cameraError.replace("{msg}", msg)
       );
       setStep("error");
     }
@@ -163,48 +161,48 @@ export function VerifyClient({
     }
 
     // Освобождаем камеру
-    streamRef.current?.getTracks().forEach((t) => t.stop());
+    streamRef.current?.getTracks().forEach((track) => track.stop());
     setStep("done");
     setTimeout(() => router.replace("/profile"), 2000);
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center bg-black text-white px-4 py-8">
-      <div className="w-full max-w-md">
+    <div className="relative flex min-h-screen flex-col items-center bg-black text-white px-4 py-8">
+      <div className="pointer-events-none absolute left-1/2 top-1/4 -translate-x-1/2 h-[320px] w-[320px] rounded-full bg-echo opacity-12 blur-[130px]" />
+
+      <div className="relative z-10 w-full max-w-md">
         <div className="flex items-center justify-between mb-6">
-          <Link href="/profile" className="text-zinc-400 hover:text-white">← назад</Link>
-          <h1 className="text-xl font-bold lowercase">верификация</h1>
+          <Link href="/profile" className="text-zinc-400 hover:text-white text-sm">{t.nav.back}</Link>
+          <h1 className="text-xl font-bold lowercase">{t.verify.title}</h1>
+          <LanguageSwitcher />
         </div>
 
         {step === "intro" && (
           <div className="space-y-6">
             <div className="text-center py-6">
               <p className="text-5xl mb-2">🎥</p>
-              <h2 className="text-2xl font-semibold mb-2">Селфи-видео</h2>
-              <p className="text-zinc-400">
-                Запишем 8-секундное видео где ты медленно поворачиваешь голову.
-                Это нужно чтобы подтвердить что ты реальный человек.
-              </p>
+              <h2 className="text-2xl font-semibold mb-2">{t.verify.introTitle}</h2>
+              <p className="text-zinc-400">{t.verify.introText}</p>
             </div>
 
-            {previousRejection && (
-              <div className="rounded-lg bg-red-950/40 border border-red-900 p-4 text-sm">
-                <p className="text-red-300 font-semibold mb-1">Прошлая заявка отклонена:</p>
-                <p className="text-red-200">{previousRejection || "Без указания причины."}</p>
+            {previousRejection !== null && (
+              <div className="rounded-2xl bg-red-950/40 border border-red-900 p-4 text-sm">
+                <p className="text-red-300 font-semibold mb-1">{t.verify.prevRejected}</p>
+                <p className="text-red-200">{previousRejection || t.verify.noReason}</p>
               </div>
             )}
 
             <ul className="text-sm text-zinc-400 space-y-2">
-              <li>• Хорошее освещение, лицо в кадре</li>
-              <li>• Без масок, очков и фильтров</li>
-              <li>• Видео никому не показывается публично</li>
+              <li>• {t.verify.tip1}</li>
+              <li>• {t.verify.tip2}</li>
+              <li>• {t.verify.tip3}</li>
             </ul>
 
             <Button
               onClick={requestCamera}
-              className="w-full bg-white text-black hover:bg-zinc-200"
+              className="w-full bg-echo text-white hover:bg-echo-bright glow-echo rounded-full h-12 font-medium"
             >
-              Включить камеру
+              {t.verify.enableCamera}
             </Button>
           </div>
         )}
@@ -213,15 +211,15 @@ export function VerifyClient({
           <div className="space-y-4 text-center py-8">
             <p className="text-4xl">⚠</p>
             <p className="text-red-400">{error}</p>
-            <Button onClick={() => setStep("intro")} variant="outline" className="bg-transparent border-zinc-700 text-white hover:bg-zinc-900 hover:text-white">
-              Попробовать снова
+            <Button onClick={() => setStep("intro")} variant="outline" className="glass border-white/15 text-white hover:bg-white/10 hover:text-white rounded-full">
+              {t.verify.tryAgain}
             </Button>
           </div>
         )}
 
         {(step === "ready" || step === "recording") && (
           <div className="space-y-4">
-            <div className="relative rounded-2xl overflow-hidden bg-zinc-950 aspect-[9/16]">
+            <div className="relative rounded-3xl overflow-hidden bg-zinc-950 aspect-[9/16] border border-white/10">
               <video
                 ref={liveVideoRef}
                 autoPlay
@@ -250,9 +248,9 @@ export function VerifyClient({
             {step === "ready" && (
               <Button
                 onClick={startRecording}
-                className="w-full bg-red-500 text-white hover:bg-red-600"
+                className="w-full bg-red-500 text-white hover:bg-red-600 rounded-full h-12 font-medium"
               >
-                ● Записать
+                {t.verify.record}
               </Button>
             )}
           </div>
@@ -260,8 +258,8 @@ export function VerifyClient({
 
         {step === "review" && (
           <div className="space-y-4">
-            <p className="text-zinc-400 text-sm text-center">Посмотри что получилось:</p>
-            <div className="rounded-2xl overflow-hidden bg-zinc-950 aspect-[9/16]">
+            <p className="text-zinc-400 text-sm text-center">{t.verify.reviewPrompt}</p>
+            <div className="rounded-3xl overflow-hidden bg-zinc-950 aspect-[9/16] border border-white/10">
               <video
                 key={reviewUrl ?? "empty"}
                 src={reviewUrl ?? undefined}
@@ -274,12 +272,12 @@ export function VerifyClient({
               <Button
                 onClick={restart}
                 variant="outline"
-                className="bg-transparent border-zinc-700 text-white hover:bg-zinc-900 hover:text-white"
+                className="glass border-white/15 text-white hover:bg-white/10 hover:text-white rounded-full"
               >
-                Перезаписать
+                {t.verify.retake}
               </Button>
-              <Button onClick={submit} className="bg-white text-black hover:bg-zinc-200">
-                Отправить
+              <Button onClick={submit} className="bg-echo text-white hover:bg-echo-bright glow-echo rounded-full">
+                {t.verify.submit}
               </Button>
             </div>
           </div>
@@ -287,15 +285,15 @@ export function VerifyClient({
 
         {step === "submitting" && (
           <div className="text-center py-12">
-            <p className="text-zinc-400">Отправляю...</p>
+            <p className="text-zinc-400">{t.verify.submitting}</p>
           </div>
         )}
 
         {step === "done" && (
           <div className="text-center py-12 space-y-2">
             <p className="text-5xl">✓</p>
-            <h2 className="text-2xl font-bold">Отправлено!</h2>
-            <p className="text-zinc-400">Проверим в ближайшее время.</p>
+            <h2 className="text-2xl font-bold">{t.verify.doneTitle}</h2>
+            <p className="text-zinc-400">{t.verify.doneText}</p>
           </div>
         )}
       </div>

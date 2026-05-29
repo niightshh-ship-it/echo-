@@ -1,43 +1,30 @@
-import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { Button } from "@/components/ui/button";
+import { Hero } from "./hero";
+import { MarketingSections } from "./marketing-sections";
+import { CursorGlow } from "@/components/cursor-glow";
 
 export default async function Home() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
+  const isLoggedIn = !!user;
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-black text-white">
-      <h1 className="text-8xl font-bold tracking-tight lowercase">echo</h1>
-      <p className="mt-4 text-xl text-zinc-400">обмен навыками в Нидерландах</p>
+    <main className="echo-aurora relative overflow-x-clip text-white">
+      {/* Свечение за курсором — на весь экран, следует за мышкой при скролле */}
+      <CursorGlow />
 
-      <div className="mt-12 flex gap-3">
-        {user ? (
-          <>
-            <Link href="/feed">
-              <Button className="bg-white text-black hover:bg-zinc-200">
-                смотреть фид
-              </Button>
-            </Link>
-            <Link href="/matches">
-              <Button variant="outline" className="bg-transparent border-zinc-700 text-white hover:bg-zinc-900 hover:text-white">
-                мэтчи
-              </Button>
-            </Link>
-            <Link href="/profile">
-              <Button variant="outline" className="bg-transparent border-zinc-700 text-white hover:bg-zinc-900 hover:text-white">
-                профиль
-              </Button>
-            </Link>
-          </>
-        ) : (
-          <Link href="/sign-in">
-            <Button className="bg-white text-black hover:bg-zinc-200">
-              войти
-            </Button>
-          </Link>
-        )}
+      {/* Единый слой свечения на всю страницу — не режется по секциям */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="blob blob-1 absolute top-[14%] left-1/2 -translate-x-1/2 h-[460px] w-[460px] bg-echo opacity-[0.22]" />
+        <div className="blob blob-2 absolute top-[40%] -right-24 h-[420px] w-[420px] bg-echo-fuchsia opacity-[0.10]" />
+        <div className="blob blob-1 absolute top-[66%] -left-24 h-[400px] w-[400px] bg-echo opacity-[0.12]" />
+        <div className="blob blob-2 absolute top-[88%] left-1/3 h-[360px] w-[360px] bg-echo opacity-[0.10]" />
       </div>
-    </div>
+
+      <div className="relative z-10">
+        <Hero isLoggedIn={isLoggedIn} />
+        <MarketingSections isLoggedIn={isLoggedIn} />
+      </div>
+    </main>
   );
 }

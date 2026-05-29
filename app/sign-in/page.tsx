@@ -6,9 +6,14 @@ import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useT } from "@/lib/i18n/provider";
+import { LanguageSwitcher } from "@/components/language-switcher";
+import { CursorGlow } from "@/components/cursor-glow";
+import { EchoPulse } from "@/components/echo-pulse";
 
 export default function SignInPage() {
   const router = useRouter();
+  const t = useT();
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
   const [stage, setStage] = useState<"email" | "code">("email");
@@ -51,7 +56,7 @@ export default function SignInPage() {
       setStatus("idle");
       setErrorMsg(
         error.message.includes("expired") || error.message.includes("invalid")
-          ? "Код неверный или просрочен. Запроси новый."
+          ? t.signIn.invalidCode
           : error.message
       );
       return;
@@ -72,17 +77,32 @@ export default function SignInPage() {
     }
   }
 
+  const [codeSentBefore, codeSentAfter] = t.signIn.codeSent.split("{email}");
+
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-black text-white px-4">
-      <div className="w-full max-w-sm">
-        <h1 className="text-5xl font-bold tracking-tight lowercase mb-2">echo</h1>
+    <div className="echo-aurora relative flex min-h-screen flex-col items-center justify-center overflow-hidden text-white px-4">
+      {/* Свечение за курсором — как на главной */}
+      <CursorGlow />
+
+      {/* Дрейфующее свечение фона */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="blob blob-1 absolute left-1/2 top-1/4 -translate-x-1/2 h-[420px] w-[420px] bg-echo opacity-20" />
+        <div className="blob blob-2 absolute bottom-0 right-0 h-[300px] w-[400px] bg-echo-fuchsia opacity-10" />
+      </div>
+
+      <div className="absolute top-5 right-5 z-20">
+        <LanguageSwitcher />
+      </div>
+
+      <div className="relative z-10 w-full max-w-sm">
+        <EchoPulse text="echo" className="text-5xl font-bold tracking-tighter lowercase mb-2" />
 
         {stage === "email" ? (
           <>
-            <p className="text-zinc-400 mb-8">войди по коду из письма</p>
+            <p className="text-zinc-400 mb-8">{t.signIn.subtitleEmail}</p>
             <form onSubmit={sendCode} className="space-y-4">
               <div>
-                <Label htmlFor="email" className="text-zinc-300">Email</Label>
+                <Label htmlFor="email" className="text-zinc-300">{t.signIn.email}</Label>
                 <Input
                   id="email"
                   type="email"
@@ -90,28 +110,30 @@ export default function SignInPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="ty@example.com"
-                  className="mt-2 bg-zinc-900 border-zinc-800 text-white"
+                  className="mt-2 bg-white/5 border-white/10 text-white h-12 rounded-xl"
                   disabled={status === "sending"}
                 />
               </div>
               <Button
                 type="submit"
-                className="w-full bg-white text-black hover:bg-zinc-200"
+                className="w-full bg-echo text-white hover:bg-echo-bright glow-echo rounded-full h-12 font-medium"
                 disabled={status === "sending"}
               >
-                {status === "sending" ? "Отправляю..." : "Получить код"}
+                {status === "sending" ? t.signIn.sending : t.signIn.getCode}
               </Button>
-              {errorMsg && <p className="text-sm text-red-500">{errorMsg}</p>}
+              {errorMsg && <p className="text-sm text-red-400">{errorMsg}</p>}
             </form>
           </>
         ) : (
           <>
             <p className="text-zinc-400 mb-8">
-              Код отправлен на <span className="text-white">{email}</span>. Введи цифры из письма.
+              {codeSentBefore}
+              <span className="text-white">{email}</span>
+              {codeSentAfter}
             </p>
             <form onSubmit={verifyCode} className="space-y-4">
               <div>
-                <Label htmlFor="code" className="text-zinc-300">Код из письма</Label>
+                <Label htmlFor="code" className="text-zinc-300">{t.signIn.codeLabel}</Label>
                 <Input
                   id="code"
                   type="text"
@@ -121,18 +143,18 @@ export default function SignInPage() {
                   value={code}
                   onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 10))}
                   placeholder="12345678"
-                  className="mt-2 bg-zinc-900 border-zinc-800 text-white text-center text-2xl tracking-[0.3em] font-mono"
+                  className="mt-2 bg-white/5 border-white/10 text-white text-center text-2xl tracking-[0.3em] font-mono h-14 rounded-xl"
                   disabled={status === "verifying"}
                 />
               </div>
               <Button
                 type="submit"
-                className="w-full bg-white text-black hover:bg-zinc-200"
+                className="w-full bg-echo text-white hover:bg-echo-bright glow-echo rounded-full h-12 font-medium"
                 disabled={status === "verifying" || code.length < 6}
               >
-                {status === "verifying" ? "Проверяю..." : "Войти"}
+                {status === "verifying" ? t.signIn.verifying : t.signIn.enter}
               </Button>
-              {errorMsg && <p className="text-sm text-red-500">{errorMsg}</p>}
+              {errorMsg && <p className="text-sm text-red-400">{errorMsg}</p>}
               <button
                 type="button"
                 onClick={() => {
@@ -142,7 +164,7 @@ export default function SignInPage() {
                 }}
                 className="w-full text-sm text-zinc-500 hover:text-zinc-300"
               >
-                ← другой email
+                {t.signIn.otherEmail}
               </button>
             </form>
           </>

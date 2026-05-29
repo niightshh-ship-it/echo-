@@ -39,6 +39,10 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  /* Echo brand accent */
+  --color-echo: #7c5cff;
+  --color-echo-bright: #9b7cff;
+  --color-echo-fuchsia: #e455ff;
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -126,5 +130,185 @@
   }
   html {
     @apply font-sans;
+  }
+}
+
+@layer utilities {
+  /* Градиентный текст для логотипа и акцентов */
+  .text-gradient-echo {
+    background-image: linear-gradient(135deg, #b3a0ff 0%, #7c5cff 45%, #e455ff 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  /* Мягкое свечение под кнопками-акцентами */
+  .glow-echo {
+    box-shadow: 0 8px 30px -6px rgba(124, 92, 255, 0.55);
+  }
+  /* Тонкое стекло для карточек поверх тёмного фона */
+  .glass {
+    background-color: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(12px);
+  }
+
+  /* Матовое стекло — для карточек на лендинге */
+  .glass-card {
+    background-color: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  }
+
+  /* Переливающийся фиолетовый "аврора"-градиент — мягкий, без резких границ */
+  .echo-aurora {
+    background: linear-gradient(
+      165deg,
+      #050109 0%,
+      #0a0518 35%,
+      #110a28 50%,
+      #0a0518 65%,
+      #050109 100%
+    );
+    background-size: 200% 240%;
+    animation: aurora-shift 24s ease-in-out infinite;
+  }
+  @keyframes aurora-shift {
+    0% { background-position: 50% 0%; }
+    50% { background-position: 50% 100%; }
+    100% { background-position: 50% 0%; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .echo-aurora { animation: none; }
+  }
+
+  /* Эхо-эффект логотипа: прозрачные копии расходятся волной */
+  .echo-ghost {
+    pointer-events: none;
+    opacity: 0; /* скрыты до старта своей анимации — без мелькания на загрузке */
+    animation: echo-ripple 4s cubic-bezier(0.16, 0.7, 0.3, 1) infinite;
+  }
+  .echo-ghost-1 { animation-delay: 0s; }
+  .echo-ghost-2 { animation-delay: 1.33s; }
+  .echo-ghost-3 { animation-delay: 2.66s; }
+
+  @keyframes echo-ripple {
+    0% {
+      opacity: 0.5;
+      transform: scale(1);
+      filter: blur(0px);
+    }
+    100% {
+      opacity: 0;
+      transform: scale(1.65);
+      filter: blur(6px);
+    }
+  }
+
+  /* Круги от капли: еле заметные, мягкие, с тонким светящимся следом */
+  .echo-ring {
+    pointer-events: none;
+    opacity: 0; /* скрыты до старта своей анимации */
+    border-radius: 9999px;
+    border: 1px solid rgba(155, 124, 255, 0.18);
+    box-shadow: 0 0 18px rgba(124, 92, 255, 0.12),
+                inset 0 0 12px rgba(124, 92, 255, 0.08);
+    filter: blur(0.5px);
+    animation: ring-expand 4s cubic-bezier(0.16, 0.7, 0.3, 1) infinite;
+  }
+  .echo-ring-1 { animation-delay: 0s; }
+  .echo-ring-2 { animation-delay: 1.33s; }
+  .echo-ring-3 { animation-delay: 2.66s; }
+
+  @keyframes ring-expand {
+    0%   { opacity: 0; transform: scale(0.2); }
+    15%  { opacity: 0.3; }
+    100% { opacity: 0; transform: scale(2.8); }
+  }
+
+  /* Дрейфующие пятна-блобы фона */
+  .blob {
+    pointer-events: none;
+    border-radius: 9999px;
+    filter: blur(120px);
+    will-change: transform;
+  }
+  .blob-1 { animation: blob-drift-1 18s ease-in-out infinite; }
+  .blob-2 { animation: blob-drift-2 22s ease-in-out infinite; }
+
+  @keyframes blob-drift-1 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33%      { transform: translate(60px, -40px) scale(1.15); }
+    66%      { transform: translate(-40px, 30px) scale(0.92); }
+  }
+  @keyframes blob-drift-2 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33%      { transform: translate(-50px, 40px) scale(0.9); }
+    66%      { transform: translate(45px, -25px) scale(1.12); }
+  }
+
+  /* Логотип Echo: при наведении расходится эхо-пинг */
+  .echo-logo {
+    position: relative;
+    display: inline-block;
+  }
+  .echo-logo-ghost {
+    position: absolute;
+    left: 0;
+    top: 0;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .echo-logo:hover .echo-logo-ghost {
+    animation: echo-logo-ping 1.5s ease-out infinite;
+  }
+  .echo-logo:hover .echo-logo-ghost-2 {
+    animation-delay: 0.75s;
+  }
+  @keyframes echo-logo-ping {
+    0% { opacity: 0.5; transform: scale(1); }
+    100% { opacity: 0; transform: scale(1.5); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .echo-logo:hover .echo-logo-ghost { animation: none; }
+  }
+
+  /* Бегущая лента (стена навыков) */
+  .marquee-track {
+    display: flex;
+    width: max-content;
+  }
+  .marquee-left {
+    animation: marquee-x 40s linear infinite;
+  }
+  .marquee-right {
+    animation: marquee-x 52s linear infinite reverse;
+  }
+  @keyframes marquee-x {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .marquee-left, .marquee-right { animation: none; }
+  }
+
+  /* Появление блоков при скролле (fade-up) */
+  .reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity 0.7s cubic-bezier(0.22, 0.61, 0.36, 1),
+                transform 0.7s cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+  .reveal.reveal-visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* Уважаем настройку "меньше движения" */
+  @media (prefers-reduced-motion: reduce) {
+    .echo-ghost,
+    .echo-ring { animation: none; opacity: 0; }
+    .blob-1, .blob-2 { animation: none; }
+    .reveal { opacity: 1; transform: none; transition: none; }
   }
 }

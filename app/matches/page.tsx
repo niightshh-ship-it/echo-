@@ -1,11 +1,13 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { getDictionary } from "@/lib/i18n/server";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
 export default async function MatchesPage() {
   const supabase = await createClient();
+  const { dict: t } = await getDictionary();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/sign-in");
 
@@ -55,28 +57,26 @@ export default async function MatchesPage() {
   });
 
   return (
-    <div className="flex min-h-screen flex-col items-center bg-black text-white px-4 py-12">
-      <div className="w-full max-w-md">
+    <div className="relative flex min-h-screen flex-col items-center bg-black text-white px-4 py-12">
+      <div className="pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 h-[300px] w-[500px] rounded-full bg-echo opacity-10 blur-[130px]" />
+
+      <div className="relative z-10 w-full max-w-md">
         <div className="flex items-center justify-between mb-8">
-          <Link href="/" className="text-2xl font-bold lowercase">echo</Link>
+          <Link href="/" className="text-2xl font-bold lowercase text-gradient-echo">echo</Link>
           <Link href="/feed">
-            <Button variant="ghost" className="text-zinc-400 hover:text-white hover:bg-zinc-900">
-              ← фид
+            <Button variant="ghost" className="text-zinc-400 hover:text-white hover:bg-white/5 rounded-full">
+              {t.matches.backFeed}
             </Button>
           </Link>
         </div>
 
-        <h1 className="text-3xl font-bold mb-2 lowercase">твои мэтчи</h1>
-        <p className="text-zinc-400 text-sm mb-8">
-          С теми, с кем у вас взаимные лайки — можно общаться.
-        </p>
+        <h1 className="text-3xl font-bold mb-2 lowercase">{t.matches.title}</h1>
+        <p className="text-zinc-400 text-sm mb-8">{t.matches.subtitle}</p>
 
         {items.length === 0 ? (
-          <div className="text-center py-12 border border-dashed border-zinc-800 rounded-lg">
-            <p className="text-zinc-500 mb-2">Пока нет мэтчей.</p>
-            <p className="text-zinc-600 text-sm">
-              Лайкай видео в фиде — когда лайк взаимный, человек появится здесь.
-            </p>
+          <div className="text-center py-12 border border-dashed border-white/10 rounded-2xl">
+            <p className="text-zinc-500 mb-2">{t.matches.emptyTitle}</p>
+            <p className="text-zinc-600 text-sm">{t.matches.emptyText}</p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -86,14 +86,14 @@ export default async function MatchesPage() {
                 <Link
                   key={other.id}
                   href={`/matches/${other.id}`}
-                  className="block rounded-xl border border-zinc-800 p-5 bg-zinc-950 hover:bg-zinc-900 transition-colors"
+                  className="block rounded-2xl glass border border-white/10 p-5 hover:bg-white/[0.06] transition-colors"
                 >
                   <div className="flex items-start justify-between mb-2">
                     <div>
                       <div className="flex items-center gap-2">
                         <p className="text-xl font-semibold">{other.name}</p>
                         {unread > 0 && (
-                          <span className="bg-red-500 text-white text-xs font-bold rounded-full min-w-[20px] h-5 flex items-center justify-center px-1.5">
+                          <span className="bg-echo text-white text-xs font-bold rounded-full min-w-[20px] h-5 flex items-center justify-center px-1.5">
                             {unread}
                           </span>
                         )}
@@ -101,12 +101,12 @@ export default async function MatchesPage() {
                       <p className="text-zinc-400 text-sm">{other.city}</p>
                     </div>
                     <p className="text-xs text-zinc-600">
-                      {new Date(matched_at).toLocaleDateString("ru-RU")}
+                      {new Date(matched_at).toLocaleDateString()}
                     </p>
                   </div>
                   <div className="flex flex-wrap gap-1.5 mt-3">
                     {other.skills?.map((s: string) => (
-                      <Badge key={s} className="bg-zinc-800 text-white hover:bg-zinc-700">
+                      <Badge key={s} className="bg-white/10 text-white hover:bg-white/15 border-0">
                         {s}
                       </Badge>
                     ))}

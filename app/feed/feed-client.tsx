@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Heart } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { useT } from "@/lib/i18n/provider";
 
 export type FeedItem = {
   id: string;
@@ -20,6 +21,7 @@ export function FeedClient({
   items: FeedItem[];
   initiallyLiked: string[];
 }) {
+  const t = useT();
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRefs = useRef<Map<string, HTMLVideoElement>>(new Map());
   const [activeId, setActiveId] = useState<string | null>(items[0]?.id ?? null);
@@ -122,14 +124,10 @@ export function FeedClient({
   if (items.length === 0) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-black text-white px-4 text-center">
-        <h1 className="text-3xl font-bold mb-2 lowercase">фид пуст</h1>
-        <p className="text-zinc-400 mb-8">
-          Пока никто не загрузил видео (кроме тебя).
-          <br />
-          Возвращайся позже!
-        </p>
-        <Link href="/profile" className="text-white underline">
-          ← на профиль
+        <h1 className="text-3xl font-bold mb-2 lowercase">{t.feed.emptyTitle}</h1>
+        <p className="text-zinc-400 mb-8">{t.feed.emptyText}</p>
+        <Link href="/profile" className="text-echo-bright underline">
+          {t.feed.backToProfile}
         </Link>
       </div>
     );
@@ -143,8 +141,8 @@ export function FeedClient({
     >
       {/* Баннер мэтча — поверх всего */}
       {matchBanner && (
-        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-red-500 text-white px-6 py-3 rounded-full shadow-xl animate-bounce">
-          🎉 У тебя мэтч с {matchBanner}!
+        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-echo text-white px-6 py-3 rounded-full shadow-xl glow-echo animate-bounce font-medium">
+          🎉 {t.feed.match.replace("{name}", matchBanner)}
         </div>
       )}
 
@@ -169,10 +167,10 @@ export function FeedClient({
 
           <div className="absolute top-0 left-0 right-0 p-4 flex items-center justify-between bg-gradient-to-b from-black/60 to-transparent">
             <Link href="/profile" className="text-white text-sm">
-              ← профиль
+              {t.feed.profile}
             </Link>
             <Link href="/matches" className="text-white text-sm">
-              мэтчи →
+              {t.feed.matches}
             </Link>
           </div>
 
@@ -190,7 +188,7 @@ export function FeedClient({
           >
             <div
               className={`rounded-full p-3 transition-colors ${
-                liked.has(item.id) ? "bg-red-500" : "bg-white/20"
+                liked.has(item.id) ? "bg-echo glow-echo" : "bg-white/20"
               }`}
             >
               <Heart
@@ -202,7 +200,7 @@ export function FeedClient({
 
           {muted && item.id === items[0].id && (
             <div className="absolute top-20 left-1/2 -translate-x-1/2 bg-black/60 text-white text-xs px-3 py-1.5 rounded-full">
-              тапни видео чтобы включить звук
+              {t.feed.soundHint}
             </div>
           )}
         </div>

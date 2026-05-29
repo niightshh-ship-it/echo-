@@ -14,10 +14,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useT } from "@/lib/i18n/provider";
+import { LanguageSwitcher } from "@/components/language-switcher";
 
 export default function OnboardingPage() {
   const router = useRouter();
   const supabase = createClient();
+  const t = useT();
 
   const [name, setName] = useState("");
   const [city, setCity] = useState("");
@@ -26,7 +29,6 @@ export default function OnboardingPage() {
   const [error, setError] = useState("");
   const [checking, setChecking] = useState(true);
 
-  // Защита: если юзер не залогинен — на /sign-in
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (!user) router.replace("/sign-in");
@@ -70,32 +72,40 @@ export default function OnboardingPage() {
     );
   }
 
+  const placeholders = [t.onboarding.skill1, t.onboarding.skill2, t.onboarding.skill3];
+
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-black text-white px-4 py-12">
-      <div className="w-full max-w-md">
-        <h1 className="text-4xl font-bold tracking-tight lowercase mb-2">расскажи о себе</h1>
-        <p className="text-zinc-400 mb-8">это увидят другие в Echo</p>
+    <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-black text-white px-4 py-12">
+      <div className="pointer-events-none absolute left-1/2 top-1/4 -translate-x-1/2 h-[360px] w-[360px] rounded-full bg-echo opacity-15 blur-[130px]" />
+
+      <div className="absolute top-5 right-5 z-20">
+        <LanguageSwitcher />
+      </div>
+
+      <div className="relative z-10 w-full max-w-md">
+        <h1 className="text-4xl font-bold tracking-tighter lowercase mb-2">{t.onboarding.title}</h1>
+        <p className="text-zinc-400 mb-8">{t.onboarding.subtitle}</p>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <Label htmlFor="name" className="text-zinc-300">Имя</Label>
+            <Label htmlFor="name" className="text-zinc-300">{t.onboarding.nameLabel}</Label>
             <Input
               id="name"
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Александр"
-              className="mt-2 bg-zinc-900 border-zinc-800 text-white"
+              placeholder={t.onboarding.namePlaceholder}
+              className="mt-2 bg-white/5 border-white/10 text-white h-12 rounded-xl"
             />
           </div>
 
           <div>
-            <Label className="text-zinc-300">Город</Label>
+            <Label className="text-zinc-300">{t.onboarding.cityLabel}</Label>
             <Select value={city} onValueChange={(v) => setCity(v ?? "")} required>
-              <SelectTrigger className="mt-2 bg-zinc-900 border-zinc-800 text-white">
-                <SelectValue placeholder="Выбери город" />
+              <SelectTrigger className="mt-2 bg-white/5 border-white/10 text-white h-12 rounded-xl">
+                <SelectValue placeholder={t.onboarding.cityPlaceholder} />
               </SelectTrigger>
-              <SelectContent className="bg-zinc-900 border-zinc-800 text-white">
+              <SelectContent className="bg-zinc-950 border-white/10 text-white">
                 {DUTCH_CITIES.map((c) => (
                   <SelectItem key={c} value={c}>{c}</SelectItem>
                 ))}
@@ -104,8 +114,8 @@ export default function OnboardingPage() {
           </div>
 
           <div>
-            <Label className="text-zinc-300">Навыки (до 3)</Label>
-            <p className="text-xs text-zinc-500 mt-1 mb-2">что ты умеешь и можешь предложить</p>
+            <Label className="text-zinc-300">{t.onboarding.skillsLabel}</Label>
+            <p className="text-xs text-zinc-500 mt-1 mb-2">{t.onboarding.skillsHint}</p>
             <div className="space-y-2">
               {skills.map((skill, i) => (
                 <Input
@@ -116,10 +126,8 @@ export default function OnboardingPage() {
                     next[i] = e.target.value;
                     setSkills(next);
                   }}
-                  placeholder={
-                    i === 0 ? "напр. массаж" : i === 1 ? "напр. гид по Амстердаму" : "ещё навык (необязательно)"
-                  }
-                  className="bg-zinc-900 border-zinc-800 text-white"
+                  placeholder={placeholders[i]}
+                  className="bg-white/5 border-white/10 text-white h-11 rounded-xl"
                 />
               ))}
             </div>
@@ -127,13 +135,13 @@ export default function OnboardingPage() {
 
           <Button
             type="submit"
-            className="w-full bg-white text-black hover:bg-zinc-200"
+            className="w-full bg-echo text-white hover:bg-echo-bright glow-echo rounded-full h-12 font-medium"
             disabled={saving || !name || !city || !skills.some((s) => s.trim())}
           >
-            {saving ? "Сохраняю..." : "Готово"}
+            {saving ? t.onboarding.saving : t.onboarding.done}
           </Button>
 
-          {error && <p className="text-sm text-red-500">{error}</p>}
+          {error && <p className="text-sm text-red-400">{error}</p>}
         </form>
       </div>
     </div>

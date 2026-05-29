@@ -13,10 +13,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useT } from "@/lib/i18n/provider";
 
 export default function UploadPage() {
   const router = useRouter();
   const supabase = createClient();
+  const t = useT();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [userId, setUserId] = useState<string | null>(null);
@@ -101,21 +103,23 @@ export default function UploadPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-black text-white px-4 py-12">
-      <div className="w-full max-w-md">
+    <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-black text-white px-4 py-12">
+      <div className="pointer-events-none absolute left-1/2 top-1/4 -translate-x-1/2 h-[320px] w-[320px] rounded-full bg-echo opacity-12 blur-[130px]" />
+
+      <div className="relative z-10 w-full max-w-md">
         <div className="flex items-center justify-between mb-8">
-          <Link href="/profile" className="text-zinc-400 hover:text-white">← назад</Link>
-          <h1 className="text-2xl font-bold lowercase">загрузить видео</h1>
+          <Link href="/profile" className="text-zinc-400 hover:text-white text-sm">{t.nav.back}</Link>
+          <h1 className="text-2xl font-bold lowercase">{t.upload.title}</h1>
         </div>
 
         <div className="space-y-6">
           <div>
-            <Label className="text-zinc-300">К какому навыку?</Label>
+            <Label className="text-zinc-300">{t.upload.skillLabel}</Label>
             <Select value={selectedSkill} onValueChange={(v) => setSelectedSkill(v ?? "")}>
-              <SelectTrigger className="mt-2 bg-zinc-900 border-zinc-800 text-white">
+              <SelectTrigger className="mt-2 bg-white/5 border-white/10 text-white h-12 rounded-xl">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-zinc-900 border-zinc-800 text-white">
+              <SelectContent className="bg-zinc-950 border-white/10 text-white">
                 {skills.map((s) => (
                   <SelectItem key={s} value={s}>{s}</SelectItem>
                 ))}
@@ -124,7 +128,7 @@ export default function UploadPage() {
           </div>
 
           <div>
-            <Label className="text-zinc-300">Файл</Label>
+            <Label className="text-zinc-300">{t.upload.fileLabel}</Label>
             <input
               ref={fileInputRef}
               type="file"
@@ -136,17 +140,15 @@ export default function UploadPage() {
               type="button"
               onClick={() => fileInputRef.current?.click()}
               variant="outline"
-              className="mt-2 w-full bg-zinc-900 border-zinc-800 text-white hover:bg-zinc-800 hover:text-white"
+              className="mt-2 w-full glass border-white/10 text-white hover:bg-white/10 hover:text-white h-12 rounded-xl"
             >
-              {file ? file.name : "Выбрать видео"}
+              {file ? file.name : t.upload.chooseVideo}
             </Button>
-            <p className="text-xs text-zinc-500 mt-2">
-              Вертикальное видео, 5-30 секунд, до ~50 MB
-            </p>
+            <p className="text-xs text-zinc-500 mt-2">{t.upload.fileHint}</p>
           </div>
 
           {previewUrl && (
-            <div className="rounded-lg overflow-hidden border border-zinc-800 bg-zinc-950">
+            <div className="rounded-2xl overflow-hidden border border-white/10 bg-zinc-950">
               <video
                 src={previewUrl}
                 controls
@@ -158,12 +160,12 @@ export default function UploadPage() {
           <Button
             onClick={handleUpload}
             disabled={!file || !selectedSkill || uploading}
-            className="w-full bg-white text-black hover:bg-zinc-200"
+            className="w-full bg-echo text-white hover:bg-echo-bright glow-echo rounded-full h-12 font-medium"
           >
-            {uploading ? "Загружаю..." : "Опубликовать"}
+            {uploading ? t.upload.uploading : t.upload.publish}
           </Button>
 
-          {error && <p className="text-sm text-red-500">{error}</p>}
+          {error && <p className="text-sm text-red-400">{error}</p>}
         </div>
       </div>
     </div>
