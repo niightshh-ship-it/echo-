@@ -4,17 +4,10 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { DUTCH_CITIES } from "@/lib/cities";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { CityAutocomplete } from "@/components/city-autocomplete";
 import { useT } from "@/lib/i18n/provider";
 
 export default function EditProfilePage() {
@@ -150,16 +143,14 @@ export default function EditProfilePage() {
 
           <div>
             <Label className="text-zinc-300">{t.onboarding.cityLabel}</Label>
-            <Select value={city} onValueChange={(v) => setCity(v ?? "")} required>
-              <SelectTrigger className={`mt-2 h-12 ${inputCls}`}>
-                <SelectValue placeholder={t.onboarding.cityPlaceholder} />
-              </SelectTrigger>
-              <SelectContent className="bg-zinc-950 border-white/10 text-white">
-                {DUTCH_CITIES.map((c) => (
-                  <SelectItem key={c} value={c}>{c}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="mt-2">
+              <CityAutocomplete
+                value={city}
+                onChange={setCity}
+                placeholder={t.onboarding.cityPlaceholder}
+                className={`h-12 ${inputCls}`}
+              />
+            </div>
           </div>
 
           <div>

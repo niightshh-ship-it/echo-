@@ -5,21 +5,12 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Search as SearchIcon } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
-import { DUTCH_CITIES } from "@/lib/cities";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { CityAutocomplete } from "@/components/city-autocomplete";
 import { useT } from "@/lib/i18n/provider";
 
 type Row = { id: string; name: string; city: string; skills: string[]; avatar_url: string | null };
-
-const ALL = "__all__";
 
 export default function SearchPage() {
   const router = useRouter();
@@ -27,7 +18,7 @@ export default function SearchPage() {
   const t = useT();
 
   const [myId, setMyId] = useState<string | null>(null);
-  const [city, setCity] = useState<string>(ALL);
+  const [city, setCity] = useState("");
   const [query, setQuery] = useState("");
   const [all, setAll] = useState<Row[]>([]);
 
@@ -41,25 +32,25 @@ export default function SearchPage() {
   useEffect(() => {
     if (!myId) return;
     (async () => {
-      let q = supabase
+      const { data } = await supabase
         .from("profiles")
         .select("id, name, city, skills, avatar_url")
         .neq("id", myId)
-        .limit(60);
-      if (city !== ALL) q = q.eq("city", city);
-      const { data } = await q;
+        .limit(100);
       setAll((data ?? []) as Row[]);
     })();
-  }, [myId, city, supabase]);
+  }, [myId, supabase]);
 
   const ql = query.trim().toLowerCase();
-  const results = ql
-    ? all.filter(
-        (p) =>
-          p.name.toLowerCase().includes(ql) ||
-          (p.skills ?? []).some((s) => s.toLowerCase().includes(ql))
-      )
-    : all;
+  const cl = city.trim().toLowerCase();
+  const results = all.filter((p) => {
+    const matchesText =
+      !ql ||
+      p.name.toLowerCase().includes(ql) ||
+      (p.skills ?? []).some((s) => s.toLowerCase().includes(ql));
+    const matchesCity = !cl || (p.city ?? "").toLowerCase().includes(cl);
+    return matchesText && matchesCity;
+  });
 
   return (
     <div className="relative flex min-h-screen flex-col items-center bg-black text-white px-4 pt-12 pb-28">
@@ -70,7 +61,7 @@ export default function SearchPage() {
 
         <div className="space-y-3 mb-6">
           <div className="relative">
-            <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+            <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 z-10" />
             <Input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
@@ -78,17 +69,12 @@ export default function SearchPage() {
               className="pl-9 h-12 bg-white/5 border-white/10 text-white rounded-xl"
             />
           </div>
-          <Select value={city} onValueChange={(v) => setCity(v ?? ALL)}>
-            <SelectTrigger className="h-12 bg-white/5 border-white/10 text-white rounded-xl">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent className="bg-zinc-950 border-white/10 text-white">
-              <SelectItem value={ALL}>{t.search.allCities}</SelectItem>
-              {DUTCH_CITIES.map((c) => (
-                <SelectItem key={c} value={c}>{c}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <CityAutocomplete
+            value={city}
+            onChange={setCity}
+            placeholder={t.search.allCities}
+            className="h-12 bg-white/5 border-white/10 text-white rounded-xl"
+          />
         </div>
 
         {results.length === 0 ? (
