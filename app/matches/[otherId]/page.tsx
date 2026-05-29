@@ -28,7 +28,7 @@ export default async function ChatPage({
   // Профиль собеседника
   const { data: other } = await supabase
     .from("profiles")
-    .select("id, name, city")
+    .select("id, name, city, avatar_url")
     .eq("id", otherId)
     .single();
 

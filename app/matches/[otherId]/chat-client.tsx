@@ -16,7 +16,7 @@ export type Message = {
   read_at: string | null;
 };
 
-type Other = { id: string; name: string; city: string };
+type Other = { id: string; name: string; city: string; avatar_url: string | null };
 
 export function ChatClient({
   me,
@@ -190,9 +190,19 @@ export function ChatClient({
         <Link href="/matches" className="text-zinc-400 hover:text-white text-lg">
           ←
         </Link>
-        <Link href={`/u/${other.id}`} className="flex-1 hover:opacity-80">
-          <p className="font-semibold">{other.name}</p>
-          <p className="text-xs text-zinc-500">{other.city}</p>
+        <Link href={`/u/${other.id}`} className="flex-1 flex items-center gap-2.5 hover:opacity-80">
+          <span className="relative h-9 w-9 shrink-0 rounded-full overflow-hidden border border-white/15 bg-white/5 flex items-center justify-center">
+            {other.avatar_url ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={other.avatar_url} alt="" className="h-full w-full object-cover" />
+            ) : (
+              <span className="text-sm">{other.name?.[0]?.toUpperCase() ?? "?"}</span>
+            )}
+          </span>
+          <span>
+            <span className="block font-semibold leading-tight">{other.name}</span>
+            <span className="block text-xs text-zinc-500">{other.city}</span>
+          </span>
         </Link>
         <ReviewButton revieweeId={other.id} revieweeName={other.name} alreadyReviewed={alreadyReviewed} />
       </div>
