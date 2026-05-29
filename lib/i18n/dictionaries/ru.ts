@@ -64,6 +64,8 @@ const ru: Dictionary = {
     lookingFor: "Ищу взамен",
     speaks: "Говорит",
     available: "Доступен",
+    reviewsTitle: "Отзывы",
+    noReviews: "Пока нет отзывов",
   },
   profileEdit: {
     title: "редактировать профиль",

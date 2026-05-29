@@ -62,6 +62,8 @@ const en = {
     lookingFor: "Looking for",
     speaks: "Speaks",
     available: "Available",
+    reviewsTitle: "Reviews",
+    noReviews: "No reviews yet",
   },
   profileEdit: {
     title: "edit profile",

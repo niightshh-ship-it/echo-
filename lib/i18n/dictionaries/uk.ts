@@ -64,6 +64,8 @@ const uk: Dictionary = {
     lookingFor: "Шукає",
     speaks: "Говорить",
     available: "Доступний",
+    reviewsTitle: "Відгуки",
+    noReviews: "Поки немає відгуків",
   },
   profileEdit: {
     title: "редагувати профіль",

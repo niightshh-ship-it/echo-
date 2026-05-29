@@ -64,6 +64,8 @@ const nl: Dictionary = {
     lookingFor: "Zoekt",
     speaks: "Spreekt",
     available: "Beschikbaar",
+    reviewsTitle: "Reviews",
+    noReviews: "Nog geen reviews",
   },
   profileEdit: {
     title: "profiel bewerken",

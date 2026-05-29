@@ -190,10 +190,10 @@ export function ChatClient({
         <Link href="/matches" className="text-zinc-400 hover:text-white text-lg">
           ←
         </Link>
-        <div className="flex-1">
+        <Link href={`/u/${other.id}`} className="flex-1 hover:opacity-80">
           <p className="font-semibold">{other.name}</p>
           <p className="text-xs text-zinc-500">{other.city}</p>
-        </div>
+        </Link>
         <ReviewButton revieweeId={other.id} revieweeName={other.name} alreadyReviewed={alreadyReviewed} />
       </div>
 
