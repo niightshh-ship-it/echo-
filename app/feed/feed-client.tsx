@@ -8,6 +8,7 @@ import { useT } from "@/lib/i18n/provider";
 
 export type FeedItem = {
   id: string;
+  authorId: string;
   skill: string;
   authorName: string;
   authorCity: string;
@@ -174,7 +175,7 @@ export function FeedClient({
           </div>
 
           <div className="absolute bottom-16 left-0 right-16 p-6 bg-gradient-to-t from-black/80 to-transparent">
-            <div className="flex items-center gap-2.5">
+            <Link href={`/u/${item.authorId}`} className="flex items-center gap-2.5 hover:opacity-80">
               <span className="relative h-10 w-10 shrink-0 rounded-full overflow-hidden border border-white/25 bg-white/10 flex items-center justify-center">
                 {item.authorAvatar ? (
                   // eslint-disable-next-line @next/next/no-img-element
@@ -187,7 +188,7 @@ export function FeedClient({
                 <p className="text-white font-semibold text-lg leading-tight">{item.authorName}</p>
                 <p className="text-zinc-300 text-sm">{item.authorCity}</p>
               </div>
-            </div>
+            </Link>
             <p className="text-white text-sm mt-2 bg-white/10 inline-block px-2 py-0.5 rounded">
               {item.skill}
             </p>

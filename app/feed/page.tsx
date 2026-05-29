@@ -50,6 +50,7 @@ export default async function FeedPage() {
     const author = profileMap.get(v.user_id);
     return {
       id: v.id,
+      authorId: v.user_id,
       skill: v.skill,
       authorName: author?.name ?? "?",
       authorCity: author?.city ?? "",
