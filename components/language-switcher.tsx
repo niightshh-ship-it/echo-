@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
 import { Globe } from "lucide-react";
-import { locales, localeNames, type Locale } from "@/lib/i18n/config";
+import { locales, localeNames, localeShort, type Locale } from "@/lib/i18n/config";
 import { useI18n } from "@/lib/i18n/provider";
 
 export function LanguageSwitcher({ className = "" }: { className?: string }) {
@@ -34,7 +34,7 @@ export function LanguageSwitcher({ className = "" }: { className?: string }) {
         aria-label="Language"
       >
         <Globe className="w-4 h-4" />
-        <span className="uppercase">{locale}</span>
+        <span>{localeShort[locale]}</span>
       </button>
       {open && (
         <div className="absolute right-0 mt-2 w-40 rounded-xl border border-white/10 bg-zinc-950/95 backdrop-blur p-1 z-50 shadow-xl">
