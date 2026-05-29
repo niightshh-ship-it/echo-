@@ -33,6 +33,18 @@ export default async function MatchesPage() {
 
   const profileMap = new Map((profiles ?? []).map((p) => [p.id, p]));
 
+  // Рейтинги собеседников
+  const { data: revs } = otherIds.length
+    ? await supabase.from("reviews").select("reviewee_id, rating").in("reviewee_id", otherIds)
+    : { data: [] };
+  const ratingMap = new Map<string, { sum: number; n: number }>();
+  (revs ?? []).forEach((r) => {
+    const cur = ratingMap.get(r.reviewee_id) ?? { sum: 0, n: 0 };
+    cur.sum += r.rating;
+    cur.n += 1;
+    ratingMap.set(r.reviewee_id, cur);
+  });
+
   // 3. Непрочитанные сообщения — где я получатель и read_at пуст
   const { data: unread } = await supabase
     .from("messages")
@@ -99,6 +111,18 @@ export default async function MatchesPage() {
                         )}
                       </div>
                       <p className="text-zinc-400 text-sm">{other.city}</p>
+                      {(() => {
+                        const r = ratingMap.get(other.id);
+                        if (!r) return null;
+                        const avg = r.sum / r.n;
+                        return (
+                          <p className="text-xs mt-0.5">
+                            <span className="text-echo-bright">{"★".repeat(Math.round(avg))}</span>
+                            <span className="text-zinc-600">{"★".repeat(5 - Math.round(avg))}</span>
+                            <span className="text-zinc-500"> {avg.toFixed(1)}</span>
+                          </p>
+                        );
+                      })()}
                     </div>
                     <p className="text-xs text-zinc-600">
                       {new Date(matched_at).toLocaleDateString()}
