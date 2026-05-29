@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useT } from "@/lib/i18n/provider";
+import { useT, useI18n } from "@/lib/i18n/provider";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { CursorGlow } from "@/components/cursor-glow";
 import { EchoPulse } from "@/components/echo-pulse";
@@ -14,6 +14,7 @@ import { EchoPulse } from "@/components/echo-pulse";
 export default function SignInPage() {
   const router = useRouter();
   const t = useT();
+  const { locale } = useI18n();
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
   const [stage, setStage] = useState<"email" | "code">("email");
@@ -25,19 +26,19 @@ export default function SignInPage() {
     setStatus("sending");
     setErrorMsg("");
 
-    const supabase = createClient();
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: { shouldCreateUser: true },
+    const res = await fetch("/api/auth/send-code", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, locale }),
     });
 
-    if (error) {
-      setStatus("idle");
-      setErrorMsg(error.message);
-    } else {
-      setStatus("idle");
-      setStage("code");
+    setStatus("idle");
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({} as { error?: string }));
+      setErrorMsg(data.error ?? "send failed");
+      return;
     }
+    setStage("code");
   }
 
   async function verifyCode(e: React.FormEvent) {
