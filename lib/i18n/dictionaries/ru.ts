@@ -102,6 +102,11 @@ const ru: Dictionary = {
     placeholder: "Сообщение...",
     typing: "печатает...",
     read: "прочитано",
+    rate: "Оценить",
+    rateTitle: "Оцени {name}",
+    reviewPlaceholder: "Пара слов (необязательно)",
+    rateSubmit: "Отправить",
+    rateThanks: "Спасибо за отзыв!",
   },
   verify: {
     title: "верификация",

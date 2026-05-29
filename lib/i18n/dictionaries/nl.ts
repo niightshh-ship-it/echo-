@@ -102,6 +102,11 @@ const nl: Dictionary = {
     placeholder: "Bericht...",
     typing: "typt...",
     read: "gelezen",
+    rate: "Beoordelen",
+    rateTitle: "Beoordeel {name}",
+    reviewPlaceholder: "Een paar woorden (optioneel)",
+    rateSubmit: "Versturen",
+    rateThanks: "Bedankt voor je review!",
   },
   verify: {
     title: "verificatie",

@@ -100,6 +100,11 @@ const en = {
     placeholder: "Message...",
     typing: "typing...",
     read: "read",
+    rate: "Rate",
+    rateTitle: "Rate {name}",
+    reviewPlaceholder: "A few words (optional)",
+    rateSubmit: "Submit",
+    rateThanks: "Thanks for the review!",
   },
   verify: {
     title: "verification",

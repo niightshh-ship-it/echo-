@@ -42,6 +42,14 @@ export default async function ChatPage({
     .eq("match_user_b", b)
     .order("created_at", { ascending: true });
 
+  // Оставлял ли я уже отзыв этому человеку
+  const { data: existingReview } = await supabase
+    .from("reviews")
+    .select("id")
+    .eq("reviewer_id", user.id)
+    .eq("reviewee_id", otherId)
+    .maybeSingle();
+
   return (
     <ChatClient
       me={user.id}
@@ -49,6 +57,7 @@ export default async function ChatPage({
       pairB={b}
       other={other}
       initialMessages={(messages ?? []) as Message[]}
+      alreadyReviewed={!!existingReview}
     />
   );
 }

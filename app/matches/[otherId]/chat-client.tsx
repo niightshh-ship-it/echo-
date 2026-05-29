@@ -6,6 +6,7 @@ import { Send } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import { useT } from "@/lib/i18n/provider";
+import { ReviewButton } from "./review-button";
 
 export type Message = {
   id: string;
@@ -23,12 +24,14 @@ export function ChatClient({
   pairB,
   other,
   initialMessages,
+  alreadyReviewed,
 }: {
   me: string;
   pairA: string;
   pairB: string;
   other: Other;
   initialMessages: Message[];
+  alreadyReviewed: boolean;
 }) {
   const t = useT();
   const supabase = useRef(createClient()).current;
@@ -187,10 +190,11 @@ export function ChatClient({
         <Link href="/matches" className="text-zinc-400 hover:text-white text-lg">
           ←
         </Link>
-        <div>
+        <div className="flex-1">
           <p className="font-semibold">{other.name}</p>
           <p className="text-xs text-zinc-500">{other.city}</p>
         </div>
+        <ReviewButton revieweeId={other.id} revieweeName={other.name} alreadyReviewed={alreadyReviewed} />
       </div>
 
       {/* Сообщения */}

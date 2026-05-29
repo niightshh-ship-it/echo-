@@ -102,6 +102,11 @@ const uk: Dictionary = {
     placeholder: "Повідомлення...",
     typing: "друкує...",
     read: "прочитано",
+    rate: "Оцінити",
+    rateTitle: "Оціни {name}",
+    reviewPlaceholder: "Кілька слів (необов'язково)",
+    rateSubmit: "Надіслати",
+    rateThanks: "Дякуємо за відгук!",
   },
   verify: {
     title: "верифікація",
