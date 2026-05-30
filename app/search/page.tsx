@@ -8,6 +8,7 @@ import { createClient } from "@/lib/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { CityAutocomplete } from "@/components/city-autocomplete";
+import { NotificationBell } from "@/components/notification-bell";
 import { useT } from "@/lib/i18n/provider";
 
 type Row = { id: string; name: string; city: string; skills: string[]; avatar_url: string | null };
@@ -70,7 +71,10 @@ export default function SearchPage() {
       <div className="pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 h-[280px] w-[460px] rounded-full bg-echo opacity-10 blur-[130px]" />
 
       <div className="relative z-10 w-full max-w-md page-fade-in">
-        <h1 className="text-3xl font-bold mb-6 lowercase">{t.search.title}</h1>
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-3xl font-bold lowercase">{t.search.title}</h1>
+          {myId && <NotificationBell userId={myId} />}
+        </div>
 
         <div className="space-y-3 mb-6">
           <div className="relative">

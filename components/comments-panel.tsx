@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import Link from "next/link";
 import { X, Trash2, Send } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { useBackButtonClose } from "@/lib/use-back-button-close";
 import { useT } from "@/lib/i18n/provider";
 
 type Comment = {
@@ -36,6 +37,8 @@ export function CommentsPanel({
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useBackButtonClose(true, onClose);
 
   useEffect(() => {
     (async () => {

@@ -6,6 +6,7 @@ import { Search } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { LanguageSwitcher } from "@/components/language-switcher";
+import { NotificationBell } from "@/components/notification-bell";
 
 export default async function MatchesPage() {
   const supabase = await createClient();
@@ -79,6 +80,7 @@ export default async function MatchesPage() {
         <div className="flex items-center justify-between mb-8">
           <Link href="/" className="text-2xl font-bold lowercase text-gradient-echo">echo</Link>
           <div className="flex items-center gap-1">
+            <NotificationBell userId={user.id} />
             <Link href="/search">
               <Button variant="ghost" className="text-zinc-400 hover:text-white hover:bg-white/5 rounded-full h-9 w-9 p-0">
                 <Search className="w-5 h-5" />

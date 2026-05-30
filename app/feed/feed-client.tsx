@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useT } from "@/lib/i18n/provider";
 import { CommentsPanel } from "@/components/comments-panel";
 import { MatchCelebration } from "@/components/match-celebration";
+import { ShareButton } from "@/components/share-button";
 
 export type FeedItem = {
   id: string;
@@ -284,9 +285,28 @@ function FeedColumn({
 
   if (items.length === 0) {
     return (
-      <div className="w-screen h-screen shrink-0 flex flex-col items-center justify-center text-center px-6">
-        <h1 className="text-2xl font-bold mb-2 lowercase">{t.feed.emptyTitle}</h1>
-        <p className="text-zinc-400 text-sm">{t.feed.emptyText}</p>
+      <div className="w-screen h-screen shrink-0 flex flex-col items-center justify-center text-center px-6 bg-black">
+        <div className="text-6xl mb-5 select-none animate-pulse">
+          {mode === "skill" ? "🎯" : "✨"}
+        </div>
+        <h1 className="text-3xl font-bold mb-3 tracking-tight">{t.feed.emptyTitle}</h1>
+        <p className="text-zinc-400 text-sm max-w-xs mb-7 leading-relaxed">
+          {t.feed.emptyText}
+        </p>
+        <div className="flex flex-col gap-2.5 w-full max-w-xs">
+          <Link href="/upload">
+            <button className="w-full bg-echo text-white hover:bg-echo-bright rounded-full h-12 font-semibold transition-colors glow-echo">
+              {t.feed.emptyUpload}
+            </button>
+          </Link>
+          <ShareButton
+            url="/"
+            title="Echo — trade skills"
+            text={t.feed.emptyText}
+            variant="button"
+            className="w-full justify-center h-12 bg-white/5 border border-white/10 hover:bg-white/10 text-zinc-200 text-sm"
+          />
+        </div>
       </div>
     );
   }

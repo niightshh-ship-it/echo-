@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Trash2 } from "lucide-react";
+import { toast } from "sonner";
 import { useT } from "@/lib/i18n/provider";
 
 export function DeleteVideoButton({ videoId }: { videoId: string }) {
@@ -20,13 +21,14 @@ export function DeleteVideoButton({ videoId }: { videoId: string }) {
         body: JSON.stringify({ videoId }),
       });
       if (res.ok) {
+        toast.success(t.profile.deleted);
         router.refresh();
         return;
       }
       const data = await res.json().catch(() => ({}));
-      alert(`Не удалось удалить: ${data.error ?? res.status}`);
+      toast.error(`${t.profile.deleteError}: ${data.error ?? res.status}`);
     } catch (e) {
-      alert(`Ошибка сети: ${e instanceof Error ? e.message : String(e)}`);
+      toast.error(`${t.profile.deleteError}: ${e instanceof Error ? e.message : String(e)}`);
     }
     setBusy(false);
   }

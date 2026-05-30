@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Share2, Check } from "lucide-react";
+import { toast } from "sonner";
 import { useT } from "@/lib/i18n/provider";
 
 export function ShareButton({
@@ -45,6 +46,7 @@ export function ShareButton({
     try {
       await navigator.clipboard.writeText(fullUrl);
       setCopied(true);
+      toast.success(t.share.copied);
       setTimeout(() => setCopied(false), 1800);
     } catch {
       // совсем уж старый браузер

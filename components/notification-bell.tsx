@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import Link from "next/link";
 import { Bell, X } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { useBackButtonClose } from "@/lib/use-back-button-close";
 import { useT } from "@/lib/i18n/provider";
 
 type RawNotification = {
@@ -27,14 +28,26 @@ export function NotificationBell({
   initialUnreadCount,
 }: {
   userId: string;
-  initialUnreadCount: number;
+  /** Если не передан — компонент сам сходит за счётчиком при монтаже. */
+  initialUnreadCount?: number;
 }) {
   const t = useT();
   const supabase = useRef(createClient()).current;
-  const [unreadCount, setUnreadCount] = useState(initialUnreadCount);
+  const [unreadCount, setUnreadCount] = useState(initialUnreadCount ?? 0);
   const [panelOpen, setPanelOpen] = useState(false);
   const [items, setItems] = useState<Notification[]>([]);
   const [loaded, setLoaded] = useState(false);
+
+  // Если счётчик не передан с сервера — тащим сами
+  useEffect(() => {
+    if (typeof initialUnreadCount === "number") return;
+    supabase
+      .from("notifications")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", userId)
+      .is("read_at", null)
+      .then(({ count }) => setUnreadCount(count ?? 0));
+  }, [supabase, userId, initialUnreadCount]);
 
   // Realtime: новые уведомления → подкручиваем счётчик
   useEffect(() => {
@@ -185,6 +198,7 @@ function NotificationsPanel({
   useEffect(() => {
     setMounted(true);
   }, []);
+  useBackButtonClose(true, onClose);
   if (!mounted) return null;
 
   return createPortal(

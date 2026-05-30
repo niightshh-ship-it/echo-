@@ -5,6 +5,7 @@ import { getDictionary } from "@/lib/i18n/server";
 import { I18nProvider } from "@/lib/i18n/provider";
 import { BottomNav } from "@/components/bottom-nav";
 import { Analytics } from "@vercel/analytics/react";
+import { Toaster } from "sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -61,6 +62,18 @@ export default async function RootLayout({
           {children}
           <BottomNav />
         </I18nProvider>
+        <Toaster
+          theme="dark"
+          position="top-center"
+          toastOptions={{
+            style: {
+              background: "rgba(20, 14, 40, 0.95)",
+              border: "1px solid rgba(124, 92, 255, 0.3)",
+              color: "white",
+              backdropFilter: "blur(12px)",
+            },
+          }}
+        />
         <Analytics />
       </body>
     </html>

@@ -7,6 +7,7 @@ import { LogOut, Trash2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { LanguageSwitcher } from "@/components/language-switcher";
+import { NotificationBell } from "@/components/notification-bell";
 import { useT } from "@/lib/i18n/provider";
 
 export default function SettingsPage() {
@@ -90,6 +91,11 @@ export default function SettingsPage() {
         <div className="flex items-center justify-between mb-8">
           <Link href="/profile" className="text-zinc-400 hover:text-white text-sm">{t.nav.back}</Link>
           <h1 className="text-2xl font-bold lowercase">{t.settings.title}</h1>
+          {userIdRef.current ? (
+            <NotificationBell userId={userIdRef.current} />
+          ) : (
+            <span className="w-9" />
+          )}
         </div>
 
         {/* Account */}

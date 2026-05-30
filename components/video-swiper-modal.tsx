@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import Link from "next/link";
 import { Heart, MessageCircle, X } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { useBackButtonClose } from "@/lib/use-back-button-close";
 import { CommentsPanel } from "./comments-panel";
 
 export type SwiperVideo = {
@@ -43,6 +44,8 @@ export function VideoSwiperModal({
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useBackButtonClose(true, onClose);
 
   // Сразу прыгаем на нужное видео (тапнутый тайл)
   useEffect(() => {

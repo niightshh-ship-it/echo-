@@ -34,6 +34,24 @@ export default async function ProfilePage() {
 
   if (!profile) redirect("/onboarding");
 
+  // Чего не хватает в профиле — для жёлтой полоски-напоминалки
+  const missing = {
+    avatar: !profile.avatar_url,
+    bio: !profile.bio || profile.bio.trim().length === 0,
+    wants: !profile.wants || profile.wants.length === 0,
+  };
+  const missingCount = (missing.avatar ? 1 : 0) + (missing.bio ? 1 : 0) + (missing.wants ? 1 : 0);
+  const completionHint =
+    missingCount >= 2
+      ? t.profile.completeAll
+      : missing.avatar
+      ? t.profile.completeAvatarHint
+      : missing.bio
+      ? t.profile.completeBioHint
+      : missing.wants
+      ? t.profile.completeWantsHint
+      : null;
+
   const videosWithUrl = (videos ?? []).map((v) => ({
     id: v.id,
     url: supabase.storage.from("videos").getPublicUrl(v.storage_path).data.publicUrl,
@@ -78,6 +96,28 @@ export default async function ProfilePage() {
             </Link>
           </div>
         </div>
+
+        {completionHint && (
+          <Link
+            href="/profile/edit"
+            className="block mb-4 rounded-2xl border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/15 transition-colors p-4"
+          >
+            <div className="flex items-start gap-3">
+              <span className="text-2xl shrink-0">✨</span>
+              <div className="flex-1 min-w-0">
+                <p className="text-amber-300 font-semibold text-sm">
+                  {t.profile.completeTitle}
+                </p>
+                <p className="text-amber-200/80 text-xs mt-0.5 leading-snug">
+                  {completionHint}
+                </p>
+              </div>
+              <span className="text-amber-300 text-sm shrink-0 self-center">
+                {t.profile.completeCta}
+              </span>
+            </div>
+          </Link>
+        )}
 
         <div className="rounded-3xl glass border border-white/10 p-8 mb-6">
           <div className="flex items-start gap-4 mb-4">

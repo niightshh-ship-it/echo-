@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { getDictionary } from "@/lib/i18n/server";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { ProfileActions } from "@/components/profile-actions";
 import { VideoGrid } from "@/components/video-grid";
 import { ShareButton } from "@/components/share-button";
@@ -60,10 +61,9 @@ export default async function UserProfilePage({
   const { id } = await params;
   const supabase = await createClient();
   const { dict: t } = await getDictionary();
+  // Страница публичная — гости тоже видят. Если открыл свой профиль — на /profile.
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/sign-in");
-
-  if (id === user.id) redirect("/profile");
+  if (user && id === user.id) redirect("/profile");
 
   const [{ data: profile }, { data: reviews }, { data: videos }] = await Promise.all([
     supabase
@@ -115,16 +115,39 @@ export default async function UserProfilePage({
 
       <div className="relative z-10 w-full max-w-md page-fade-in">
         <div className="mb-6 flex items-center justify-between">
-          <Link href="/matches" className="text-zinc-400 hover:text-white text-sm">{t.nav.back}</Link>
+          <Link
+            href={user ? "/matches" : "/"}
+            className="text-zinc-400 hover:text-white text-sm"
+          >
+            {t.nav.back}
+          </Link>
           <div className="flex items-center gap-2">
             <ShareButton
               url={`/u/${id}`}
               title={t.share.profileTitle.replace("{name}", profile.name)}
               text={t.share.profileText.replace("{name}", profile.name)}
             />
-            <ProfileActions targetId={id} />
+            {user && <ProfileActions targetId={id} />}
           </div>
         </div>
+
+        {/* Гостям — мягкий призыв войти */}
+        {!user && (
+          <div className="mb-6 rounded-2xl bg-echo/10 border border-echo/30 p-4 flex items-center gap-3">
+            <span className="text-2xl">👋</span>
+            <div className="flex-1">
+              <p className="text-sm text-white font-medium">
+                {t.publicProfile.guestTitle.replace("{name}", profile.name)}
+              </p>
+              <p className="text-xs text-zinc-300 mt-0.5">{t.publicProfile.guestText}</p>
+            </div>
+            <Link href="/sign-in">
+              <Button className="bg-echo text-white hover:bg-echo-bright rounded-full text-sm h-9 px-4">
+                {t.publicProfile.guestCta}
+              </Button>
+            </Link>
+          </div>
+        )}
 
         <div className="rounded-3xl glass border border-white/10 p-8 mb-6">
           <div className="flex items-start gap-4 mb-4">
@@ -174,14 +197,14 @@ export default async function UserProfilePage({
         {skillVideos.length > 0 && (
           <div className="mb-8">
             <h2 className="text-lg font-semibold mb-3 lowercase">🎯 {t.profile.skillVideos}</h2>
-            <VideoGrid videos={skillVideos} author={author} currentUserId={user.id} />
+            <VideoGrid videos={skillVideos} author={author} currentUserId={user?.id ?? null} />
           </div>
         )}
 
         {randomVideos.length > 0 && (
           <div className="mb-8">
             <h2 className="text-lg font-semibold mb-3 lowercase">✨ {t.profile.randomVideos}</h2>
-            <VideoGrid videos={randomVideos} author={author} currentUserId={user.id} />
+            <VideoGrid videos={randomVideos} author={author} currentUserId={user?.id ?? null} />
           </div>
         )}
 
