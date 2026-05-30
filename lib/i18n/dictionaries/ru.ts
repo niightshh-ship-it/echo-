@@ -69,6 +69,17 @@ const ru: Dictionary = {
     profileTitle: "{name} в Echo",
     profileText: "Меняйся скиллами с {name} на Echo.",
   },
+  notifications: {
+    title: "Уведомления",
+    empty: "Пока нет уведомлений",
+    markAllRead: "Прочитать все",
+    typeMatch: "У тебя мэтч с {name}",
+    typeMessage: "{name}: {preview}",
+    justNow: "только что",
+    minutesAgo: "{n} мин",
+    hoursAgo: "{n} ч",
+    daysAgo: "{n} д",
+  },
   profile: {
     verified: "верифицирован",
     verifyCta: "Пройти верификацию",

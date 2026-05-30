@@ -69,6 +69,17 @@ const nl: Dictionary = {
     profileTitle: "{name} op Echo",
     profileText: "Ruil vaardigheden met {name} op Echo.",
   },
+  notifications: {
+    title: "Meldingen",
+    empty: "Nog geen meldingen",
+    markAllRead: "Markeer alles gelezen",
+    typeMatch: "Je hebt een match met {name}",
+    typeMessage: "{name}: {preview}",
+    justNow: "zojuist",
+    minutesAgo: "{n} min",
+    hoursAgo: "{n} u",
+    daysAgo: "{n} d",
+  },
   profile: {
     verified: "geverifieerd",
     verifyCta: "Verifieer jezelf",

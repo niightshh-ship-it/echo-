@@ -69,6 +69,17 @@ const uk: Dictionary = {
     profileTitle: "{name} в Echo",
     profileText: "Обмінюйся навичками з {name} на Echo.",
   },
+  notifications: {
+    title: "Сповіщення",
+    empty: "Поки немає сповіщень",
+    markAllRead: "Позначити всі",
+    typeMatch: "У тебе метч з {name}",
+    typeMessage: "{name}: {preview}",
+    justNow: "щойно",
+    minutesAgo: "{n} хв",
+    hoursAgo: "{n} год",
+    daysAgo: "{n} д",
+  },
   profile: {
     verified: "верифікований",
     verifyCta: "Пройти верифікацію",

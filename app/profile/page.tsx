@@ -8,6 +8,7 @@ import { Search, Settings as SettingsIcon } from "lucide-react";
 import { DeleteVideoButton } from "./delete-video-button";
 import { VideoGrid } from "@/components/video-grid";
 import { ShareButton } from "@/components/share-button";
+import { NotificationBell } from "@/components/notification-bell";
 
 export default async function ProfilePage() {
   const supabase = await createClient();
@@ -17,13 +18,18 @@ export default async function ProfilePage() {
   if (!user) redirect("/sign-in");
 
   // Параллелим — раньше шло друг за другом
-  const [{ data: profile }, { data: videos }] = await Promise.all([
+  const [{ data: profile }, { data: videos }, { count: unreadCount }] = await Promise.all([
     supabase.from("profiles").select("*").eq("id", user.id).single(),
     supabase
       .from("videos")
       .select("id, skill, storage_path, created_at, is_random, description, views_count")
       .eq("user_id", user.id)
       .order("created_at", { ascending: false }),
+    supabase
+      .from("notifications")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user.id)
+      .is("read_at", null),
   ]);
 
   if (!profile) redirect("/onboarding");
@@ -53,6 +59,7 @@ export default async function ProfilePage() {
         <div className="flex items-center justify-between mb-8">
           <Link href="/" className="text-2xl font-bold lowercase text-gradient-echo">echo</Link>
           <div className="flex items-center gap-1">
+            <NotificationBell userId={user.id} initialUnreadCount={unreadCount ?? 0} />
             <ShareButton
               url={`/u/${user.id}`}
               title={t.share.profileTitle.replace("{name}", profile.name)}

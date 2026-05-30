@@ -67,6 +67,17 @@ const en = {
     profileTitle: "{name} on Echo",
     profileText: "Trade skills with {name} on Echo.",
   },
+  notifications: {
+    title: "Notifications",
+    empty: "No notifications yet",
+    markAllRead: "Mark all read",
+    typeMatch: "{name} matched with you",
+    typeMessage: "{name}: {preview}",
+    justNow: "just now",
+    minutesAgo: "{n}m",
+    hoursAgo: "{n}h",
+    daysAgo: "{n}d",
+  },
   profile: {
     verified: "verified",
     verifyCta: "Get verified",
