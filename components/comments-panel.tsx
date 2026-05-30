@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, type FormEvent } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import { X, Trash2, Send } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
@@ -30,6 +31,11 @@ export function CommentsPanel({
   const [comments, setComments] = useState<Comment[]>([]);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -90,7 +96,9 @@ export function CommentsPanel({
     onCountChange?.(newComments.length);
   }
 
-  return (
+  if (!mounted) return null;
+
+  return createPortal(
     <>
       {/* Подложка */}
       <div className="fixed inset-0 z-[60] bg-black/50" onClick={onClose} />
@@ -162,6 +170,7 @@ export function CommentsPanel({
           </form>
         )}
       </div>
-    </>
+    </>,
+    document.body
   );
 }

@@ -66,7 +66,12 @@ export function FeedClient({
       }
     }
     if (touchStart.current.dir === "h") {
-      setDrag(dx);
+      // Зажимаем drag так, чтобы карусель не уезжала за свои две колонки
+      const vw = typeof window !== "undefined" ? window.innerWidth : 0;
+      const maxRight = mode === "skill" ? 0 : vw; // вправо тянем только если на random
+      const minLeft = mode === "random" ? 0 : -vw; // влево тянем только если на skill
+      const clamped = Math.max(minLeft, Math.min(maxRight, dx));
+      setDrag(clamped);
     }
   }
   function onTouchEnd() {
@@ -124,6 +129,7 @@ export function FeedClient({
   return (
     <div
       className="h-screen w-screen overflow-hidden bg-black"
+      style={{ touchAction: "pan-y" }}
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
