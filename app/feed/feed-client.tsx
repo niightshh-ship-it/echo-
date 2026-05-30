@@ -9,24 +9,55 @@ import { useT } from "@/lib/i18n/provider";
 export type FeedItem = {
   id: string;
   authorId: string;
-  skill: string;
+  skill: string | null;
+  isRandom: boolean;
   authorName: string;
   authorCity: string;
   authorAvatar: string | null;
   url: string;
 };
 
+type Mode = "skill" | "random";
+
 export function FeedClient({
-  items,
+  skillItems,
+  randomItems,
   initiallyLiked,
 }: {
-  items: FeedItem[];
+  skillItems: FeedItem[];
+  randomItems: FeedItem[];
   initiallyLiked: string[];
 }) {
   const t = useT();
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRefs = useRef<Map<string, HTMLVideoElement>>(new Map());
+  const [mode, setMode] = useState<Mode>("skill");
+  const items = mode === "skill" ? skillItems : randomItems;
   const [activeId, setActiveId] = useState<string | null>(items[0]?.id ?? null);
+
+  // При смене режима — сбрасываем активный + скроллим к началу
+  useEffect(() => {
+    setActiveId(items[0]?.id ?? null);
+    containerRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode]);
+
+  // Свайп влево/вправо переключает режим
+  const touchStart = useRef<{ x: number; y: number } | null>(null);
+  function onTouchStart(e: React.TouchEvent) {
+    const t = e.touches[0];
+    touchStart.current = { x: t.clientX, y: t.clientY };
+  }
+  function onTouchEnd(e: React.TouchEvent) {
+    if (!touchStart.current) return;
+    const tch = e.changedTouches[0];
+    const dx = tch.clientX - touchStart.current.x;
+    const dy = tch.clientY - touchStart.current.y;
+    touchStart.current = null;
+    if (Math.abs(dx) > 80 && Math.abs(dy) < 50) {
+      setMode(dx < 0 ? "random" : "skill");
+    }
+  }
   const [muted, setMuted] = useState(true);
   const [liked, setLiked] = useState<Set<string>>(new Set(initiallyLiked));
   const [matchBanner, setMatchBanner] = useState<string | null>(null);
@@ -123,24 +154,41 @@ export function FeedClient({
     }
   }
 
-  if (items.length === 0) {
-    return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-black text-white px-4 text-center">
-        <h1 className="text-3xl font-bold mb-2 lowercase">{t.feed.emptyTitle}</h1>
-        <p className="text-zinc-400 mb-8">{t.feed.emptyText}</p>
-        <Link href="/profile" className="text-echo-bright underline">
-          {t.feed.backToProfile}
-        </Link>
-      </div>
-    );
-  }
-
   return (
     <div
       ref={containerRef}
+      onTouchStart={onTouchStart}
+      onTouchEnd={onTouchEnd}
       className="h-screen overflow-y-scroll snap-y snap-mandatory bg-black scrollbar-hide"
       style={{ scrollbarWidth: "none" }}
     >
+      {/* Переключатель режима — Skill / Random */}
+      <div className="fixed top-3 left-1/2 -translate-x-1/2 z-30 flex bg-black/60 backdrop-blur-md rounded-full p-1 gap-1 border border-white/10">
+        <button
+          onClick={() => setMode("skill")}
+          className={`px-4 py-1.5 rounded-full text-xs font-medium transition-colors ${
+            mode === "skill" ? "bg-white text-black" : "text-zinc-300"
+          }`}
+        >
+          🎯 {t.upload.skillType}
+        </button>
+        <button
+          onClick={() => setMode("random")}
+          className={`px-4 py-1.5 rounded-full text-xs font-medium transition-colors ${
+            mode === "random" ? "bg-white text-black" : "text-zinc-300"
+          }`}
+        >
+          ✨ {t.upload.randomType}
+        </button>
+      </div>
+
+      {/* Пустое состояние в текущем режиме */}
+      {items.length === 0 && (
+        <div className="h-screen w-full flex flex-col items-center justify-center text-center px-6 snap-start">
+          <h1 className="text-2xl font-bold mb-2 lowercase">{t.feed.emptyTitle}</h1>
+          <p className="text-zinc-400 text-sm">{t.feed.emptyText}</p>
+        </div>
+      )}
       {/* Баннер мэтча — поверх всего */}
       {matchBanner && (
         <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-echo text-white px-6 py-3 rounded-full shadow-xl glow-echo animate-bounce font-medium">
@@ -182,9 +230,11 @@ export function FeedClient({
                 <p className="text-zinc-300 text-sm">{item.authorCity}</p>
               </div>
             </Link>
-            <p className="text-white text-sm mt-2 bg-white/10 inline-block px-2 py-0.5 rounded">
-              {item.skill}
-            </p>
+            {item.skill && (
+              <p className="text-white text-sm mt-2 bg-white/10 inline-block px-2 py-0.5 rounded">
+                {item.skill}
+              </p>
+            )}
           </div>
 
           <button

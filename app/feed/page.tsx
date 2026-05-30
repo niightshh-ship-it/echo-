@@ -11,9 +11,8 @@ export default async function FeedPage() {
   const [videosRes, blocksRes, likedRes] = await Promise.all([
     supabase
       .from("videos")
-      .select("id, user_id, skill, storage_path, created_at")
+      .select("id, user_id, skill, storage_path, created_at, is_random")
       .neq("user_id", user.id)
-      .eq("is_random", false)
       .order("created_at", { ascending: false }),
     supabase
       .from("blocks")
@@ -41,12 +40,13 @@ export default async function FeedPage() {
 
   const profileMap = new Map((profiles ?? []).map((p) => [p.id, p]));
 
-  const items: FeedItem[] = visibleVideos.map((v) => {
+  const allItems: FeedItem[] = visibleVideos.map((v) => {
     const author = profileMap.get(v.user_id);
     return {
       id: v.id,
       authorId: v.user_id,
       skill: v.skill,
+      isRandom: !!v.is_random,
       authorName: author?.name ?? "?",
       authorCity: author?.city ?? "",
       authorAvatar: author?.avatar_url ?? null,
@@ -54,7 +54,15 @@ export default async function FeedPage() {
     };
   });
 
+  const skillItems = allItems.filter((i) => !i.isRandom);
+  const randomItems = allItems.filter((i) => i.isRandom);
   const initiallyLiked = (likedRows ?? []).map((r) => r.video_id);
 
-  return <FeedClient items={items} initiallyLiked={initiallyLiked} />;
+  return (
+    <FeedClient
+      skillItems={skillItems}
+      randomItems={randomItems}
+      initiallyLiked={initiallyLiked}
+    />
+  );
 }
