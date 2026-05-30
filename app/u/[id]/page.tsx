@@ -66,7 +66,7 @@ export default async function UserProfilePage({
     <div className="relative flex min-h-screen flex-col items-center bg-black text-white px-4 py-12">
       <div className="pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 h-[280px] w-[460px] rounded-full bg-echo opacity-10 blur-[130px]" />
 
-      <div className="relative z-10 w-full max-w-md">
+      <div className="relative z-10 w-full max-w-md page-fade-in">
         <div className="mb-6 flex items-center justify-between">
           <Link href="/matches" className="text-zinc-400 hover:text-white text-sm">{t.nav.back}</Link>
           <ProfileActions targetId={id} />
@@ -120,7 +120,7 @@ export default async function UserProfilePage({
         {skillVideos.length > 0 && (
           <>
             <h2 className="text-lg font-semibold mb-3 lowercase">🎯 {t.profile.skillVideos}</h2>
-            <div className="grid grid-cols-3 gap-2 mb-8">
+            <div className="grid grid-cols-3 gap-2 mb-8 grid-stagger">
               {skillVideos.map((v) => (
                 <VideoTile
                   key={v.id}
@@ -144,7 +144,7 @@ export default async function UserProfilePage({
         {randomVideos.length > 0 && (
           <>
             <h2 className="text-lg font-semibold mb-3 lowercase">✨ {t.profile.randomVideos}</h2>
-            <div className="grid grid-cols-3 gap-2 mb-8">
+            <div className="grid grid-cols-3 gap-2 mb-8 grid-stagger">
               {randomVideos.map((v) => (
                 <VideoTile
                   key={v.id}

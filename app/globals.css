@@ -318,6 +318,45 @@
     .marquee-left, .marquee-right { animation: none; }
   }
 
+  /* Пульс сердечка при лайке */
+  @keyframes heart-pop {
+    0% { transform: scale(1); }
+    35% { transform: scale(1.35); }
+    100% { transform: scale(1); }
+  }
+  .heart-pop {
+    animation: heart-pop 0.34s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  /* Мягкое появление основного содержимого страницы */
+  @keyframes page-fade-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: none; }
+  }
+  .page-fade-in {
+    animation: page-fade-in 0.45s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  }
+
+  /* Каскадное появление сетки тайлов */
+  @keyframes grid-stagger-in {
+    from { opacity: 0; transform: translateY(12px) scale(0.98); }
+    to { opacity: 1; transform: none; }
+  }
+  .grid-stagger > * {
+    opacity: 0;
+    animation: grid-stagger-in 0.45s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+  }
+  .grid-stagger > *:nth-child(1)  { animation-delay: 0.02s; }
+  .grid-stagger > *:nth-child(2)  { animation-delay: 0.06s; }
+  .grid-stagger > *:nth-child(3)  { animation-delay: 0.10s; }
+  .grid-stagger > *:nth-child(4)  { animation-delay: 0.14s; }
+  .grid-stagger > *:nth-child(5)  { animation-delay: 0.18s; }
+  .grid-stagger > *:nth-child(6)  { animation-delay: 0.22s; }
+  .grid-stagger > *:nth-child(7)  { animation-delay: 0.26s; }
+  .grid-stagger > *:nth-child(8)  { animation-delay: 0.30s; }
+  .grid-stagger > *:nth-child(9)  { animation-delay: 0.34s; }
+  .grid-stagger > *:nth-child(n+10) { animation-delay: 0.36s; }
+
   /* Появление блоков при скролле (fade-up) */
   .reveal {
     opacity: 0;
@@ -336,6 +375,9 @@
     .echo-ring { animation: none; opacity: 0; }
     .echo-pulse::before,
     .echo-pulse::after { animation: none; opacity: 0; }
+    .heart-pop,
+    .page-fade-in,
+    .grid-stagger > * { animation: none; opacity: 1; transform: none; }
     .blob-1, .blob-2 { animation: none; }
     .reveal { opacity: 1; transform: none; transition: none; }
   }

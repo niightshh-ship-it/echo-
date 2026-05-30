@@ -38,7 +38,7 @@ export default async function ProfilePage() {
     <div className="relative flex min-h-screen flex-col items-center bg-black text-white px-4 pt-12 pb-28">
       <div className="pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 h-[300px] w-[500px] rounded-full bg-echo opacity-10 blur-[130px]" />
 
-      <div className="relative z-10 w-full max-w-md">
+      <div className="relative z-10 w-full max-w-md page-fade-in">
         <div className="flex items-center justify-between mb-8">
           <Link href="/" className="text-2xl font-bold lowercase text-gradient-echo">echo</Link>
           <div className="flex items-center gap-1">
@@ -141,7 +141,7 @@ export default async function ProfilePage() {
             {t.profile.noVideos}
           </p>
         ) : (
-          <div className="grid grid-cols-3 gap-2 mb-8">
+          <div className="grid grid-cols-3 gap-2 mb-8 grid-stagger">
             {skillVideos.map((v) => (
               <VideoTile
                 key={v.id}
@@ -165,7 +165,7 @@ export default async function ProfilePage() {
         {randomVideos.length > 0 && (
           <>
             <h2 className="text-xl font-semibold lowercase mb-4">✨ {t.profile.randomVideos}</h2>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-3 gap-2 grid-stagger">
               {randomVideos.map((v) => (
                 <VideoTile
                   key={v.id}

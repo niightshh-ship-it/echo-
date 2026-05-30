@@ -75,7 +75,7 @@ export default function OnboardingPage() {
         <LanguageSwitcher />
       </div>
 
-      <div className="relative z-10 w-full max-w-md">
+      <div className="relative z-10 w-full max-w-md page-fade-in">
         <h1 className="text-4xl font-bold tracking-tighter lowercase mb-2">{t.onboarding.title}</h1>
         <p className="text-zinc-400 mb-8">{t.onboarding.subtitle}</p>
 

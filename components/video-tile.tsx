@@ -47,7 +47,7 @@ export function VideoTile({
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="relative block w-full aspect-[9/16] rounded-xl overflow-hidden bg-zinc-900 border border-white/10 group focus:outline-none focus:ring-2 focus:ring-echo"
+          className="relative block w-full aspect-[9/16] rounded-xl overflow-hidden bg-zinc-900 border border-white/10 group transition-transform duration-200 ease-out hover:scale-[1.02] active:scale-[0.97] hover:border-echo/40 focus:outline-none focus:ring-2 focus:ring-echo"
         >
           {/* Превью — первый кадр без автоплея */}
           {/* eslint-disable-next-line jsx-a11y/media-has-caption */}

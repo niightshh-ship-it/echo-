@@ -15,7 +15,7 @@ export default async function InstallPage() {
     <div className="relative flex min-h-screen flex-col items-center bg-black text-white px-4 py-12">
       <div className="pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 h-[300px] w-[500px] rounded-full bg-echo opacity-10 blur-[130px]" />
 
-      <div className="relative z-10 w-full max-w-md">
+      <div className="relative z-10 w-full max-w-md page-fade-in">
         <div className="mb-6">
           <Link href="/" className="text-2xl font-bold lowercase text-gradient-echo">echo</Link>
         </div>

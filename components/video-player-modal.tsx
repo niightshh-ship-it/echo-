@@ -40,6 +40,7 @@ export function VideoPlayerModal({
   const [likeCount, setLikeCount] = useState(0);
   const [commentCount, setCommentCount] = useState(0);
   const [showComments, setShowComments] = useState(false);
+  const [heartPop, setHeartPop] = useState(0);
   const viewedRef = useRef(false);
 
   useEffect(() => {
@@ -92,6 +93,7 @@ export function VideoPlayerModal({
     const wasLiked = liked;
     setLiked(!wasLiked);
     setLikeCount((c) => c + (wasLiked ? -1 : 1));
+    setHeartPop((n) => n + 1); // перезапуск анимации
     if (wasLiked) {
       await supabase.rpc("unlike_video", { p_video_id: videoId });
     } else {
@@ -102,7 +104,7 @@ export function VideoPlayerModal({
   if (!mounted) return null;
 
   return createPortal(
-    <div className="fixed inset-0 z-[55] bg-black flex items-center justify-center">
+    <div className="fixed inset-0 z-[55] bg-black flex items-center justify-center animate-in fade-in zoom-in-95 duration-200">
       <button
         onClick={onClose}
         className="absolute top-4 left-4 z-10 bg-black/60 backdrop-blur rounded-full p-2 text-white"
@@ -168,7 +170,11 @@ export function VideoPlayerModal({
               liked ? "bg-echo glow-echo" : "bg-white/20"
             }`}
           >
-            <Heart className="w-6 h-6 text-white" fill={liked ? "white" : "none"} />
+            <Heart
+              key={heartPop}
+              className={`w-6 h-6 text-white ${heartPop > 0 ? "heart-pop" : ""}`}
+              fill={liked ? "white" : "none"}
+            />
           </div>
           <span className="text-white text-xs font-medium">{likeCount}</span>
         </button>

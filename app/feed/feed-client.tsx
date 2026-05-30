@@ -315,6 +315,7 @@ function VideoSlide({
   const [likeCount, setLikeCount] = useState(0);
   const [commentCount, setCommentCount] = useState(0);
   const [showComments, setShowComments] = useState(false);
+  const [heartPop, setHeartPop] = useState(0);
 
   // Счётчики — только в режиме random
   useEffect(() => {
@@ -344,6 +345,7 @@ function VideoSlide({
     if (mode === "random") {
       setLikeCount((c) => c + (isLiked ? -1 : 1));
     }
+    setHeartPop((n) => n + 1);
     onLikeToggle();
   }
 
@@ -417,7 +419,11 @@ function VideoSlide({
               isLiked ? "bg-echo glow-echo" : "bg-white/20"
             }`}
           >
-            <Heart className="w-7 h-7 text-white" fill={isLiked ? "white" : "none"} />
+            <Heart
+              key={heartPop}
+              className={`w-7 h-7 text-white ${heartPop > 0 ? "heart-pop" : ""}`}
+              fill={isLiked ? "white" : "none"}
+            />
           </div>
           {mode === "random" && (
             <span className="text-white text-xs font-medium">{likeCount}</span>

@@ -17,7 +17,7 @@ export function LegalLayout({
     <div className="relative flex min-h-screen flex-col items-center bg-black text-white px-4 pt-12 pb-20">
       <div className="pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 h-[260px] w-[420px] rounded-full bg-echo opacity-10 blur-[130px]" />
 
-      <div className="relative z-10 w-full max-w-2xl">
+      <div className="relative z-10 w-full max-w-2xl page-fade-in">
         <div className="mb-8">
           <Link href="/" className="text-zinc-400 hover:text-white text-sm">{backLabel}</Link>
         </div>
