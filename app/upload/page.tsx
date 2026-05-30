@@ -14,6 +14,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useT } from "@/lib/i18n/provider";
+import { CATEGORIES, CATEGORY_EMOJI } from "@/lib/categories";
+
+const OTHER = "__other__";
 
 export default function UploadPage() {
   const router = useRouter();
@@ -24,6 +27,8 @@ export default function UploadPage() {
   const [userId, setUserId] = useState<string | null>(null);
   const [skills, setSkills] = useState<string[]>([]);
   const [selectedSkill, setSelectedSkill] = useState("");
+  const [categoryKey, setCategoryKey] = useState<string>(CATEGORIES[0]);
+  const [customCategory, setCustomCategory] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -79,10 +84,14 @@ export default function UploadPage() {
       return;
     }
 
+    const category =
+      categoryKey === OTHER ? customCategory.trim() || null : categoryKey;
+
     const { error: insertError } = await supabase.from("videos").insert({
       user_id: userId,
       skill: selectedSkill,
       storage_path: path,
+      category,
     });
 
     if (insertError) {
@@ -125,6 +134,32 @@ export default function UploadPage() {
                 ))}
               </SelectContent>
             </Select>
+          </div>
+
+          <div>
+            <Label className="text-zinc-300">{t.upload.category}</Label>
+            <Select value={categoryKey} onValueChange={(v) => setCategoryKey(v ?? CATEGORIES[0])}>
+              <SelectTrigger className="mt-2 bg-white/5 border-white/10 text-white h-12 rounded-xl">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="bg-zinc-950 border-white/10 text-white">
+                {CATEGORIES.map((c) => (
+                  <SelectItem key={c} value={c}>
+                    {CATEGORY_EMOJI[c]} {t.categories[c]}
+                  </SelectItem>
+                ))}
+                <SelectItem value={OTHER}>✨ {t.categories.other}</SelectItem>
+              </SelectContent>
+            </Select>
+            {categoryKey === OTHER && (
+              <input
+                type="text"
+                value={customCategory}
+                onChange={(e) => setCustomCategory(e.target.value)}
+                placeholder={t.upload.customCategoryPlaceholder}
+                className="mt-2 w-full h-11 px-3 bg-white/5 border border-white/10 text-white rounded-xl placeholder:text-zinc-500"
+              />
+            )}
           </div>
 
           <div>

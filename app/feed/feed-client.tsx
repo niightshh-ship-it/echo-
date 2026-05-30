@@ -5,11 +5,13 @@ import Link from "next/link";
 import { Heart, Search } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useT } from "@/lib/i18n/provider";
+import { CATEGORIES, CATEGORY_EMOJI, isPredefined } from "@/lib/categories";
 
 export type FeedItem = {
   id: string;
   authorId: string;
   skill: string;
+  category: string | null;
   authorName: string;
   authorCity: string;
   authorAvatar: string | null;
@@ -26,7 +28,11 @@ export function FeedClient({
   const t = useT();
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRefs = useRef<Map<string, HTMLVideoElement>>(new Map());
-  const [activeId, setActiveId] = useState<string | null>(items[0]?.id ?? null);
+  const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
+  const visibleItems = categoryFilter
+    ? items.filter((i) => i.category === categoryFilter)
+    : items;
+  const [activeId, setActiveId] = useState<string | null>(visibleItems[0]?.id ?? null);
   const [muted, setMuted] = useState(true);
   const [liked, setLiked] = useState<Set<string>>(new Set(initiallyLiked));
   const [matchBanner, setMatchBanner] = useState<string | null>(null);
@@ -68,8 +74,8 @@ export function FeedClient({
       if (e.key === "ArrowDown" || e.key === "ArrowUp") {
         e.preventDefault();
         const delta = e.key === "ArrowDown" ? 1 : -1;
-        const idx = items.findIndex((i) => i.id === activeId);
-        const next = items[idx + delta];
+        const idx = visibleItems.findIndex((i) => i.id === activeId);
+        const next = visibleItems[idx + delta];
         if (next) {
           const el = container.querySelector(`[data-id="${next.id}"]`);
           el?.scrollIntoView({ behavior: "smooth" });
@@ -78,7 +84,7 @@ export function FeedClient({
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [activeId, items]);
+  }, [activeId, visibleItems]);
 
   // Авто-скрытие баннера мэтча
   useEffect(() => {
@@ -148,7 +154,38 @@ export function FeedClient({
         </div>
       )}
 
-      {items.map((item) => (
+      {/* Категории — фиксированный фильтр-бар сверху */}
+      <div className="fixed top-0 left-0 right-0 z-30 px-3 pt-3 pb-2 bg-gradient-to-b from-black/70 via-black/40 to-transparent backdrop-blur-sm">
+        <div className="flex gap-2 overflow-x-auto" style={{ scrollbarWidth: "none" }}>
+          <button
+            onClick={() => setCategoryFilter(null)}
+            className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap ${
+              categoryFilter === null ? "bg-white text-black" : "bg-white/15 text-white"
+            }`}
+          >
+            {t.categories.all}
+          </button>
+          {CATEGORIES.map((c) => (
+            <button
+              key={c}
+              onClick={() => setCategoryFilter(c)}
+              className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap ${
+                categoryFilter === c ? "bg-white text-black" : "bg-white/15 text-white"
+              }`}
+            >
+              {CATEGORY_EMOJI[c]} {t.categories[c]}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {visibleItems.length === 0 && (
+        <div className="h-screen w-full flex items-center justify-center snap-start">
+          <p className="text-zinc-400 text-sm">{t.feed.emptyTitle}</p>
+        </div>
+      )}
+
+      {visibleItems.map((item) => (
         <div
           key={item.id}
           data-id={item.id}
@@ -167,13 +204,6 @@ export function FeedClient({
             className="h-full w-full object-contain bg-black"
           />
 
-          <div className="absolute top-0 left-0 right-0 p-4 flex items-center justify-between bg-gradient-to-b from-black/60 to-transparent">
-            <Link href="/" className="text-xl font-bold lowercase text-gradient-echo">echo</Link>
-            <Link href="/search" className="text-white">
-              <Search className="w-5 h-5" />
-            </Link>
-          </div>
-
           <div className="absolute bottom-16 left-0 right-16 p-6 bg-gradient-to-t from-black/80 to-transparent">
             <Link href={`/u/${item.authorId}`} className="flex items-center gap-2.5 hover:opacity-80">
               <span className="relative h-10 w-10 shrink-0 rounded-full overflow-hidden border border-white/25 bg-white/10 flex items-center justify-center">
@@ -189,9 +219,16 @@ export function FeedClient({
                 <p className="text-zinc-300 text-sm">{item.authorCity}</p>
               </div>
             </Link>
-            <p className="text-white text-sm mt-2 bg-white/10 inline-block px-2 py-0.5 rounded">
-              {item.skill}
-            </p>
+            <div className="flex flex-wrap items-center gap-1.5 mt-2">
+              <span className="text-white text-sm bg-white/10 px-2 py-0.5 rounded">{item.skill}</span>
+              {item.category && (
+                <span className="text-xs text-white/80 bg-echo/30 border border-echo/40 px-2 py-0.5 rounded">
+                  {isPredefined(item.category)
+                    ? `${CATEGORY_EMOJI[item.category]} ${t.categories[item.category]}`
+                    : `✨ ${item.category}`}
+                </span>
+              )}
+            </div>
           </div>
 
           <button
