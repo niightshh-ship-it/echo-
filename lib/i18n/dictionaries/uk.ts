@@ -100,7 +100,7 @@ const uk: Dictionary = {
     skillType: "Навичка",
     skillTypeHint: "З'явиться у стрічці для метчингу",
     randomType: "Випадкове",
-    randomTypeHint: "Лише на твоєму профілі, просто так",
+    randomTypeHint: "Здивуй усіх. Будь-яке відео, без правил.",
   },
   categories: {
     all: "Усі",

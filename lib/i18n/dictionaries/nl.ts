@@ -100,7 +100,7 @@ const nl: Dictionary = {
     skillType: "Vaardigheid",
     skillTypeHint: "Verschijnt in de feed voor matches",
     randomType: "Random",
-    randomTypeHint: "Alleen op je profiel, voor de lol",
+    randomTypeHint: "Verras iedereen. Alles mag.",
   },
   categories: {
     all: "Alles",

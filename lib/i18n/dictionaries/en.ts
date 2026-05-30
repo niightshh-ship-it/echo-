@@ -98,7 +98,7 @@ const en = {
     skillType: "Skill",
     skillTypeHint: "Will appear in the feed for matching",
     randomType: "Random",
-    randomTypeHint: "Only on your profile, just for fun",
+    randomTypeHint: "Surprise everyone. Anything goes.",
   },
   categories: {
     all: "All",

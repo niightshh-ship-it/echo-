@@ -100,7 +100,7 @@ const ru: Dictionary = {
     skillType: "Навык",
     skillTypeHint: "Появится в фиде для мэтчинга",
     randomType: "Случайное",
-    randomTypeHint: "Только на твоём профиле, просто так",
+    randomTypeHint: "Удиви всех. Любое видео, без правил.",
   },
   categories: {
     all: "Все",
