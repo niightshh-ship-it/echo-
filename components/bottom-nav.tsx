@@ -8,7 +8,7 @@ import { useT } from "@/lib/i18n/provider";
 import { createClient } from "@/lib/supabase/client";
 
 // Показываем только на основных экранах приложения
-const SHOW_ON = ["/feed", "/matches", "/profile", "/upload", "/search"];
+const SHOW_ON = ["/feed", "/matches", "/profile", "/upload", "/search", "/settings"];
 
 export function BottomNav() {
   const pathname = usePathname();

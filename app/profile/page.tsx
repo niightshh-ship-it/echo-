@@ -4,10 +4,8 @@ import { createClient } from "@/lib/supabase/server";
 import { getDictionary } from "@/lib/i18n/server";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Search } from "lucide-react";
-import { SignOutButton } from "./sign-out-button";
+import { Search, Settings as SettingsIcon } from "lucide-react";
 import { DeleteVideoButton } from "./delete-video-button";
-import { LanguageSwitcher } from "@/components/language-switcher";
 
 export default async function ProfilePage() {
   const supabase = await createClient();
@@ -46,8 +44,11 @@ export default async function ProfilePage() {
                 <Search className="w-5 h-5" />
               </Button>
             </Link>
-            <LanguageSwitcher className="ml-1" />
-            <SignOutButton />
+            <Link href="/settings">
+              <Button variant="ghost" className="text-zinc-400 hover:text-white hover:bg-white/5 rounded-full h-9 w-9 p-0">
+                <SettingsIcon className="w-5 h-5" />
+              </Button>
+            </Link>
           </div>
         </div>
 

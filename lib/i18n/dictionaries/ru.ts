@@ -160,6 +160,16 @@ const ru: Dictionary = {
     reportsEmpty: "Жалоб нет.",
     reportArrow: "на",
   },
+  settings: {
+    title: "Настройки",
+    account: "Аккаунт",
+    email: "Email",
+    language: "Язык",
+    danger: "Опасная зона",
+    deleteAccount: "Удалить аккаунт",
+    deleteConfirm: "Удалить аккаунт навсегда? Все твои видео, мэтчи и сообщения пропадут. Это нельзя отменить.",
+    deleting: "Удаляю...",
+  },
   install: {
     title: "Установить приложение",
     intro: "Добавь Echo на домашний экран — откроется как настоящее приложение, без браузерной строки.",

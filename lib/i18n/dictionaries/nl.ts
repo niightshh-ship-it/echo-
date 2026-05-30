@@ -160,6 +160,16 @@ const nl: Dictionary = {
     reportsEmpty: "Geen meldingen.",
     reportArrow: "meldde",
   },
+  settings: {
+    title: "Instellingen",
+    account: "Account",
+    email: "E-mail",
+    language: "Taal",
+    danger: "Gevarenzone",
+    deleteAccount: "Account verwijderen",
+    deleteConfirm: "Account permanent verwijderen? Al je video's, matches en berichten gaan verloren. Dit kan niet ongedaan worden gemaakt.",
+    deleting: "Verwijderen...",
+  },
   install: {
     title: "App installeren",
     intro: "Zet Echo op je beginscherm — het opent als een echte app, zonder browserbalk.",

@@ -158,6 +158,16 @@ const en = {
     reportsEmpty: "No reports.",
     reportArrow: "reported",
   },
+  settings: {
+    title: "Settings",
+    account: "Account",
+    email: "Email",
+    language: "Language",
+    danger: "Danger zone",
+    deleteAccount: "Delete account",
+    deleteConfirm: "Delete your account permanently? All your videos, matches and messages will be lost. This cannot be undone.",
+    deleting: "Deleting...",
+  },
   install: {
     title: "Install the app",
     intro: "Add Echo to your home screen — it opens like a real app, without the browser bar.",
