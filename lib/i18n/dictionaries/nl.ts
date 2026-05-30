@@ -213,6 +213,11 @@ const nl: Dictionary = {
     desktop3: 'Klik op "Installeren"',
     cta: "App installeren",
   },
+  comments: {
+    placeholder: "Schrijf een reactie...",
+    empty: "Nog geen reacties",
+    deleteConfirm: "Reactie verwijderen?",
+  },
   safety: {
     report: "Rapporteren",
     block: "Blokkeren",

@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Search, Settings as SettingsIcon } from "lucide-react";
 import { DeleteVideoButton } from "./delete-video-button";
+import { RandomVideoCard } from "@/components/random-video-card";
 
 export default async function ProfilePage() {
   const supabase = await createClient();
@@ -19,7 +20,7 @@ export default async function ProfilePage() {
     supabase.from("profiles").select("*").eq("id", user.id).single(),
     supabase
       .from("videos")
-      .select("id, skill, storage_path, created_at, is_random")
+      .select("id, skill, storage_path, created_at, is_random, description")
       .eq("user_id", user.id)
       .order("created_at", { ascending: false }),
   ]);
@@ -154,11 +155,16 @@ export default async function ProfilePage() {
         {randomVideos.length > 0 && (
           <>
             <h2 className="text-xl font-semibold lowercase mb-4">✨ {t.profile.randomVideos}</h2>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-4">
               {randomVideos.map((v) => (
-                <div key={v.id} className="relative rounded-2xl overflow-hidden border border-white/10 bg-zinc-950">
+                <div key={v.id} className="relative">
                   <DeleteVideoButton videoId={v.id} />
-                  <video src={v.url} controls className="w-full aspect-[9/16] object-cover" />
+                  <RandomVideoCard
+                    videoId={v.id}
+                    videoUrl={v.url}
+                    description={v.description ?? null}
+                    currentUserId={user.id}
+                  />
                 </div>
               ))}
             </div>

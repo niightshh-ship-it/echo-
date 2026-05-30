@@ -211,6 +211,11 @@ const en = {
     desktop3: 'Click "Install"',
     cta: "Install app",
   },
+  comments: {
+    placeholder: "Write a comment...",
+    empty: "No comments yet",
+    deleteConfirm: "Delete this comment?",
+  },
   safety: {
     report: "Report",
     block: "Block",

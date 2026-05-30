@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getDictionary } from "@/lib/i18n/server";
 import { Badge } from "@/components/ui/badge";
 import { ProfileActions } from "@/components/profile-actions";
+import { RandomVideoCard } from "@/components/random-video-card";
 
 function Stars({ value }: { value: number }) {
   return (
@@ -40,7 +41,7 @@ export default async function UserProfilePage({
       .order("created_at", { ascending: false }),
     supabase
       .from("videos")
-      .select("id, storage_path")
+      .select("id, storage_path, description")
       .eq("user_id", id)
       .eq("is_random", true)
       .order("created_at", { ascending: false }),
@@ -118,11 +119,15 @@ export default async function UserProfilePage({
         {randomVideosWithUrl.length > 0 && (
           <>
             <h2 className="text-lg font-semibold mb-3 lowercase">✨ {t.profile.randomVideos}</h2>
-            <div className="grid grid-cols-2 gap-3 mb-8">
+            <div className="space-y-4 mb-8">
               {randomVideosWithUrl.map((v) => (
-                <div key={v.id} className="rounded-2xl overflow-hidden border border-white/10 bg-zinc-950">
-                  <video src={v.url} controls className="w-full aspect-[9/16] object-cover" />
-                </div>
+                <RandomVideoCard
+                  key={v.id}
+                  videoId={v.id}
+                  videoUrl={v.url}
+                  description={v.description ?? null}
+                  currentUserId={user.id}
+                />
               ))}
             </div>
           </>

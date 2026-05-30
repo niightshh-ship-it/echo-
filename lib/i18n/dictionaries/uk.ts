@@ -213,6 +213,11 @@ const uk: Dictionary = {
     desktop3: 'Натисни «Встановити»',
     cta: "Встановити застосунок",
   },
+  comments: {
+    placeholder: "Написати коментар...",
+    empty: "Поки немає коментарів",
+    deleteConfirm: "Видалити цей коментар?",
+  },
   safety: {
     report: "Поскаржитися",
     block: "Заблокувати",
