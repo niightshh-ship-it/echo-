@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Search, Settings as SettingsIcon } from "lucide-react";
 import { DeleteVideoButton } from "./delete-video-button";
 import { VideoGrid } from "@/components/video-grid";
+import { ShareButton } from "@/components/share-button";
 
 export default async function ProfilePage() {
   const supabase = await createClient();
@@ -52,6 +53,12 @@ export default async function ProfilePage() {
         <div className="flex items-center justify-between mb-8">
           <Link href="/" className="text-2xl font-bold lowercase text-gradient-echo">echo</Link>
           <div className="flex items-center gap-1">
+            <ShareButton
+              url={`/u/${user.id}`}
+              title={t.share.profileTitle.replace("{name}", profile.name)}
+              text={t.share.profileText.replace("{name}", profile.name)}
+              className="h-9 w-9 p-0 flex items-center justify-center"
+            />
             <Link href="/search">
               <Button variant="ghost" className="text-zinc-400 hover:text-white hover:bg-white/5 rounded-full h-9 w-9 p-0">
                 <Search className="w-5 h-5" />

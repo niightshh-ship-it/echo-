@@ -16,7 +16,10 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://echo-brown-chi.vercel.app";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: "Echo — skill exchange",
   description: "Trade skills with people near you. No money, just skills.",
   manifest: "/manifest.webmanifest",

@@ -1,10 +1,47 @@
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
+import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { getDictionary } from "@/lib/i18n/server";
 import { Badge } from "@/components/ui/badge";
 import { ProfileActions } from "@/components/profile-actions";
 import { VideoGrid } from "@/components/video-grid";
+import { ShareButton } from "@/components/share-button";
+
+export async function generateMetadata(
+  { params }: { params: Promise<{ id: string }> }
+): Promise<Metadata> {
+  const { id } = await params;
+  const supabase = await createClient();
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("name, city, bio, skills, avatar_url")
+    .eq("id", id)
+    .maybeSingle();
+  if (!profile) return { title: "Echo" };
+  const title = `${profile.name} on Echo`;
+  const description =
+    profile.bio?.trim() ||
+    (profile.skills?.length
+      ? `${profile.name} offers ${profile.skills.join(", ")} on Echo · ${profile.city}`
+      : `${profile.name} on Echo · ${profile.city}`);
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      type: "profile",
+      images: profile.avatar_url ? [{ url: profile.avatar_url }] : undefined,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: profile.avatar_url ? [profile.avatar_url] : undefined,
+    },
+  };
+}
 
 function Stars({ value }: { value: number }) {
   return (
@@ -79,7 +116,14 @@ export default async function UserProfilePage({
       <div className="relative z-10 w-full max-w-md page-fade-in">
         <div className="mb-6 flex items-center justify-between">
           <Link href="/matches" className="text-zinc-400 hover:text-white text-sm">{t.nav.back}</Link>
-          <ProfileActions targetId={id} />
+          <div className="flex items-center gap-2">
+            <ShareButton
+              url={`/u/${id}`}
+              title={t.share.profileTitle.replace("{name}", profile.name)}
+              text={t.share.profileText.replace("{name}", profile.name)}
+            />
+            <ProfileActions targetId={id} />
+          </div>
         </div>
 
         <div className="rounded-3xl glass border border-white/10 p-8 mb-6">

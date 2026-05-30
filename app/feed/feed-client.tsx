@@ -6,6 +6,7 @@ import { Heart, MessageCircle } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useT } from "@/lib/i18n/provider";
 import { CommentsPanel } from "@/components/comments-panel";
+import { MatchCelebration } from "@/components/match-celebration";
 
 export type FeedItem = {
   id: string;
@@ -25,17 +26,25 @@ export function FeedClient({
   skillItems,
   randomItems,
   initiallyLiked,
+  myName,
+  myAvatar,
 }: {
   skillItems: FeedItem[];
   randomItems: FeedItem[];
   initiallyLiked: string[];
+  myName: string;
+  myAvatar: string | null;
 }) {
   const t = useT();
   const [mode, setMode] = useState<Mode>("skill");
   const [drag, setDrag] = useState(0);
   const [animating, setAnimating] = useState(true);
   const [liked, setLiked] = useState<Set<string>>(new Set(initiallyLiked));
-  const [matchBanner, setMatchBanner] = useState<string | null>(null);
+  const [match, setMatch] = useState<{
+    name: string;
+    avatar: string | null;
+    id: string;
+  } | null>(null);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -46,11 +55,7 @@ export function FeedClient({
 
   const touchStart = useRef<{ x: number; y: number; dir: "unknown" | "h" | "v" } | null>(null);
 
-  useEffect(() => {
-    if (!matchBanner) return;
-    const id = setTimeout(() => setMatchBanner(null), 4000);
-    return () => clearTimeout(id);
-  }, [matchBanner]);
+  // Старого автозакрытия больше нет — у мэтча своя кнопка «продолжить»
 
   function onTouchStart(e: React.TouchEvent) {
     touchStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY, dir: "unknown" };
@@ -119,7 +124,11 @@ export function FeedClient({
         return;
       }
       if (data?.matched) {
-        setMatchBanner(item.authorName);
+        setMatch({
+          name: item.authorName,
+          avatar: item.authorAvatar,
+          id: item.authorId,
+        });
       }
     }
   }
@@ -154,11 +163,16 @@ export function FeedClient({
         </button>
       </div>
 
-      {/* Баннер мэтча */}
-      {matchBanner && (
-        <div className="fixed top-16 left-1/2 -translate-x-1/2 z-50 bg-echo text-white px-6 py-3 rounded-full shadow-xl glow-echo animate-bounce font-medium">
-          🎉 {t.feed.match.replace("{name}", matchBanner)}
-        </div>
+      {/* Празднование мэтча */}
+      {match && (
+        <MatchCelebration
+          myName={myName}
+          myAvatar={myAvatar}
+          partnerName={match.name}
+          partnerAvatar={match.avatar}
+          partnerId={match.id}
+          onClose={() => setMatch(null)}
+        />
       )}
 
       {/* Карусель */}
@@ -211,6 +225,15 @@ function FeedColumn({
   const videoRefs = useRef<Map<string, HTMLVideoElement>>(new Map());
   const [activeId, setActiveId] = useState<string | null>(items[0]?.id ?? null);
   const [muted, setMuted] = useState(true);
+  // Каждый id засчитываем как просмотр один раз за сессию ленты
+  const viewedRef = useRef<Set<string>>(new Set());
+
+  useEffect(() => {
+    if (!active || !activeId) return;
+    if (viewedRef.current.has(activeId)) return;
+    viewedRef.current.add(activeId);
+    createClient().rpc("increment_video_views", { p_video_id: activeId });
+  }, [active, activeId]);
 
   useEffect(() => {
     const container = containerRef.current;

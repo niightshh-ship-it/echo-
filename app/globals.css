@@ -318,6 +318,73 @@
     .marquee-left, .marquee-right { animation: none; }
   }
 
+  /* === MATCH CELEBRATION === */
+  /* Левый аватар: летит слева к центру, лёгкий вращательный замах */
+  @keyframes match-avatar-left {
+    0%   { transform: translateX(-180px) rotate(-12deg) scale(0.85); opacity: 0; }
+    55%  { transform: translateX(-28px)  rotate(-3deg)  scale(1.05); opacity: 1; }
+    70%  { transform: translateX(-32px)  rotate(0deg)   scale(1.00); }
+    100% { transform: translateX(-32px)  rotate(0deg)   scale(1.00); opacity: 1; }
+  }
+  .match-avatar-left { animation: match-avatar-left 0.85s cubic-bezier(0.18, 0.7, 0.3, 1.2) both; }
+
+  /* Правый аватар: летит справа */
+  @keyframes match-avatar-right {
+    0%   { transform: translateX(180px)  rotate(12deg)  scale(0.85); opacity: 0; }
+    55%  { transform: translateX(28px)   rotate(3deg)   scale(1.05); opacity: 1; }
+    70%  { transform: translateX(32px)   rotate(0deg)   scale(1.00); }
+    100% { transform: translateX(32px)   rotate(0deg)   scale(1.00); opacity: 1; }
+  }
+  .match-avatar-right { animation: match-avatar-right 0.85s cubic-bezier(0.18, 0.7, 0.3, 1.2) both; }
+
+  /* Сердце в центре: вспышка при «столкновении» */
+  @keyframes match-heart-burst {
+    0%   { transform: scale(0); opacity: 0; }
+    55%  { transform: scale(0); opacity: 0; }
+    70%  { transform: scale(2.2); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .match-heart-burst {
+    animation: match-heart-burst 0.95s cubic-bezier(0.18, 0.7, 0.3, 1.4) both;
+    filter: drop-shadow(0 0 20px rgba(228, 85, 255, 0.8));
+  }
+
+  /* Радиальное свечение пульсирует */
+  @keyframes match-glow {
+    0%, 100% { opacity: 0.25; transform: translate(-50%, -50%) scale(1); }
+    50%      { opacity: 0.45; transform: translate(-50%, -50%) scale(1.15); }
+  }
+  .match-glow { animation: match-glow 2.4s ease-in-out infinite; }
+
+  /* Конфетти: точка летит наружу под --angle на --dist, потом падает */
+  @keyframes confetti-fly {
+    0% {
+      transform: rotate(var(--angle)) translateX(0) rotate(calc(var(--angle) * -1)) scale(0);
+      opacity: 1;
+    }
+    25% {
+      transform: rotate(var(--angle)) translateX(calc(var(--dist) * 0.4)) rotate(calc(var(--angle) * -1)) scale(1.2);
+      opacity: 1;
+    }
+    100% {
+      transform: rotate(var(--angle)) translateX(var(--dist)) rotate(calc(var(--angle) * -1)) translateY(120px) scale(0.6);
+      opacity: 0;
+    }
+  }
+  .confetti-piece {
+    animation: confetti-fly 1.6s cubic-bezier(0.18, 0.7, 0.3, 1) 0.55s both;
+    will-change: transform, opacity;
+  }
+
+  /* Заголовок и подзаголовок появляются после столкновения */
+  @keyframes match-text-in {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: none; }
+  }
+  .match-title-in    { animation: match-text-in 0.5s ease-out 0.75s both; }
+  .match-subtitle-in { animation: match-text-in 0.5s ease-out 0.95s both; }
+  .match-buttons-in  { animation: match-text-in 0.5s ease-out 1.15s both; }
+
   /* Пульс сердечка при лайке */
   @keyframes heart-pop {
     0% { transform: scale(1); }
@@ -377,7 +444,15 @@
     .echo-pulse::after { animation: none; opacity: 0; }
     .heart-pop,
     .page-fade-in,
-    .grid-stagger > * { animation: none; opacity: 1; transform: none; }
+    .grid-stagger > *,
+    .match-avatar-left,
+    .match-avatar-right,
+    .match-heart-burst,
+    .match-glow,
+    .confetti-piece,
+    .match-title-in,
+    .match-subtitle-in,
+    .match-buttons-in { animation: none; opacity: 1; transform: none; }
     .blob-1, .blob-2 { animation: none; }
     .reveal { opacity: 1; transform: none; transition: none; }
   }

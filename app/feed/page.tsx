@@ -8,7 +8,7 @@ export default async function FeedPage() {
   if (!user) redirect("/sign-in");
 
   // Параллелим всё что не зависит друг от друга
-  const [videosRes, blocksRes, likedRes] = await Promise.all([
+  const [videosRes, blocksRes, likedRes, myProfileRes] = await Promise.all([
     supabase
       .from("videos")
       .select("id, user_id, skill, storage_path, created_at, is_random, description")
@@ -19,6 +19,7 @@ export default async function FeedPage() {
       .select("blocker_id, blocked_id")
       .or(`blocker_id.eq.${user.id},blocked_id.eq.${user.id}`),
     supabase.from("likes").select("video_id").eq("liker_id", user.id),
+    supabase.from("profiles").select("name, avatar_url").eq("id", user.id).maybeSingle(),
   ]);
 
   const videos = videosRes.data;
@@ -64,6 +65,8 @@ export default async function FeedPage() {
       skillItems={skillItems}
       randomItems={randomItems}
       initiallyLiked={initiallyLiked}
+      myName={myProfileRes.data?.name ?? "?"}
+      myAvatar={myProfileRes.data?.avatar_url ?? null}
     />
   );
 }
