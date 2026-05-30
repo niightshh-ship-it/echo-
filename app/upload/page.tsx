@@ -14,9 +14,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useT } from "@/lib/i18n/provider";
-import { CATEGORIES, CATEGORY_EMOJI } from "@/lib/categories";
 
-const OTHER = "__other__";
+type Kind = "skill" | "random";
 
 export default function UploadPage() {
   const router = useRouter();
@@ -27,15 +26,13 @@ export default function UploadPage() {
   const [userId, setUserId] = useState<string | null>(null);
   const [skills, setSkills] = useState<string[]>([]);
   const [selectedSkill, setSelectedSkill] = useState("");
-  const [categoryKey, setCategoryKey] = useState<string>(CATEGORIES[0]);
-  const [customCategory, setCustomCategory] = useState("");
+  const [kind, setKind] = useState<Kind>("skill");
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
   const [checking, setChecking] = useState(true);
 
-  // Получаем профиль (для списка навыков и проверки авторизации)
   useEffect(() => {
     (async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -53,8 +50,8 @@ export default function UploadPage() {
         return;
       }
       setUserId(user.id);
-      setSkills(profile.skills);
-      if (profile.skills.length > 0) setSelectedSkill(profile.skills[0]);
+      setSkills(profile.skills ?? []);
+      if (profile.skills?.length > 0) setSelectedSkill(profile.skills[0]);
       setChecking(false);
     })();
   }, [router, supabase]);
@@ -66,8 +63,11 @@ export default function UploadPage() {
     setPreviewUrl(f ? URL.createObjectURL(f) : null);
   }
 
+  const canPublish =
+    !!file && !!userId && (kind === "random" || !!selectedSkill);
+
   async function handleUpload() {
-    if (!file || !userId || !selectedSkill) return;
+    if (!canPublish || !file || !userId) return;
     setUploading(true);
     setError("");
 
@@ -84,14 +84,11 @@ export default function UploadPage() {
       return;
     }
 
-    const category =
-      categoryKey === OTHER ? customCategory.trim() || null : categoryKey;
-
     const { error: insertError } = await supabase.from("videos").insert({
       user_id: userId,
-      skill: selectedSkill,
+      skill: kind === "skill" ? selectedSkill : null,
       storage_path: path,
-      category,
+      is_random: kind === "random",
     });
 
     if (insertError) {
@@ -112,7 +109,7 @@ export default function UploadPage() {
   }
 
   return (
-    <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-black text-white px-4 py-12">
+    <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-black text-white px-4 pt-12 pb-28">
       <div className="pointer-events-none absolute left-1/2 top-1/4 -translate-x-1/2 h-[320px] w-[320px] rounded-full bg-echo opacity-12 blur-[130px]" />
 
       <div className="relative z-10 w-full max-w-md">
@@ -122,45 +119,52 @@ export default function UploadPage() {
         </div>
 
         <div className="space-y-6">
+          {/* Тип видео */}
           <div>
-            <Label className="text-zinc-300">{t.upload.skillLabel}</Label>
-            <Select value={selectedSkill} onValueChange={(v) => setSelectedSkill(v ?? "")}>
-              <SelectTrigger className="mt-2 bg-white/5 border-white/10 text-white h-12 rounded-xl">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="bg-zinc-950 border-white/10 text-white">
-                {skills.map((s) => (
-                  <SelectItem key={s} value={s}>{s}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Label className="text-zinc-300">{t.upload.videoType}</Label>
+            <div className="grid grid-cols-2 gap-2 mt-2">
+              <button
+                type="button"
+                onClick={() => setKind("skill")}
+                className={`rounded-2xl border p-4 text-left transition-colors ${
+                  kind === "skill"
+                    ? "bg-echo/15 border-echo/60"
+                    : "bg-white/5 border-white/10 hover:bg-white/[0.08]"
+                }`}
+              >
+                <p className="font-semibold mb-1">🎯 {t.upload.skillType}</p>
+                <p className="text-xs text-zinc-400 leading-tight">{t.upload.skillTypeHint}</p>
+              </button>
+              <button
+                type="button"
+                onClick={() => setKind("random")}
+                className={`rounded-2xl border p-4 text-left transition-colors ${
+                  kind === "random"
+                    ? "bg-echo/15 border-echo/60"
+                    : "bg-white/5 border-white/10 hover:bg-white/[0.08]"
+                }`}
+              >
+                <p className="font-semibold mb-1">✨ {t.upload.randomType}</p>
+                <p className="text-xs text-zinc-400 leading-tight">{t.upload.randomTypeHint}</p>
+              </button>
+            </div>
           </div>
 
-          <div>
-            <Label className="text-zinc-300">{t.upload.category}</Label>
-            <Select value={categoryKey} onValueChange={(v) => setCategoryKey(v ?? CATEGORIES[0])}>
-              <SelectTrigger className="mt-2 bg-white/5 border-white/10 text-white h-12 rounded-xl">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="bg-zinc-950 border-white/10 text-white">
-                {CATEGORIES.map((c) => (
-                  <SelectItem key={c} value={c}>
-                    {CATEGORY_EMOJI[c]} {t.categories[c]}
-                  </SelectItem>
-                ))}
-                <SelectItem value={OTHER}>✨ {t.categories.other}</SelectItem>
-              </SelectContent>
-            </Select>
-            {categoryKey === OTHER && (
-              <input
-                type="text"
-                value={customCategory}
-                onChange={(e) => setCustomCategory(e.target.value)}
-                placeholder={t.upload.customCategoryPlaceholder}
-                className="mt-2 w-full h-11 px-3 bg-white/5 border border-white/10 text-white rounded-xl placeholder:text-zinc-500"
-              />
-            )}
-          </div>
+          {kind === "skill" && (
+            <div>
+              <Label className="text-zinc-300">{t.upload.skillLabel}</Label>
+              <Select value={selectedSkill} onValueChange={(v) => setSelectedSkill(v ?? "")}>
+                <SelectTrigger className="mt-2 bg-white/5 border-white/10 text-white h-12 rounded-xl">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-zinc-950 border-white/10 text-white">
+                  {skills.map((s) => (
+                    <SelectItem key={s} value={s}>{s}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
           <div>
             <Label className="text-zinc-300">{t.upload.fileLabel}</Label>
@@ -184,17 +188,13 @@ export default function UploadPage() {
 
           {previewUrl && (
             <div className="rounded-2xl overflow-hidden border border-white/10 bg-zinc-950">
-              <video
-                src={previewUrl}
-                controls
-                className="w-full max-h-96 object-contain"
-              />
+              <video src={previewUrl} controls className="w-full max-h-96 object-contain" />
             </div>
           )}
 
           <Button
             onClick={handleUpload}
-            disabled={!file || !selectedSkill || uploading}
+            disabled={!canPublish || uploading}
             className="w-full bg-echo text-white hover:bg-echo-bright glow-echo rounded-full h-12 font-medium"
           >
             {uploading ? t.upload.uploading : t.upload.publish}

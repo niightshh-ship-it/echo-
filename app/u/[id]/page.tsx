@@ -27,7 +27,7 @@ export default async function UserProfilePage({
 
   if (id === user.id) redirect("/profile");
 
-  const [{ data: profile }, { data: reviews }] = await Promise.all([
+  const [{ data: profile }, { data: reviews }, { data: randomVideos }] = await Promise.all([
     supabase
       .from("profiles")
       .select("id, name, city, bio, skills, wants, avatar_url, verified")
@@ -38,7 +38,17 @@ export default async function UserProfilePage({
       .select("id, reviewer_id, rating, body, created_at")
       .eq("reviewee_id", id)
       .order("created_at", { ascending: false }),
+    supabase
+      .from("videos")
+      .select("id, storage_path")
+      .eq("user_id", id)
+      .eq("is_random", true)
+      .order("created_at", { ascending: false }),
   ]);
+  const randomVideosWithUrl = (randomVideos ?? []).map((v) => ({
+    ...v,
+    url: supabase.storage.from("videos").getPublicUrl(v.storage_path).data.publicUrl,
+  }));
   if (!profile) notFound();
 
   const reviewerIds = Array.from(new Set((reviews ?? []).map((r) => r.reviewer_id)));
@@ -104,6 +114,19 @@ export default async function UserProfilePage({
             </div>
           )}
         </div>
+
+        {randomVideosWithUrl.length > 0 && (
+          <>
+            <h2 className="text-lg font-semibold mb-3 lowercase">✨ {t.profile.randomVideos}</h2>
+            <div className="grid grid-cols-2 gap-3 mb-8">
+              {randomVideosWithUrl.map((v) => (
+                <div key={v.id} className="rounded-2xl overflow-hidden border border-white/10 bg-zinc-950">
+                  <video src={v.url} controls className="w-full aspect-[9/16] object-cover" />
+                </div>
+              ))}
+            </div>
+          </>
+        )}
 
         <h2 className="text-lg font-semibold mb-3 lowercase">{t.profile.reviewsTitle}</h2>
         {count === 0 ? (

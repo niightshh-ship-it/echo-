@@ -19,7 +19,7 @@ export default async function ProfilePage() {
     supabase.from("profiles").select("*").eq("id", user.id).single(),
     supabase
       .from("videos")
-      .select("id, skill, storage_path, created_at")
+      .select("id, skill, storage_path, created_at, is_random")
       .eq("user_id", user.id)
       .order("created_at", { ascending: false }),
   ]);
@@ -30,6 +30,8 @@ export default async function ProfilePage() {
     ...v,
     url: supabase.storage.from("videos").getPublicUrl(v.storage_path).data.publicUrl,
   }));
+  const skillVideos = videosWithUrl.filter((v) => !v.is_random);
+  const randomVideos = videosWithUrl.filter((v) => v.is_random);
 
   return (
     <div className="relative flex min-h-screen flex-col items-center bg-black text-white px-4 pt-12 pb-28">
@@ -125,7 +127,7 @@ export default async function ProfilePage() {
         )}
 
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold lowercase">{t.profile.myVideos}</h2>
+          <h2 className="text-xl font-semibold lowercase">🎯 {t.profile.skillVideos}</h2>
           <Link href="/upload">
             <Button className="bg-echo text-white hover:bg-echo-bright rounded-full">
               {t.profile.upload}
@@ -133,13 +135,13 @@ export default async function ProfilePage() {
           </Link>
         </div>
 
-        {videosWithUrl.length === 0 ? (
-          <p className="text-zinc-500 text-sm py-8 text-center border border-dashed border-white/10 rounded-2xl">
+        {skillVideos.length === 0 ? (
+          <p className="text-zinc-500 text-sm py-8 text-center border border-dashed border-white/10 rounded-2xl mb-8">
             {t.profile.noVideos}
           </p>
         ) : (
-          <div className="grid grid-cols-2 gap-3">
-            {videosWithUrl.map((v) => (
+          <div className="grid grid-cols-2 gap-3 mb-8">
+            {skillVideos.map((v) => (
               <div key={v.id} className="relative rounded-2xl overflow-hidden border border-white/10 bg-zinc-950">
                 <DeleteVideoButton videoId={v.id} />
                 <video src={v.url} controls className="w-full aspect-[9/16] object-cover" />
@@ -147,6 +149,20 @@ export default async function ProfilePage() {
               </div>
             ))}
           </div>
+        )}
+
+        {randomVideos.length > 0 && (
+          <>
+            <h2 className="text-xl font-semibold lowercase mb-4">✨ {t.profile.randomVideos}</h2>
+            <div className="grid grid-cols-2 gap-3">
+              {randomVideos.map((v) => (
+                <div key={v.id} className="relative rounded-2xl overflow-hidden border border-white/10 bg-zinc-950">
+                  <DeleteVideoButton videoId={v.id} />
+                  <video src={v.url} controls className="w-full aspect-[9/16] object-cover" />
+                </div>
+              ))}
+            </div>
+          </>
         )}
 
         <p className="text-xs text-zinc-600 mt-6 text-center">{user.email}</p>
