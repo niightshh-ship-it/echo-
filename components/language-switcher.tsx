@@ -36,7 +36,7 @@ export function LanguageSwitcher({ className = "" }: { className?: string }) {
   }
 
   return (
-    <div ref={ref} className={`relative ${className}`}>
+    <div ref={ref} className={`relative ${open ? "z-[80]" : ""} ${className}`}>
       <button
         onClick={() => setOpen((o) => !o)}
         className="flex items-center gap-1.5 text-zinc-400 hover:text-white text-sm transition-colors"
@@ -46,7 +46,7 @@ export function LanguageSwitcher({ className = "" }: { className?: string }) {
         <span>{localeShort[locale]}</span>
       </button>
       {open && (
-        <div className="absolute right-0 mt-2 w-40 rounded-xl border border-white/10 bg-zinc-950/95 backdrop-blur p-1 z-50 shadow-xl">
+        <div className="absolute right-0 mt-2 w-40 rounded-xl border border-white/10 bg-zinc-950/98 backdrop-blur p-1 z-[80] shadow-2xl">
           {locales.map((l) => (
             <button
               key={l}

@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Plus_Jakarta_Sans, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { getDictionary } from "@/lib/i18n/server";
 import { I18nProvider } from "@/lib/i18n/provider";
@@ -7,14 +7,20 @@ import { BottomNav } from "@/components/bottom-nav";
 import { Analytics } from "@vercel/analytics/react";
 import { Toaster } from "sonner";
 
-const geistSans = Geist({
+// Plus Jakarta Sans — мягкие округлые формы, отлично читается на любом размере.
+// Сохраняем переменную --font-geist-sans, чтобы Tailwind и существующая стилизация не сломались.
+const bodyFont = Plus_Jakarta_Sans({
   variable: "--font-geist-sans",
-  subsets: ["latin"],
+  subsets: ["latin", "latin-ext"],
+  weight: ["400", "500", "600", "700", "800"],
+  display: "swap",
 });
 
+// Моно оставляем — используется для OTP-кода
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  display: "swap",
 });
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://echo-brown-chi.vercel.app";
@@ -55,7 +61,7 @@ export default async function RootLayout({
   return (
     <html
       lang={locale}
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${bodyFont.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <I18nProvider dict={dict} locale={locale}>
