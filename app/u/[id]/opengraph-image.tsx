@@ -1,5 +1,5 @@
 import { ImageResponse } from "next/og";
-import { createClient } from "@/lib/supabase/server";
+import { createClient as createAdminClient } from "@supabase/supabase-js";
 
 export const alt = "Echo profile";
 export const size = { width: 1200, height: 630 };
@@ -11,7 +11,14 @@ export default async function ProfileOG({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const supabase = await createClient();
+  // Боты (Telegram, Twitter, Threads) приходят без cookies —
+  // под анонимом RLS не пускает к profiles. Берём service-role,
+  // публичные поля профиля можно отдать всем.
+  const supabase = createAdminClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    { auth: { persistSession: false } }
+  );
   const { data: profile } = await supabase
     .from("profiles")
     .select("name, city, skills, avatar_url")
