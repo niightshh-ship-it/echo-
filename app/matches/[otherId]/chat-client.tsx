@@ -252,6 +252,13 @@ export function ChatClient({
       console.error("send:", error);
     } else if (data) {
       setMessages((prev) => prev.map((m) => (m.id === tempId ? (data as Message) : m)));
+      // Письмо собеседнику (троттлится раз в час на стороне сервера)
+      const recipientId = me === pairA ? pairB : pairA;
+      fetch("/api/notify/message", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ recipientId, preview: body }),
+      }).catch(() => {});
     }
     setSending(false);
   }

@@ -5,6 +5,7 @@ import { useState, useRef, useEffect } from "react";
 import { Globe } from "lucide-react";
 import { locales, localeNames, localeShort, type Locale } from "@/lib/i18n/config";
 import { useI18n } from "@/lib/i18n/provider";
+import { createClient } from "@/lib/supabase/client";
 
 export function LanguageSwitcher({ className = "" }: { className?: string }) {
   const router = useRouter();
@@ -24,6 +25,14 @@ export function LanguageSwitcher({ className = "" }: { className?: string }) {
     document.cookie = `locale=${l};path=/;max-age=31536000;samesite=lax`;
     setOpen(false);
     router.refresh();
+    // Сохраним выбранный язык в профиль — чтобы письма приходили на нём.
+    // Молча игнорируем если юзер не залогинен или нет колонки в БД.
+    (async () => {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      await supabase.from("profiles").update({ locale: l }).eq("id", user.id);
+    })().catch(() => {});
   }
 
   return (

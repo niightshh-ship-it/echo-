@@ -16,8 +16,11 @@ export default function SettingsPage() {
 
   const [email, setEmail] = useState("");
   const [verified, setVerified] = useState(false);
+  const [emailNotifications, setEmailNotifications] = useState(true);
   const [checking, setChecking] = useState(true);
   const [deleting, setDeleting] = useState(false);
+  const [savingPref, setSavingPref] = useState(false);
+  const userIdRef = useRef<string | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -26,12 +29,33 @@ export default function SettingsPage() {
         router.replace("/sign-in");
         return;
       }
+      userIdRef.current = user.id;
       setEmail(user.email ?? "");
-      const { data: p } = await supabase.from("profiles").select("verified").eq("id", user.id).maybeSingle();
+      const { data: p } = await supabase
+        .from("profiles")
+        .select("verified, email_notifications")
+        .eq("id", user.id)
+        .maybeSingle();
       setVerified(!!p?.verified);
+      setEmailNotifications(p?.email_notifications !== false);
       setChecking(false);
     })();
   }, [router, supabase]);
+
+  async function toggleEmailNotifications() {
+    const next = !emailNotifications;
+    setEmailNotifications(next);
+    setSavingPref(true);
+    const { error } = await supabase
+      .from("profiles")
+      .update({ email_notifications: next })
+      .eq("id", userIdRef.current!);
+    if (error) {
+      setEmailNotifications(!next); // откатываем
+      console.error("update email_notifications:", error);
+    }
+    setSavingPref(false);
+  }
 
   async function signOut() {
     await supabase.auth.signOut();
@@ -102,6 +126,37 @@ export default function SettingsPage() {
             <p className="text-sm">{t.settings.language}</p>
             <LanguageSwitcher />
           </div>
+        </div>
+
+        {/* Email notifications */}
+        <div className="rounded-2xl glass border border-white/10 p-5 mb-4">
+          <p className="text-xs uppercase tracking-wider text-zinc-500 mb-3">
+            {t.settings.notifications}
+          </p>
+          <button
+            type="button"
+            onClick={toggleEmailNotifications}
+            disabled={savingPref}
+            className="w-full flex items-center justify-between gap-3 disabled:opacity-60"
+          >
+            <span className="text-sm text-left">
+              <span className="block">{t.settings.emailNotifs}</span>
+              <span className="block text-xs text-zinc-500 mt-0.5">
+                {t.settings.emailNotifsHint}
+              </span>
+            </span>
+            <span
+              className={`relative inline-block w-11 h-6 rounded-full transition-colors ${
+                emailNotifications ? "bg-echo" : "bg-zinc-700"
+              }`}
+            >
+              <span
+                className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white transition-transform ${
+                  emailNotifications ? "translate-x-5" : ""
+                }`}
+              />
+            </span>
+          </button>
         </div>
 
         {/* Sign out */}

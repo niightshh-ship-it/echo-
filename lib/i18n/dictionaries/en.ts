@@ -223,6 +223,9 @@ const en = {
     deleteConfirm: "Delete your account permanently? All your videos, matches and messages will be lost. This cannot be undone.",
     deleting: "Deleting...",
     verification: "Verification",
+    notifications: "Notifications",
+    emailNotifs: "Email me about matches and messages",
+    emailNotifsHint: "We won't email more than once per hour per chat.",
   },
   install: {
     title: "Install the app",

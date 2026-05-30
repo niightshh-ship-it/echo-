@@ -129,6 +129,12 @@ export function FeedClient({
           avatar: item.authorAvatar,
           id: item.authorId,
         });
+        // Письмо о мэтче собеседнику — не ждём и не падаем если не вышло
+        fetch("/api/notify/match", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ otherId: item.authorId }),
+        }).catch(() => {});
       }
     }
   }

@@ -225,6 +225,9 @@ const nl: Dictionary = {
     deleteConfirm: "Account permanent verwijderen? Al je video's, matches en berichten gaan verloren. Dit kan niet ongedaan worden gemaakt.",
     deleting: "Verwijderen...",
     verification: "Verificatie",
+    notifications: "Meldingen",
+    emailNotifs: "E-mail over matches en berichten",
+    emailNotifsHint: "Niet vaker dan eens per uur per chat.",
   },
   install: {
     title: "App installeren",
