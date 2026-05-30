@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getDictionary } from "@/lib/i18n/server";
 import { Badge } from "@/components/ui/badge";
 import { ProfileActions } from "@/components/profile-actions";
-import { VideoTile } from "@/components/video-tile";
+import { VideoGrid } from "@/components/video-grid";
 
 function Stars({ value }: { value: number }) {
   return (
@@ -45,13 +45,23 @@ export default async function UserProfilePage({
       .eq("user_id", id)
       .order("created_at", { ascending: false }),
   ]);
-  const videosWithUrl = (videos ?? []).map((v) => ({
-    ...v,
-    url: supabase.storage.from("videos").getPublicUrl(v.storage_path).data.publicUrl,
-  }));
-  const skillVideos = videosWithUrl.filter((v) => !v.is_random);
-  const randomVideos = videosWithUrl.filter((v) => v.is_random);
   if (!profile) notFound();
+  const videosWithUrl = (videos ?? []).map((v) => ({
+    id: v.id,
+    url: supabase.storage.from("videos").getPublicUrl(v.storage_path).data.publicUrl,
+    description: v.description ?? null,
+    skill: v.skill ?? null,
+    isRandom: !!v.is_random,
+    viewsCount: v.views_count ?? 0,
+  }));
+  const skillVideos = videosWithUrl.filter((v) => !v.isRandom);
+  const randomVideos = videosWithUrl.filter((v) => v.isRandom);
+  const author = {
+    id: profile.id,
+    name: profile.name,
+    city: profile.city,
+    avatar: profile.avatar_url ?? null,
+  };
 
   const reviewerIds = Array.from(new Set((reviews ?? []).map((r) => r.reviewer_id)));
   const { data: reviewers } = reviewerIds.length
@@ -118,51 +128,17 @@ export default async function UserProfilePage({
         </div>
 
         {skillVideos.length > 0 && (
-          <>
+          <div className="mb-8">
             <h2 className="text-lg font-semibold mb-3 lowercase">🎯 {t.profile.skillVideos}</h2>
-            <div className="grid grid-cols-3 gap-2 mb-8 grid-stagger">
-              {skillVideos.map((v) => (
-                <VideoTile
-                  key={v.id}
-                  videoId={v.id}
-                  videoUrl={v.url}
-                  description={v.description ?? null}
-                  skill={v.skill ?? null}
-                  isRandom={false}
-                  authorId={profile.id}
-                  authorName={profile.name}
-                  authorAvatar={profile.avatar_url ?? null}
-                  authorCity={profile.city}
-                  currentUserId={user.id}
-                  viewsCount={v.views_count ?? 0}
-                />
-              ))}
-            </div>
-          </>
+            <VideoGrid videos={skillVideos} author={author} currentUserId={user.id} />
+          </div>
         )}
 
         {randomVideos.length > 0 && (
-          <>
+          <div className="mb-8">
             <h2 className="text-lg font-semibold mb-3 lowercase">✨ {t.profile.randomVideos}</h2>
-            <div className="grid grid-cols-3 gap-2 mb-8 grid-stagger">
-              {randomVideos.map((v) => (
-                <VideoTile
-                  key={v.id}
-                  videoId={v.id}
-                  videoUrl={v.url}
-                  description={v.description ?? null}
-                  skill={null}
-                  isRandom={true}
-                  authorId={profile.id}
-                  authorName={profile.name}
-                  authorAvatar={profile.avatar_url ?? null}
-                  authorCity={profile.city}
-                  currentUserId={user.id}
-                  viewsCount={v.views_count ?? 0}
-                />
-              ))}
-            </div>
-          </>
+            <VideoGrid videos={randomVideos} author={author} currentUserId={user.id} />
+          </div>
         )}
 
         <h2 className="text-lg font-semibold mb-3 lowercase">{t.profile.reviewsTitle}</h2>

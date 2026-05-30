@@ -1,0 +1,72 @@
+"use client";
+
+import { useState, type ReactNode } from "react";
+import { Eye } from "lucide-react";
+import {
+  VideoSwiperModal,
+  type SwiperAuthor,
+  type SwiperVideo,
+} from "./video-swiper-modal";
+
+function formatCount(n: number) {
+  if (n < 1000) return String(n);
+  if (n < 10000) return (n / 1000).toFixed(1).replace(/\.0$/, "") + "k";
+  if (n < 1_000_000) return Math.round(n / 1000) + "k";
+  return (n / 1_000_000).toFixed(1).replace(/\.0$/, "") + "m";
+}
+
+export function VideoGrid({
+  videos,
+  author,
+  currentUserId,
+  deleteButtonFor,
+}: {
+  videos: SwiperVideo[];
+  author: SwiperAuthor;
+  currentUserId: string | null;
+  deleteButtonFor?: (videoId: string) => ReactNode;
+}) {
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+
+  return (
+    <>
+      <div className="grid grid-cols-3 gap-2 grid-stagger">
+        {videos.map((v, i) => (
+          <div key={v.id} className="relative">
+            <button
+              type="button"
+              onClick={() => setOpenIndex(i)}
+              className="relative block w-full aspect-[9/16] rounded-xl overflow-hidden bg-zinc-900 border border-white/10 group transition-transform duration-200 ease-out hover:scale-[1.02] active:scale-[0.97] hover:border-echo/40 focus:outline-none focus:ring-2 focus:ring-echo"
+            >
+              {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
+              <video
+                src={`${v.url}#t=0.1`}
+                preload="metadata"
+                muted
+                playsInline
+                className="w-full h-full object-cover"
+              />
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-black/70 to-transparent" />
+              <div className="absolute left-1.5 bottom-1.5 flex items-center gap-1 text-[11px] text-white font-medium drop-shadow">
+                <Eye className="w-3 h-3" />
+                {formatCount(v.viewsCount)}
+              </div>
+            </button>
+            {deleteButtonFor && (
+              <div className="absolute top-1 right-1 z-10">{deleteButtonFor(v.id)}</div>
+            )}
+          </div>
+        ))}
+      </div>
+      {openIndex !== null && (
+        <VideoSwiperModal
+          videos={videos}
+          author={author}
+          startIndex={openIndex}
+          currentUserId={currentUserId}
+          onClose={() => setOpenIndex(null)}
+        />
+      )}
+    </>
+  );
+}

@@ -1,0 +1,275 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import Link from "next/link";
+import { Heart, MessageCircle, X } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
+import { CommentsPanel } from "./comments-panel";
+
+export type SwiperVideo = {
+  id: string;
+  url: string;
+  description: string | null;
+  skill: string | null;
+  isRandom: boolean;
+  viewsCount: number;
+};
+
+export type SwiperAuthor = {
+  id: string;
+  name: string;
+  city: string;
+  avatar: string | null;
+};
+
+export function VideoSwiperModal({
+  videos,
+  author,
+  startIndex,
+  currentUserId,
+  onClose,
+}: {
+  videos: SwiperVideo[];
+  author: SwiperAuthor;
+  startIndex: number;
+  currentUserId: string | null;
+  onClose: () => void;
+}) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const videoRefs = useRef<Map<string, HTMLVideoElement>>(new Map());
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Сразу прыгаем на нужное видео (тапнутый тайл)
+  useEffect(() => {
+    if (!mounted) return;
+    const c = containerRef.current;
+    if (!c) return;
+    c.scrollTo({ top: c.clientHeight * startIndex, behavior: "instant" });
+  }, [mounted, startIndex]);
+
+  // Автоплей текущего, пауза остальных
+  useEffect(() => {
+    if (!mounted) return;
+    const c = containerRef.current;
+    if (!c) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          const id = entry.target.getAttribute("data-id");
+          if (!id) continue;
+          const v = videoRefs.current.get(id);
+          if (!v) continue;
+          if (entry.isIntersecting && entry.intersectionRatio > 0.7) {
+            v.play().catch(() => {});
+          } else {
+            v.pause();
+            v.currentTime = 0;
+          }
+        }
+      },
+      { root: c, threshold: [0, 0.7, 1] }
+    );
+    c.querySelectorAll("[data-id]").forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, [mounted]);
+
+  if (!mounted) return null;
+
+  return createPortal(
+    <div className="fixed inset-0 z-[55] bg-black animate-in fade-in duration-200">
+      <button
+        onClick={onClose}
+        className="fixed top-4 left-4 z-[60] bg-black/60 backdrop-blur rounded-full p-2 text-white"
+        aria-label="close"
+      >
+        <X className="w-5 h-5" />
+      </button>
+      <div
+        ref={containerRef}
+        className="h-screen w-screen overflow-y-scroll snap-y snap-mandatory scrollbar-hide"
+        style={{ scrollbarWidth: "none" }}
+      >
+        {videos.map((v) => (
+          <SwiperSlide
+            key={v.id}
+            video={v}
+            author={author}
+            currentUserId={currentUserId}
+            setVideoRef={(el) => {
+              if (el) videoRefs.current.set(v.id, el);
+              else videoRefs.current.delete(v.id);
+            }}
+          />
+        ))}
+      </div>
+    </div>,
+    document.body
+  );
+}
+
+function SwiperSlide({
+  video,
+  author,
+  currentUserId,
+  setVideoRef,
+}: {
+  video: SwiperVideo;
+  author: SwiperAuthor;
+  currentUserId: string | null;
+  setVideoRef: (el: HTMLVideoElement | null) => void;
+}) {
+  const supabase = createClient();
+  const [liked, setLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(0);
+  const [commentCount, setCommentCount] = useState(0);
+  const [showComments, setShowComments] = useState(false);
+  const [heartPop, setHeartPop] = useState(0);
+  const [muted, setMuted] = useState(true);
+  const viewedRef = useRef(false);
+
+  useEffect(() => {
+    (async () => {
+      if (!viewedRef.current && currentUserId && currentUserId !== author.id) {
+        viewedRef.current = true;
+        await supabase.rpc("increment_video_views", { p_video_id: video.id });
+      }
+      const tasks: PromiseLike<unknown>[] = [];
+      tasks.push(
+        supabase
+          .from("likes")
+          .select("*", { count: "exact", head: true })
+          .eq("video_id", video.id)
+          .then(({ count }) => setLikeCount(count ?? 0))
+      );
+      if (currentUserId) {
+        tasks.push(
+          supabase
+            .from("likes")
+            .select("video_id")
+            .eq("video_id", video.id)
+            .eq("liker_id", currentUserId)
+            .maybeSingle()
+            .then(({ data }) => setLiked(!!data))
+        );
+      }
+      if (video.isRandom) {
+        tasks.push(
+          supabase
+            .from("video_comments")
+            .select("*", { count: "exact", head: true })
+            .eq("video_id", video.id)
+            .then(({ count }) => setCommentCount(count ?? 0))
+        );
+      }
+      await Promise.all(tasks);
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [video.id]);
+
+  async function toggleLike() {
+    if (!currentUserId) return;
+    const wasLiked = liked;
+    setLiked(!wasLiked);
+    setLikeCount((c) => c + (wasLiked ? -1 : 1));
+    setHeartPop((n) => n + 1);
+    if (wasLiked) {
+      await supabase.rpc("unlike_video", { p_video_id: video.id });
+    } else {
+      await supabase.rpc("like_video", { p_video_id: video.id });
+    }
+  }
+
+  return (
+    <div
+      data-id={video.id}
+      className="relative h-screen w-full snap-start snap-always flex items-center justify-center"
+    >
+      <video
+        ref={setVideoRef}
+        src={video.url}
+        loop
+        muted={muted}
+        playsInline
+        onClick={() => setMuted((m) => !m)}
+        className="h-full w-full object-contain bg-black cursor-pointer"
+      />
+
+      <div className="absolute bottom-6 left-0 right-20 px-5">
+        <Link href={`/u/${author.id}`} className="flex items-center gap-2.5">
+          <span className="relative h-10 w-10 shrink-0 rounded-full overflow-hidden border border-white/25 bg-white/10 flex items-center justify-center">
+            {author.avatar ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={author.avatar} alt="" className="h-full w-full object-cover" />
+            ) : (
+              <span className="text-base text-white">
+                {author.name?.[0]?.toUpperCase() ?? "?"}
+              </span>
+            )}
+          </span>
+          <div>
+            <p className="text-white font-semibold text-base leading-tight">
+              {author.name}
+            </p>
+            <p className="text-zinc-300 text-xs">{author.city}</p>
+          </div>
+        </Link>
+        {video.skill && (
+          <p className="text-white text-sm mt-2 bg-white/10 inline-block px-2 py-0.5 rounded">
+            {video.skill}
+          </p>
+        )}
+        {video.description && (
+          <p className="text-white text-sm mt-2 leading-snug whitespace-pre-wrap max-h-28 overflow-y-auto bg-black/30 p-2 rounded">
+            {video.description}
+          </p>
+        )}
+      </div>
+
+      <div className="absolute right-4 bottom-24 flex flex-col items-center gap-4">
+        <button
+          onClick={toggleLike}
+          disabled={!currentUserId}
+          className="flex flex-col items-center gap-1 disabled:opacity-50"
+        >
+          <div
+            className={`rounded-full p-3 transition-colors ${
+              liked ? "bg-echo glow-echo" : "bg-white/20"
+            }`}
+          >
+            <Heart
+              key={heartPop}
+              className={`w-6 h-6 text-white ${heartPop > 0 ? "heart-pop" : ""}`}
+              fill={liked ? "white" : "none"}
+            />
+          </div>
+          <span className="text-white text-xs font-medium">{likeCount}</span>
+        </button>
+        {video.isRandom && (
+          <button
+            onClick={() => setShowComments(true)}
+            className="flex flex-col items-center gap-1"
+          >
+            <div className="rounded-full p-3 bg-white/20">
+              <MessageCircle className="w-6 h-6 text-white" />
+            </div>
+            <span className="text-white text-xs font-medium">{commentCount}</span>
+          </button>
+        )}
+      </div>
+
+      {showComments && (
+        <CommentsPanel
+          videoId={video.id}
+          currentUserId={currentUserId}
+          onClose={() => setShowComments(false)}
+          onCountChange={(c) => setCommentCount(c)}
+        />
+      )}
+    </div>
+  );
+}

@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Search, Settings as SettingsIcon } from "lucide-react";
 import { DeleteVideoButton } from "./delete-video-button";
-import { VideoTile } from "@/components/video-tile";
+import { VideoGrid } from "@/components/video-grid";
 
 export default async function ProfilePage() {
   const supabase = await createClient();
@@ -28,11 +28,21 @@ export default async function ProfilePage() {
   if (!profile) redirect("/onboarding");
 
   const videosWithUrl = (videos ?? []).map((v) => ({
-    ...v,
+    id: v.id,
     url: supabase.storage.from("videos").getPublicUrl(v.storage_path).data.publicUrl,
+    description: v.description ?? null,
+    skill: v.skill ?? null,
+    isRandom: !!v.is_random,
+    viewsCount: v.views_count ?? 0,
   }));
-  const skillVideos = videosWithUrl.filter((v) => !v.is_random);
-  const randomVideos = videosWithUrl.filter((v) => v.is_random);
+  const skillVideos = videosWithUrl.filter((v) => !v.isRandom);
+  const randomVideos = videosWithUrl.filter((v) => v.isRandom);
+  const author = {
+    id: user.id,
+    name: profile.name,
+    city: profile.city,
+    avatar: profile.avatar_url ?? null,
+  };
 
   return (
     <div className="relative flex min-h-screen flex-col items-center bg-black text-white px-4 pt-12 pb-28">
@@ -141,49 +151,25 @@ export default async function ProfilePage() {
             {t.profile.noVideos}
           </p>
         ) : (
-          <div className="grid grid-cols-3 gap-2 mb-8 grid-stagger">
-            {skillVideos.map((v) => (
-              <VideoTile
-                key={v.id}
-                videoId={v.id}
-                videoUrl={v.url}
-                description={v.description ?? null}
-                skill={v.skill ?? null}
-                isRandom={false}
-                authorId={user.id}
-                authorName={profile.name}
-                authorAvatar={profile.avatar_url ?? null}
-                authorCity={profile.city}
-                currentUserId={user.id}
-                viewsCount={v.views_count ?? 0}
-                deleteButton={<DeleteVideoButton videoId={v.id} />}
-              />
-            ))}
+          <div className="mb-8">
+            <VideoGrid
+              videos={skillVideos}
+              author={author}
+              currentUserId={user.id}
+              deleteButtonFor={(id) => <DeleteVideoButton videoId={id} />}
+            />
           </div>
         )}
 
         {randomVideos.length > 0 && (
           <>
             <h2 className="text-xl font-semibold lowercase mb-4">✨ {t.profile.randomVideos}</h2>
-            <div className="grid grid-cols-3 gap-2 grid-stagger">
-              {randomVideos.map((v) => (
-                <VideoTile
-                  key={v.id}
-                  videoId={v.id}
-                  videoUrl={v.url}
-                  description={v.description ?? null}
-                  skill={null}
-                  isRandom={true}
-                  authorId={user.id}
-                  authorName={profile.name}
-                  authorAvatar={profile.avatar_url ?? null}
-                  authorCity={profile.city}
-                  currentUserId={user.id}
-                  viewsCount={v.views_count ?? 0}
-                  deleteButton={<DeleteVideoButton videoId={v.id} />}
-                />
-              ))}
-            </div>
+            <VideoGrid
+              videos={randomVideos}
+              author={author}
+              currentUserId={user.id}
+              deleteButtonFor={(id) => <DeleteVideoButton videoId={id} />}
+            />
           </>
         )}
 
