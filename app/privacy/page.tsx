@@ -13,7 +13,7 @@ const CONTENT: Record<Locale, { pageTitle: string; updated: string; sections: Se
       { title: "Third parties", body: "Supabase (hosting, auth, database), Brevo (sending sign-in emails), Vercel (web hosting). They process data only to provide their service to us." },
       { title: "Your rights", body: "You can edit your data anytime in Settings, and delete your account permanently — that removes everything: videos, profile, messages, matches." },
       { title: "Changes", body: "We may update this policy. The latest version is always on this page." },
-      { title: "Contact", body: "Privacy questions: hello@echo.app" },
+      { title: "Contact", body: "Privacy questions: smartwoter@gmail.com" },
     ],
   },
   ru: {
@@ -26,7 +26,7 @@ const CONTENT: Record<Locale, { pageTitle: string; updated: string; sections: Se
       { title: "Третьи стороны", body: "Supabase (хостинг, авторизация, БД), Brevo (отправка писем со входом), Vercel (хостинг сайта). Они обрабатывают данные только чтобы оказывать свою услугу нам." },
       { title: "Твои права", body: "В любой момент можно отредактировать данные через Настройки или удалить аккаунт навсегда — это сотрёт всё: видео, профиль, сообщения, мэтчи." },
       { title: "Изменения", body: "Мы можем обновлять эту политику. Последняя версия всегда тут." },
-      { title: "Контакты", body: "По вопросам приватности: hello@echo.app" },
+      { title: "Контакты", body: "По вопросам приватности: smartwoter@gmail.com" },
     ],
   },
   nl: {
@@ -39,7 +39,7 @@ const CONTENT: Record<Locale, { pageTitle: string; updated: string; sections: Se
       { title: "Derde partijen", body: "Supabase (hosting, auth, database), Brevo (verzending van inlogmails), Vercel (webhosting). Zij verwerken gegevens alleen om hun dienst aan ons te leveren." },
       { title: "Jouw rechten", body: "Je kunt je gegevens altijd aanpassen in Instellingen, of je account permanent verwijderen — daarmee verdwijnt alles: video's, profiel, berichten, matches." },
       { title: "Wijzigingen", body: "We kunnen dit beleid bijwerken. De laatste versie staat altijd op deze pagina." },
-      { title: "Contact", body: "Privacyvragen: hello@echo.app" },
+      { title: "Contact", body: "Privacyvragen: smartwoter@gmail.com" },
     ],
   },
   uk: {
@@ -52,7 +52,7 @@ const CONTENT: Record<Locale, { pageTitle: string; updated: string; sections: Se
       { title: "Треті сторони", body: "Supabase (хостинг, авторизація, БД), Brevo (надсилання листів зі входом), Vercel (хостинг сайту). Вони обробляють дані лише щоб надавати нам свою послугу." },
       { title: "Твої права", body: "У будь-який момент можна відредагувати дані через Налаштування або видалити акаунт назавжди — це зітре все: відео, профіль, повідомлення, метчі." },
       { title: "Зміни", body: "Ми можемо оновлювати цю політику. Остання версія завжди тут." },
-      { title: "Контакти", body: "З питань конфіденційності: hello@echo.app" },
+      { title: "Контакти", body: "З питань конфіденційності: smartwoter@gmail.com" },
     ],
   },
 };
