@@ -37,6 +37,20 @@ export async function MarketingSections({ isLoggedIn }: { isLoggedIn: boolean })
     { q: t.home.q3, a: t.home.a3 },
   ];
 
+  const examples = [
+    { from: "🎸", to: "🇳🇱", text: t.home.example1 },
+    { from: "💆", to: "📷", text: t.home.example2 },
+    { from: "💻", to: "🍳", text: t.home.example3 },
+    { from: "🧘", to: "🎨", text: t.home.example4 },
+  ];
+
+  const safety = [
+    { icon: "✓", text: t.home.safety1 },
+    { icon: "🛡", text: t.home.safety2 },
+    { icon: "💸", text: t.home.safety3 },
+    { icon: "🔒", text: t.home.safety4 },
+  ];
+
   return (
     <div className="relative text-white">
       <div className="relative z-10">
@@ -77,6 +91,51 @@ export async function MarketingSections({ isLoggedIn }: { isLoggedIn: boolean })
                   <div className="text-3xl mb-4">{w.icon}</div>
                   <h3 className="text-lg font-semibold mb-2">{w.title}</h3>
                   <p className="text-sm text-zinc-400 leading-relaxed">{w.text}</p>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </section>
+
+        {/* What people trade */}
+        <section className="mx-auto max-w-5xl px-6 py-16">
+          <Reveal>
+            <h2 className="text-center text-3xl sm:text-4xl font-bold tracking-tight mb-3">
+              {t.home.examplesTitle}
+            </h2>
+            <p className="text-center text-zinc-400 text-sm mb-12">
+              {t.home.examplesSubtitle}
+            </p>
+          </Reveal>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {examples.map((ex, i) => (
+              <Reveal key={ex.text} delay={i * 100}>
+                <div className="rounded-2xl glass-card p-6 h-full hover:border-echo/40 transition-colors">
+                  <div className="flex items-center gap-2 text-3xl mb-4">
+                    <span>{ex.from}</span>
+                    <span className="text-echo-bright text-lg">↔</span>
+                    <span>{ex.to}</span>
+                  </div>
+                  <p className="text-sm text-zinc-300 leading-relaxed">{ex.text}</p>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </section>
+
+        {/* Trust & Safety */}
+        <section className="mx-auto max-w-3xl px-6 py-16">
+          <Reveal>
+            <h2 className="text-center text-3xl sm:text-4xl font-bold tracking-tight mb-10">
+              {t.home.safetyTitle}
+            </h2>
+          </Reveal>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {safety.map((s, i) => (
+              <Reveal key={s.text} delay={i * 80}>
+                <div className="flex items-center gap-3 rounded-2xl glass-card px-5 py-4">
+                  <span className="text-2xl">{s.icon}</span>
+                  <p className="text-sm text-zinc-200">{s.text}</p>
                 </div>
               </Reveal>
             ))}

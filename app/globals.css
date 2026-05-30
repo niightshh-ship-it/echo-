@@ -194,6 +194,30 @@
   .echo-ghost-2 { animation-delay: 1.33s; }
   .echo-ghost-3 { animation-delay: 2.66s; }
 
+  /* Та же эхо-волна, но только через CSS — текст не дублируется в DOM,
+     поэтому боты/SEO видят чистый заголовок. */
+  .echo-pulse {
+    position: relative;
+    display: inline-block;
+    vertical-align: baseline;
+  }
+  .echo-pulse::before,
+  .echo-pulse::after {
+    content: attr(data-text);
+    position: absolute;
+    left: 0;
+    top: 0;
+    pointer-events: none;
+    opacity: 0;
+    background-image: linear-gradient(135deg, #b3a0ff 0%, #7c5cff 45%, #e455ff 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: echo-ripple 4s cubic-bezier(0.16, 0.7, 0.3, 1) infinite;
+  }
+  .echo-pulse::before { animation-delay: 0s; }
+  .echo-pulse::after { animation-delay: 2s; }
+
   @keyframes echo-ripple {
     0% {
       opacity: 0.5;
@@ -310,6 +334,8 @@
   @media (prefers-reduced-motion: reduce) {
     .echo-ghost,
     .echo-ring { animation: none; opacity: 0; }
+    .echo-pulse::before,
+    .echo-pulse::after { animation: none; opacity: 0; }
     .blob-1, .blob-2 { animation: none; }
     .reveal { opacity: 1; transform: none; transition: none; }
   }

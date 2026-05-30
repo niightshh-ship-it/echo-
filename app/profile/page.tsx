@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Search, Settings as SettingsIcon } from "lucide-react";
 import { DeleteVideoButton } from "./delete-video-button";
-import { RandomVideoTile } from "@/components/random-video-tile";
+import { VideoTile } from "@/components/video-tile";
 
 export default async function ProfilePage() {
   const supabase = await createClient();
@@ -20,7 +20,7 @@ export default async function ProfilePage() {
     supabase.from("profiles").select("*").eq("id", user.id).single(),
     supabase
       .from("videos")
-      .select("id, skill, storage_path, created_at, is_random, description")
+      .select("id, skill, storage_path, created_at, is_random, description, views_count")
       .eq("user_id", user.id)
       .order("created_at", { ascending: false }),
   ]);
@@ -141,13 +141,23 @@ export default async function ProfilePage() {
             {t.profile.noVideos}
           </p>
         ) : (
-          <div className="grid grid-cols-2 gap-3 mb-8">
+          <div className="grid grid-cols-3 gap-2 mb-8">
             {skillVideos.map((v) => (
-              <div key={v.id} className="relative rounded-2xl overflow-hidden border border-white/10 bg-zinc-950">
-                <DeleteVideoButton videoId={v.id} />
-                <video src={v.url} controls className="w-full aspect-[9/16] object-cover" />
-                <p className="text-xs text-zinc-400 px-3 py-2">{v.skill}</p>
-              </div>
+              <VideoTile
+                key={v.id}
+                videoId={v.id}
+                videoUrl={v.url}
+                description={v.description ?? null}
+                skill={v.skill ?? null}
+                isRandom={false}
+                authorId={user.id}
+                authorName={profile.name}
+                authorAvatar={profile.avatar_url ?? null}
+                authorCity={profile.city}
+                currentUserId={user.id}
+                viewsCount={v.views_count ?? 0}
+                deleteButton={<DeleteVideoButton videoId={v.id} />}
+              />
             ))}
           </div>
         )}
@@ -155,14 +165,21 @@ export default async function ProfilePage() {
         {randomVideos.length > 0 && (
           <>
             <h2 className="text-xl font-semibold lowercase mb-4">✨ {t.profile.randomVideos}</h2>
-            <div className="space-y-4">
+            <div className="grid grid-cols-3 gap-2">
               {randomVideos.map((v) => (
-                <RandomVideoTile
+                <VideoTile
                   key={v.id}
                   videoId={v.id}
                   videoUrl={v.url}
                   description={v.description ?? null}
+                  skill={null}
+                  isRandom={true}
+                  authorId={user.id}
+                  authorName={profile.name}
+                  authorAvatar={profile.avatar_url ?? null}
+                  authorCity={profile.city}
                   currentUserId={user.id}
+                  viewsCount={v.views_count ?? 0}
                   deleteButton={<DeleteVideoButton videoId={v.id} />}
                 />
               ))}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -91,6 +92,11 @@ export default function SignInPage() {
         <div className="blob blob-2 absolute bottom-0 right-0 h-[300px] w-[400px] bg-echo-fuchsia opacity-10" />
       </div>
 
+      <div className="absolute top-5 left-5 z-20">
+        <Link href="/" className="text-sm text-zinc-400 hover:text-white transition-colors">
+          {t.signIn.backToLanding}
+        </Link>
+      </div>
       <div className="absolute top-5 right-5 z-20">
         <LanguageSwitcher />
       </div>
@@ -100,7 +106,8 @@ export default function SignInPage() {
 
         {stage === "email" ? (
           <>
-            <p className="text-zinc-400 mb-8">{t.signIn.subtitleEmail}</p>
+            <p className="text-zinc-300 mb-2">{t.signIn.noPasswordHint}</p>
+            <p className="text-zinc-500 text-sm mb-8">{t.signIn.newHereHint}</p>
             <form onSubmit={sendCode} className="space-y-4">
               <div>
                 <Label htmlFor="email" className="text-zinc-300">{t.signIn.email}</Label>
@@ -123,6 +130,9 @@ export default function SignInPage() {
                 {status === "sending" ? t.signIn.sending : t.signIn.getCode}
               </Button>
               {errorMsg && <p className="text-sm text-red-400">{errorMsg}</p>}
+              <p className="text-xs text-zinc-500 text-center leading-relaxed pt-2">
+                {t.signIn.ageGate}
+              </p>
             </form>
           </>
         ) : (

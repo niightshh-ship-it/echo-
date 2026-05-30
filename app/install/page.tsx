@@ -32,7 +32,9 @@ export default async function InstallPage() {
                   <Icon className="w-5 h-5 text-echo-bright" />
                   <h2 className="font-semibold">{b.title}</h2>
                 </div>
-                <ol className="space-y-2">
+                <ol className="space-y-2 list-none">
+                  {/* list-none защищает от случая, когда дефолтная нумерация <ol>
+                      рендерится поверх наших цветных бейджей и получается "1. 1 ..." */}
                   {b.steps.map((s, i) => (
                     <li key={i} className="flex gap-3 text-sm text-zinc-300">
                       <span className="shrink-0 w-5 h-5 rounded-full bg-echo/20 text-echo-bright text-xs flex items-center justify-center">

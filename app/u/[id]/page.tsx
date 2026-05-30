@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getDictionary } from "@/lib/i18n/server";
 import { Badge } from "@/components/ui/badge";
 import { ProfileActions } from "@/components/profile-actions";
-import { RandomVideoTile } from "@/components/random-video-tile";
+import { VideoTile } from "@/components/video-tile";
 
 function Stars({ value }: { value: number }) {
   return (
@@ -28,7 +28,7 @@ export default async function UserProfilePage({
 
   if (id === user.id) redirect("/profile");
 
-  const [{ data: profile }, { data: reviews }, { data: randomVideos }] = await Promise.all([
+  const [{ data: profile }, { data: reviews }, { data: videos }] = await Promise.all([
     supabase
       .from("profiles")
       .select("id, name, city, bio, skills, wants, avatar_url, verified")
@@ -41,15 +41,16 @@ export default async function UserProfilePage({
       .order("created_at", { ascending: false }),
     supabase
       .from("videos")
-      .select("id, storage_path, description")
+      .select("id, skill, storage_path, description, is_random, views_count")
       .eq("user_id", id)
-      .eq("is_random", true)
       .order("created_at", { ascending: false }),
   ]);
-  const randomVideosWithUrl = (randomVideos ?? []).map((v) => ({
+  const videosWithUrl = (videos ?? []).map((v) => ({
     ...v,
     url: supabase.storage.from("videos").getPublicUrl(v.storage_path).data.publicUrl,
   }));
+  const skillVideos = videosWithUrl.filter((v) => !v.is_random);
+  const randomVideos = videosWithUrl.filter((v) => v.is_random);
   if (!profile) notFound();
 
   const reviewerIds = Array.from(new Set((reviews ?? []).map((r) => r.reviewer_id)));
@@ -116,17 +117,48 @@ export default async function UserProfilePage({
           )}
         </div>
 
-        {randomVideosWithUrl.length > 0 && (
+        {skillVideos.length > 0 && (
           <>
-            <h2 className="text-lg font-semibold mb-3 lowercase">✨ {t.profile.randomVideos}</h2>
-            <div className="space-y-4 mb-8">
-              {randomVideosWithUrl.map((v) => (
-                <RandomVideoTile
+            <h2 className="text-lg font-semibold mb-3 lowercase">🎯 {t.profile.skillVideos}</h2>
+            <div className="grid grid-cols-3 gap-2 mb-8">
+              {skillVideos.map((v) => (
+                <VideoTile
                   key={v.id}
                   videoId={v.id}
                   videoUrl={v.url}
                   description={v.description ?? null}
+                  skill={v.skill ?? null}
+                  isRandom={false}
+                  authorId={profile.id}
+                  authorName={profile.name}
+                  authorAvatar={profile.avatar_url ?? null}
+                  authorCity={profile.city}
                   currentUserId={user.id}
+                  viewsCount={v.views_count ?? 0}
+                />
+              ))}
+            </div>
+          </>
+        )}
+
+        {randomVideos.length > 0 && (
+          <>
+            <h2 className="text-lg font-semibold mb-3 lowercase">✨ {t.profile.randomVideos}</h2>
+            <div className="grid grid-cols-3 gap-2 mb-8">
+              {randomVideos.map((v) => (
+                <VideoTile
+                  key={v.id}
+                  videoId={v.id}
+                  videoUrl={v.url}
+                  description={v.description ?? null}
+                  skill={null}
+                  isRandom={true}
+                  authorId={profile.id}
+                  authorName={profile.name}
+                  authorAvatar={profile.avatar_url ?? null}
+                  authorCity={profile.city}
+                  currentUserId={user.id}
+                  viewsCount={v.views_count ?? 0}
                 />
               ))}
             </div>

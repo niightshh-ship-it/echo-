@@ -1,6 +1,7 @@
 import { getDictionary } from "@/lib/i18n/server";
 import type { Locale } from "@/lib/i18n/config";
 import { LegalLayout, type Section } from "../(legal)/legal-layout";
+import { CONTACT_EMAIL } from "@/lib/config";
 
 const CONTENT: Record<Locale, { pageTitle: string; updated: string; sections: Section[] }> = {
   en: {
@@ -15,7 +16,7 @@ const CONTENT: Record<Locale, { pageTitle: string; updated: string; sections: Se
       { title: "No warranty", body: "Echo is provided \"as is\", without warranties. We don't guarantee uninterrupted or error-free service." },
       { title: "Liability", body: "To the extent allowed by law, Echo isn't liable for indirect, incidental or consequential damages." },
       { title: "Changes", body: "We may update these terms. The latest version is always on this page." },
-      { title: "Contact", body: "Questions: smartwoter@gmail.com" },
+      { title: "Contact", body: `Questions: ${CONTACT_EMAIL}` },
     ],
   },
   ru: {
@@ -30,7 +31,7 @@ const CONTENT: Record<Locale, { pageTitle: string; updated: string; sections: Se
       { title: "Без гарантий", body: "Echo предоставляется «как есть», без гарантий. Мы не гарантируем бесперебойную работу или отсутствие ошибок." },
       { title: "Ответственность", body: "В рамках, разрешённых законом, Echo не несёт ответственности за косвенный, случайный или последующий ущерб." },
       { title: "Изменения", body: "Мы можем обновлять эти условия. Последняя версия всегда тут." },
-      { title: "Контакты", body: "Вопросы: smartwoter@gmail.com" },
+      { title: "Контакты", body: `Вопросы: ${CONTACT_EMAIL}` },
     ],
   },
   nl: {
@@ -45,7 +46,7 @@ const CONTENT: Record<Locale, { pageTitle: string; updated: string; sections: Se
       { title: "Geen garantie", body: "Echo wordt geleverd \"zoals het is\", zonder garanties. We garanderen geen ononderbroken of foutloze service." },
       { title: "Aansprakelijkheid", body: "Voor zover wettelijk toegestaan, is Echo niet aansprakelijk voor indirecte, incidentele of gevolgschade." },
       { title: "Wijzigingen", body: "We kunnen deze voorwaarden bijwerken. De laatste versie staat altijd op deze pagina." },
-      { title: "Contact", body: "Vragen: smartwoter@gmail.com" },
+      { title: "Contact", body: `Vragen: ${CONTACT_EMAIL}` },
     ],
   },
   uk: {
@@ -60,7 +61,7 @@ const CONTENT: Record<Locale, { pageTitle: string; updated: string; sections: Se
       { title: "Без гарантій", body: "Echo надається \"як є\", без гарантій. Ми не гарантуємо безперервної або безпомилкової роботи." },
       { title: "Відповідальність", body: "У межах, дозволених законом, Echo не несе відповідальності за непрямі, випадкові чи наслідкові збитки." },
       { title: "Зміни", body: "Ми можемо оновлювати ці умови. Остання версія завжди тут." },
-      { title: "Контакти", body: "Питання: smartwoter@gmail.com" },
+      { title: "Контакти", body: `Питання: ${CONTACT_EMAIL}` },
     ],
   },
 };
