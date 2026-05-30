@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { Heart } from "lucide-react";
+import { Heart, MessageCircle } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useT } from "@/lib/i18n/provider";
+import { CommentsPanel } from "@/components/comments-panel";
 
 export type FeedItem = {
   id: string;
@@ -35,10 +36,16 @@ export function FeedClient({
   const [animating, setAnimating] = useState(true);
   const [liked, setLiked] = useState<Set<string>>(new Set(initiallyLiked));
   const [matchBanner, setMatchBanner] = useState<string | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    createClient().auth.getUser().then(({ data: { user } }) => {
+      setCurrentUserId(user?.id ?? null);
+    });
+  }, []);
 
   const touchStart = useRef<{ x: number; y: number; dir: "unknown" | "h" | "v" } | null>(null);
 
-  // Авто-скрытие баннера мэтча
   useEffect(() => {
     if (!matchBanner) return;
     const id = setTimeout(() => setMatchBanner(null), 4000);
@@ -112,7 +119,6 @@ export function FeedClient({
     }
   }
 
-  // Когда mode = skill, перемещаем wrapper на 0; random → -100vw. Плюс drag.
   const baseTx = mode === "skill" ? "0vw" : "-100vw";
 
   return (
@@ -149,7 +155,7 @@ export function FeedClient({
         </div>
       )}
 
-      {/* Карусель — две колонки бок-о-бок */}
+      {/* Карусель */}
       <div
         className="flex h-screen"
         style={{
@@ -160,17 +166,19 @@ export function FeedClient({
       >
         <FeedColumn
           items={skillItems}
+          mode="skill"
           active={mode === "skill"}
           liked={liked}
           onLikeToggle={toggleLike}
-          t={t}
+          currentUserId={currentUserId}
         />
         <FeedColumn
           items={randomItems}
+          mode="random"
           active={mode === "random"}
           liked={liked}
           onLikeToggle={toggleLike}
-          t={t}
+          currentUserId={currentUserId}
         />
       </div>
     </div>
@@ -179,24 +187,25 @@ export function FeedClient({
 
 function FeedColumn({
   items,
+  mode,
   active,
   liked,
   onLikeToggle,
-  t,
+  currentUserId,
 }: {
   items: FeedItem[];
+  mode: Mode;
   active: boolean;
   liked: Set<string>;
   onLikeToggle: (item: FeedItem) => void;
-  t: ReturnType<typeof useT>;
+  currentUserId: string | null;
 }) {
+  const t = useT();
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRefs = useRef<Map<string, HTMLVideoElement>>(new Map());
   const [activeId, setActiveId] = useState<string | null>(items[0]?.id ?? null);
   const [muted, setMuted] = useState(true);
-  const [expanded, setExpanded] = useState<Set<string>>(new Set());
 
-  // Автоплей текущего видео — только когда колонка активна
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -227,7 +236,6 @@ function FeedColumn({
     return () => io.disconnect();
   }, [active, items]);
 
-  // Когда колонка становится активной — скроллим к началу, ставим первый видео
   useEffect(() => {
     if (active) {
       containerRef.current?.scrollTo({ top: 0 });
@@ -244,13 +252,9 @@ function FeedColumn({
     );
   }
 
-  function toggleExpand(id: string) {
-    setExpanded((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
+  function setVideoRef(id: string, el: HTMLVideoElement | null) {
+    if (el) videoRefs.current.set(id, el);
+    else videoRefs.current.delete(id);
   }
 
   return (
@@ -259,88 +263,187 @@ function FeedColumn({
       className="w-screen h-screen shrink-0 overflow-y-scroll snap-y snap-mandatory bg-black scrollbar-hide"
       style={{ scrollbarWidth: "none" }}
     >
-      {items.map((item) => {
-        const isExpanded = expanded.has(item.id);
-        const hasDescription = !!item.description && item.description.trim().length > 0;
-        return (
-          <div
-            key={item.id}
-            data-id={item.id}
-            className="relative h-screen w-full snap-start snap-always flex items-center justify-center"
-          >
-            <video
-              ref={(el) => {
-                if (el) videoRefs.current.set(item.id, el);
-                else videoRefs.current.delete(item.id);
-              }}
-              src={item.url}
-              loop
-              muted={muted}
-              playsInline
-              onClick={() => setMuted((m) => !m)}
-              className="h-full w-full object-contain bg-black"
-            />
+      {items.map((item) => (
+        <VideoSlide
+          key={item.id}
+          item={item}
+          mode={mode}
+          isLiked={liked.has(item.id)}
+          onLikeToggle={() => onLikeToggle(item)}
+          muted={muted}
+          onMuteToggle={() => setMuted((m) => !m)}
+          setVideoRef={setVideoRef}
+          showSoundHint={muted && item.id === items[0].id && activeId === item.id}
+          currentUserId={currentUserId}
+        />
+      ))}
+    </div>
+  );
+}
 
-            <div className="absolute bottom-16 left-0 right-16 p-6 bg-gradient-to-t from-black/80 to-transparent">
-              <Link href={`/u/${item.authorId}`} className="flex items-center gap-2.5 hover:opacity-80">
-                <span className="relative h-10 w-10 shrink-0 rounded-full overflow-hidden border border-white/25 bg-white/10 flex items-center justify-center">
-                  {item.authorAvatar ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={item.authorAvatar} alt="" className="h-full w-full object-cover" />
-                  ) : (
-                    <span className="text-base">{item.authorName?.[0]?.toUpperCase() ?? "?"}</span>
-                  )}
-                </span>
-                <div>
-                  <p className="text-white font-semibold text-lg leading-tight">{item.authorName}</p>
-                  <p className="text-zinc-300 text-sm">{item.authorCity}</p>
-                </div>
-              </Link>
-              {item.skill && (
-                <p className="text-white text-sm mt-2 bg-white/10 inline-block px-2 py-0.5 rounded">
-                  {item.skill}
-                </p>
-              )}
-              {hasDescription && (
-                <div className="mt-2">
-                  <p
-                    className={`text-white text-sm leading-snug whitespace-pre-wrap ${
-                      isExpanded ? "" : "line-clamp-2"
-                    }`}
-                  >
-                    {item.description}
-                  </p>
-                  <button
-                    onClick={() => toggleExpand(item.id)}
-                    className="text-xs text-zinc-300 mt-1 underline"
-                  >
-                    {isExpanded ? t.feed.less : t.feed.more}
-                  </button>
-                </div>
-              )}
-            </div>
+function VideoSlide({
+  item,
+  mode,
+  isLiked,
+  onLikeToggle,
+  muted,
+  onMuteToggle,
+  setVideoRef,
+  showSoundHint,
+  currentUserId,
+}: {
+  item: FeedItem;
+  mode: Mode;
+  isLiked: boolean;
+  onLikeToggle: () => void;
+  muted: boolean;
+  onMuteToggle: () => void;
+  setVideoRef: (id: string, el: HTMLVideoElement | null) => void;
+  showSoundHint: boolean;
+  currentUserId: string | null;
+}) {
+  const t = useT();
+  const descRef = useRef<HTMLParagraphElement>(null);
+  const [overflows, setOverflows] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+  const [likeCount, setLikeCount] = useState(0);
+  const [commentCount, setCommentCount] = useState(0);
+  const [showComments, setShowComments] = useState(false);
 
-            <button
-              onClick={() => onLikeToggle(item)}
-              className="absolute right-4 bottom-44 flex flex-col items-center gap-1"
+  // Счётчики — только в режиме random
+  useEffect(() => {
+    if (mode !== "random") return;
+    const supabase = createClient();
+    (async () => {
+      const [{ count: lc }, { count: cc }] = await Promise.all([
+        supabase.from("likes").select("*", { count: "exact", head: true }).eq("video_id", item.id),
+        supabase
+          .from("video_comments")
+          .select("*", { count: "exact", head: true })
+          .eq("video_id", item.id),
+      ]);
+      setLikeCount(lc ?? 0);
+      setCommentCount(cc ?? 0);
+    })();
+  }, [mode, item.id]);
+
+  // Определяем — действительно ли описание не помещается в 2 строки
+  useLayoutEffect(() => {
+    const el = descRef.current;
+    if (!el || expanded) return;
+    setOverflows(el.scrollHeight > el.offsetHeight + 1);
+  }, [item.description, expanded]);
+
+  function handleLikeToggle() {
+    if (mode === "random") {
+      setLikeCount((c) => c + (isLiked ? -1 : 1));
+    }
+    onLikeToggle();
+  }
+
+  const hasDescription = !!item.description && item.description.trim().length > 0;
+
+  return (
+    <div
+      data-id={item.id}
+      className="relative h-screen w-full snap-start snap-always flex items-center justify-center"
+    >
+      <video
+        ref={(el) => setVideoRef(item.id, el)}
+        src={item.url}
+        loop
+        muted={muted}
+        playsInline
+        onClick={onMuteToggle}
+        className="h-full w-full object-contain bg-black"
+      />
+
+      <div className="absolute bottom-16 left-0 right-20 p-6 bg-gradient-to-t from-black/80 to-transparent">
+        <Link
+          href={`/u/${item.authorId}`}
+          className="flex items-center gap-2.5 hover:opacity-80"
+        >
+          <span className="relative h-10 w-10 shrink-0 rounded-full overflow-hidden border border-white/25 bg-white/10 flex items-center justify-center">
+            {item.authorAvatar ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={item.authorAvatar} alt="" className="h-full w-full object-cover" />
+            ) : (
+              <span className="text-base">{item.authorName?.[0]?.toUpperCase() ?? "?"}</span>
+            )}
+          </span>
+          <div>
+            <p className="text-white font-semibold text-lg leading-tight">{item.authorName}</p>
+            <p className="text-zinc-300 text-sm">{item.authorCity}</p>
+          </div>
+        </Link>
+        {item.skill && (
+          <p className="text-white text-sm mt-2 bg-white/10 inline-block px-2 py-0.5 rounded">
+            {item.skill}
+          </p>
+        )}
+        {hasDescription && (
+          <div className="mt-2">
+            <p
+              ref={descRef}
+              className={`text-white text-sm leading-snug whitespace-pre-wrap ${
+                expanded ? "" : "line-clamp-2"
+              }`}
             >
-              <div
-                className={`rounded-full p-3 transition-colors ${
-                  liked.has(item.id) ? "bg-echo glow-echo" : "bg-white/20"
-                }`}
+              {item.description}
+            </p>
+            {(overflows || expanded) && (
+              <button
+                onClick={() => setExpanded((e) => !e)}
+                className="text-xs text-zinc-300 mt-1 underline"
               >
-                <Heart className="w-7 h-7 text-white" fill={liked.has(item.id) ? "white" : "none"} />
-              </div>
-            </button>
-
-            {muted && item.id === items[0].id && (
-              <div className="absolute top-20 left-1/2 -translate-x-1/2 bg-black/60 text-white text-xs px-3 py-1.5 rounded-full">
-                {t.feed.soundHint}
-              </div>
+                {expanded ? t.feed.less : t.feed.more}
+              </button>
             )}
           </div>
-        );
-      })}
+        )}
+      </div>
+
+      {/* Колонка действий справа */}
+      <div className="absolute right-4 bottom-32 flex flex-col items-center gap-4">
+        <button onClick={handleLikeToggle} className="flex flex-col items-center gap-1">
+          <div
+            className={`rounded-full p-3 transition-colors ${
+              isLiked ? "bg-echo glow-echo" : "bg-white/20"
+            }`}
+          >
+            <Heart className="w-7 h-7 text-white" fill={isLiked ? "white" : "none"} />
+          </div>
+          {mode === "random" && (
+            <span className="text-white text-xs font-medium">{likeCount}</span>
+          )}
+        </button>
+        {mode === "random" && (
+          <button
+            onClick={() => setShowComments(true)}
+            className="flex flex-col items-center gap-1"
+          >
+            <div className="rounded-full p-3 bg-white/20">
+              <MessageCircle className="w-7 h-7 text-white" />
+            </div>
+            <span className="text-white text-xs font-medium">{commentCount}</span>
+          </button>
+        )}
+      </div>
+
+      {showSoundHint && (
+        <div className="absolute top-20 left-1/2 -translate-x-1/2 bg-black/60 text-white text-xs px-3 py-1.5 rounded-full">
+          {t.feed.soundHint}
+        </div>
+      )}
+
+      {showComments && (
+        <CommentsPanel
+          videoId={item.id}
+          currentUserId={currentUserId}
+          onClose={() => setShowComments(false)}
+          onCountChange={(c) => setCommentCount(c)}
+        />
+      )}
     </div>
   );
 }

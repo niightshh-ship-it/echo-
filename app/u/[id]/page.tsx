@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getDictionary } from "@/lib/i18n/server";
 import { Badge } from "@/components/ui/badge";
 import { ProfileActions } from "@/components/profile-actions";
-import { RandomVideoCard } from "@/components/random-video-card";
+import { RandomVideoTile } from "@/components/random-video-tile";
 
 function Stars({ value }: { value: number }) {
   return (
@@ -121,7 +121,7 @@ export default async function UserProfilePage({
             <h2 className="text-lg font-semibold mb-3 lowercase">✨ {t.profile.randomVideos}</h2>
             <div className="space-y-4 mb-8">
               {randomVideosWithUrl.map((v) => (
-                <RandomVideoCard
+                <RandomVideoTile
                   key={v.id}
                   videoId={v.id}
                   videoUrl={v.url}
