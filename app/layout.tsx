@@ -4,6 +4,7 @@ import "./globals.css";
 import { getDictionary } from "@/lib/i18n/server";
 import { I18nProvider } from "@/lib/i18n/provider";
 import { BottomNav } from "@/components/bottom-nav";
+import { Analytics } from "@vercel/analytics/react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -21,6 +22,19 @@ export const metadata: Metadata = {
   manifest: "/manifest.webmanifest",
   icons: { icon: "/icon.svg", apple: "/icon.svg" },
   appleWebApp: { capable: true, title: "Echo", statusBarStyle: "black-translucent" },
+  openGraph: {
+    title: "Echo — skill exchange",
+    description: "Trade skills with people near you. No money, just skills.",
+    type: "website",
+    siteName: "Echo",
+    images: [{ url: "/icon.svg", width: 512, height: 512, alt: "Echo" }],
+  },
+  twitter: {
+    card: "summary",
+    title: "Echo — skill exchange",
+    description: "Trade skills with people near you. No money, just skills.",
+    images: ["/icon.svg"],
+  },
 };
 
 export const viewport: Viewport = {
@@ -44,6 +58,7 @@ export default async function RootLayout({
           {children}
           <BottomNav />
         </I18nProvider>
+        <Analytics />
       </body>
     </html>
   );

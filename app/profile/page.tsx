@@ -106,13 +106,6 @@ export default async function ProfilePage() {
             </div>
           )}
 
-          {!profile.verified && (
-            <Link href="/verify" className="block mt-5">
-              <Button className="w-full bg-echo text-white hover:bg-echo-bright glow-echo rounded-full h-11 font-medium">
-                {t.profile.verifyCta}
-              </Button>
-            </Link>
-          )}
         </div>
 
         {profile.is_admin && (

@@ -167,6 +167,7 @@ const en = {
     deleteAccount: "Delete account",
     deleteConfirm: "Delete your account permanently? All your videos, matches and messages will be lost. This cannot be undone.",
     deleting: "Deleting...",
+    verification: "Verification",
   },
   install: {
     title: "Install the app",

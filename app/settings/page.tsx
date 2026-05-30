@@ -15,18 +15,22 @@ export default function SettingsPage() {
   const t = useT();
 
   const [email, setEmail] = useState("");
+  const [verified, setVerified] = useState(false);
   const [checking, setChecking] = useState(true);
   const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
+    (async () => {
+      const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         router.replace("/sign-in");
         return;
       }
       setEmail(user.email ?? "");
+      const { data: p } = await supabase.from("profiles").select("verified").eq("id", user.id).maybeSingle();
+      setVerified(!!p?.verified);
       setChecking(false);
-    });
+    })();
   }, [router, supabase]);
 
   async function signOut() {
@@ -73,6 +77,23 @@ export default function SettingsPage() {
               <p className="text-sm truncate">{email}</p>
             </div>
           </div>
+        </div>
+
+        {/* Verification */}
+        <div className="rounded-2xl glass border border-white/10 p-5 mb-4">
+          <p className="text-xs uppercase tracking-wider text-zinc-500 mb-3">{t.settings.verification}</p>
+          {verified ? (
+            <p className="text-sm text-emerald-400 flex items-center gap-1.5">
+              <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400" />
+              {t.profile.verified}
+            </p>
+          ) : (
+            <Link href="/verify">
+              <Button className="w-full bg-echo text-white hover:bg-echo-bright glow-echo rounded-full h-11 font-medium">
+                {t.profile.verifyCta}
+              </Button>
+            </Link>
+          )}
         </div>
 
         {/* Language */}

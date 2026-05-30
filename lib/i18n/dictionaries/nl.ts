@@ -169,6 +169,7 @@ const nl: Dictionary = {
     deleteAccount: "Account verwijderen",
     deleteConfirm: "Account permanent verwijderen? Al je video's, matches en berichten gaan verloren. Dit kan niet ongedaan worden gemaakt.",
     deleting: "Verwijderen...",
+    verification: "Verificatie",
   },
   install: {
     title: "App installeren",
