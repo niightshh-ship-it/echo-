@@ -140,6 +140,11 @@ export async function MarketingSections({ isLoggedIn }: { isLoggedIn: boolean })
               <Link href="/install" className="text-xs text-echo-bright hover:underline">
                 📱 {t.install.cta}
               </Link>
+              <div className="flex items-center gap-3 text-xs text-zinc-500">
+                <Link href="/privacy" className="hover:text-zinc-300">{t.home.privacy}</Link>
+                <span>·</span>
+                <Link href="/terms" className="hover:text-zinc-300">{t.home.terms}</Link>
+              </div>
               <p className="text-xs text-zinc-600">{t.home.footerRights}</p>
             </div>
           </div>

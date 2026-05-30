@@ -227,6 +227,8 @@ const nl: Dictionary = {
     ctaButton: "Word lid van Echo",
     footerTagline: "Ruil vaardigheden met mensen in de buurt",
     footerRights: "© 2026 Echo · Amsterdam",
+    privacy: "Privacy",
+    terms: "Voorwaarden",
     skillsWall: ["massage", "gitaar", "koken", "foto", "yoga", "coderen", "dans", "talen", "schilderen", "fitness", "zang", "bakken", "design", "reparatie"],
   },
 };

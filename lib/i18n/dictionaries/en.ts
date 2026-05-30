@@ -225,6 +225,8 @@ const en = {
     ctaButton: "Join Echo",
     footerTagline: "Trade skills with people near you",
     footerRights: "© 2026 Echo · Amsterdam",
+    privacy: "Privacy",
+    terms: "Terms",
     skillsWall: ["massage", "guitar", "cooking", "photo", "yoga", "coding", "dance", "languages", "painting", "fitness", "singing", "baking", "design", "repair"],
   },
 };
