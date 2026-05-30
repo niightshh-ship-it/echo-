@@ -142,9 +142,13 @@ const uk: Dictionary = {
   },
   chat: {
     empty: "Почни розмову — напиши першим.",
+    emptyHint: "У вас метч — привітайся 👋",
     placeholder: "Повідомлення...",
     typing: "друкує...",
     read: "прочитано",
+    today: "Сьогодні",
+    yesterday: "Вчора",
+    scrollToBottom: "Нові повідомлення",
     rate: "Оцінити",
     rateTitle: "Оціни {name}",
     reviewPlaceholder: "Кілька слів (необов'язково)",

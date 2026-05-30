@@ -140,9 +140,13 @@ const en = {
   },
   chat: {
     empty: "Start the conversation — write first.",
+    emptyHint: "You matched — say hi 👋",
     placeholder: "Message...",
     typing: "typing...",
     read: "read",
+    today: "Today",
+    yesterday: "Yesterday",
+    scrollToBottom: "New messages",
     rate: "Rate",
     rateTitle: "Rate {name}",
     reviewPlaceholder: "A few words (optional)",

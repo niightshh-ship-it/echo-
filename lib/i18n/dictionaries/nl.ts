@@ -142,9 +142,13 @@ const nl: Dictionary = {
   },
   chat: {
     empty: "Begin het gesprek — schrijf als eerste.",
+    emptyHint: "Jullie matchen — zeg hallo 👋",
     placeholder: "Bericht...",
     typing: "typt...",
     read: "gelezen",
+    today: "Vandaag",
+    yesterday: "Gisteren",
+    scrollToBottom: "Nieuwe berichten",
     rate: "Beoordelen",
     rateTitle: "Beoordeel {name}",
     reviewPlaceholder: "Een paar woorden (optioneel)",

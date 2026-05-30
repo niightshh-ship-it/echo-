@@ -318,6 +318,37 @@
     .marquee-left, .marquee-right { animation: none; }
   }
 
+  /* === CHAT === */
+  /* Появление нового сообщения */
+  @keyframes msg-in {
+    from { opacity: 0; transform: translateY(8px) scale(0.96); }
+    to   { opacity: 1; transform: none; }
+  }
+  .msg-in {
+    animation: msg-in 0.22s cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+
+  /* Пузырь "печатает": три прыгающие точки */
+  .typing-dots {
+    display: inline-flex;
+    gap: 3px;
+    padding: 4px 2px;
+  }
+  .typing-dots span {
+    width: 6px;
+    height: 6px;
+    border-radius: 9999px;
+    background: rgb(160 160 175);
+    display: inline-block;
+    animation: typing-bounce 1.2s ease-in-out infinite;
+  }
+  .typing-dots span:nth-child(2) { animation-delay: 0.15s; }
+  .typing-dots span:nth-child(3) { animation-delay: 0.30s; }
+  @keyframes typing-bounce {
+    0%, 60%, 100% { transform: translateY(0);    opacity: 0.4; }
+    30%           { transform: translateY(-6px); opacity: 1;   }
+  }
+
   /* === MATCH CELEBRATION === */
   /* Левый аватар: летит слева к центру, лёгкий вращательный замах */
   @keyframes match-avatar-left {
@@ -452,7 +483,9 @@
     .confetti-piece,
     .match-title-in,
     .match-subtitle-in,
-    .match-buttons-in { animation: none; opacity: 1; transform: none; }
+    .match-buttons-in,
+    .msg-in,
+    .typing-dots span { animation: none; opacity: 1; transform: none; }
     .blob-1, .blob-2 { animation: none; }
     .reveal { opacity: 1; transform: none; transition: none; }
   }

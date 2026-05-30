@@ -142,9 +142,13 @@ const ru: Dictionary = {
   },
   chat: {
     empty: "Начните разговор — напишите первым.",
+    emptyHint: "У вас мэтч — поздоровайся 👋",
     placeholder: "Сообщение...",
     typing: "печатает...",
     read: "прочитано",
+    today: "Сегодня",
+    yesterday: "Вчера",
+    scrollToBottom: "Новые сообщения",
     rate: "Оценить",
     rateTitle: "Оцени {name}",
     reviewPlaceholder: "Пара слов (необязательно)",
