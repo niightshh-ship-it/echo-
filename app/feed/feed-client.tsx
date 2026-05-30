@@ -336,6 +336,46 @@ function FeedColumn({
           currentUserId={currentUserId}
         />
       ))}
+      {/* Финальный слайд: «ты посмотрел всё» */}
+      <EndOfFeedSlide />
+    </div>
+  );
+}
+
+function EndOfFeedSlide() {
+  const t = useT();
+  return (
+    <div className="relative h-screen w-full snap-start snap-always flex flex-col items-center justify-center text-center px-6 bg-black">
+      <div className="pointer-events-none absolute left-1/2 top-1/3 -translate-x-1/2 h-[260px] w-[420px] rounded-full bg-echo opacity-15 blur-[110px]" />
+      <div className="relative z-10 flex flex-col items-center max-w-xs">
+        <div className="text-6xl mb-5 select-none">🎬</div>
+        <h1 className="text-2xl font-bold mb-3 tracking-tight text-white">
+          {t.feed.endTitle}
+        </h1>
+        <p className="text-zinc-400 text-sm mb-7 leading-relaxed">
+          {t.feed.endText}
+        </p>
+        <div className="flex flex-col gap-2.5 w-full">
+          <Link href="/upload">
+            <button className="w-full bg-echo text-white hover:bg-echo-bright rounded-full h-12 font-semibold transition-colors glow-echo">
+              {t.feed.emptyUpload}
+            </button>
+          </Link>
+          <ShareButton
+            url="/"
+            title="Echo — trade skills"
+            text={t.feed.emptyText}
+            variant="button"
+            className="w-full justify-center h-12 bg-white/5 border border-white/10 hover:bg-white/10 text-zinc-200 text-sm"
+          />
+          <button
+            onClick={() => window.location.reload()}
+            className="w-full h-11 text-sm text-zinc-500 hover:text-white transition-colors"
+          >
+            ↻ {t.feed.endRefresh}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
