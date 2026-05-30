@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -57,11 +58,33 @@ export default function UploadPage() {
     })();
   }, [router, supabase]);
 
+  function formatSize(bytes: number) {
+    if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
+    return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+  }
+
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0] ?? null;
+    // Сброс инпута, чтобы повторный выбор того же файла тоже триггерил onChange
+    e.target.value = "";
+
+    if (!f) return;
+
+    if (!f.type.startsWith("video/")) {
+      toast.error(t.upload.fileNotVideo);
+      return;
+    }
+    // 50MB лимит бакета на free-tier Supabase. Раньше падало с криптовым ошибкой
+    // от стораджа, теперь — понятный тост сразу до загрузки.
+    const MAX = 50 * 1024 * 1024;
+    if (f.size > MAX) {
+      toast.error(t.upload.fileTooLarge.replace("{size}", formatSize(f.size)));
+      return;
+    }
+
     setFile(f);
     if (previewUrl) URL.revokeObjectURL(previewUrl);
-    setPreviewUrl(f ? URL.createObjectURL(f) : null);
+    setPreviewUrl(URL.createObjectURL(f));
   }
 
   const canPublish =
