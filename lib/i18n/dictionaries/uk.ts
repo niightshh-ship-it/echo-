@@ -93,7 +93,7 @@ const uk: Dictionary = {
     skillLabel: "До якої навички?",
     fileLabel: "Файл",
     chooseVideo: "Обрати відео",
-    fileHint: "Вертикальне відео, 5-30 секунд, до ~50 MB",
+    fileHint: "Вертикальне відео, до 2 хвилин, до ~100 MB",
     publish: "Опублікувати",
     uploading: "Завантажую...",
     category: "Категорія",

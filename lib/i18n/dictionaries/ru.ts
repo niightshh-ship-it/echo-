@@ -93,7 +93,7 @@ const ru: Dictionary = {
     skillLabel: "К какому навыку?",
     fileLabel: "Файл",
     chooseVideo: "Выбрать видео",
-    fileHint: "Вертикальное видео, 5-30 секунд, до ~50 MB",
+    fileHint: "Вертикальное видео, до 2 минут, до ~100 MB",
     publish: "Опубликовать",
     uploading: "Загружаю...",
     category: "Категория",

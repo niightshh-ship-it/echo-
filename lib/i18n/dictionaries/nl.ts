@@ -93,7 +93,7 @@ const nl: Dictionary = {
     skillLabel: "Welke vaardigheid?",
     fileLabel: "Bestand",
     chooseVideo: "Kies video",
-    fileHint: "Verticale video, 5-30 seconden, tot ~50 MB",
+    fileHint: "Verticale video, tot 2 minuten, ~100 MB",
     publish: "Publiceren",
     uploading: "Uploaden...",
     category: "Categorie",

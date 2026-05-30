@@ -91,7 +91,7 @@ const en = {
     skillLabel: "Which skill?",
     fileLabel: "File",
     chooseVideo: "Choose video",
-    fileHint: "Vertical video, 5-30 seconds, up to ~50 MB",
+    fileHint: "Vertical video, up to 2 minutes, ~100 MB",
     publish: "Publish",
     uploading: "Uploading...",
     category: "Category",
