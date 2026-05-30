@@ -51,6 +51,8 @@ const uk: Dictionary = {
     matches: "метчі →",
     soundHint: "торкнись відео щоб увімкнути звук",
     match: "У тебе метч з {name}!",
+    more: "ще",
+    less: "згорнути",
   },
   profile: {
     verified: "верифікований",
@@ -98,6 +100,8 @@ const uk: Dictionary = {
     customCategoryPlaceholder: "Своя категорія",
     videoType: "Тип відео",
     skillType: "Навичка",
+    description: "Опис",
+    descriptionPlaceholder: "Необов'язково. Пара слів про відео.",
     skillTypeHint: "З'явиться у стрічці для метчингу",
     randomType: "Випадкове",
     randomTypeHint: "Здивуй усіх. Будь-яке відео, без правил.",

@@ -27,6 +27,7 @@ export default function UploadPage() {
   const [skills, setSkills] = useState<string[]>([]);
   const [selectedSkill, setSelectedSkill] = useState("");
   const [kind, setKind] = useState<Kind>("skill");
+  const [description, setDescription] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -89,6 +90,7 @@ export default function UploadPage() {
       skill: kind === "skill" ? selectedSkill : null,
       storage_path: path,
       is_random: kind === "random",
+      description: description.trim() || null,
     });
 
     if (insertError) {
@@ -165,6 +167,18 @@ export default function UploadPage() {
               </Select>
             </div>
           )}
+
+          <div>
+            <Label className="text-zinc-300">{t.upload.description}</Label>
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder={t.upload.descriptionPlaceholder}
+              rows={2}
+              maxLength={500}
+              className="mt-2 w-full p-3 text-sm bg-white/5 border border-white/10 text-white rounded-xl resize-none placeholder:text-zinc-500"
+            />
+          </div>
 
           <div>
             <Label className="text-zinc-300">{t.upload.fileLabel}</Label>

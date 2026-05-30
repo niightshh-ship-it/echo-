@@ -49,6 +49,8 @@ const en = {
     matches: "matches →",
     soundHint: "tap the video to turn on sound",
     match: "It's a match with {name}!",
+    more: "more",
+    less: "less",
   },
   profile: {
     verified: "verified",
@@ -96,6 +98,8 @@ const en = {
     customCategoryPlaceholder: "Your category",
     videoType: "Video type",
     skillType: "Skill",
+    description: "Description",
+    descriptionPlaceholder: "Optional. A few words about the video.",
     skillTypeHint: "Will appear in the feed for matching",
     randomType: "Random",
     randomTypeHint: "Surprise everyone. Anything goes.",

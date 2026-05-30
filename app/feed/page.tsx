@@ -11,7 +11,7 @@ export default async function FeedPage() {
   const [videosRes, blocksRes, likedRes] = await Promise.all([
     supabase
       .from("videos")
-      .select("id, user_id, skill, storage_path, created_at, is_random")
+      .select("id, user_id, skill, storage_path, created_at, is_random, description")
       .neq("user_id", user.id)
       .order("created_at", { ascending: false }),
     supabase
@@ -46,6 +46,7 @@ export default async function FeedPage() {
       id: v.id,
       authorId: v.user_id,
       skill: v.skill,
+      description: v.description ?? null,
       isRandom: !!v.is_random,
       authorName: author?.name ?? "?",
       authorCity: author?.city ?? "",

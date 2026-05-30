@@ -51,6 +51,8 @@ const ru: Dictionary = {
     matches: "мэтчи →",
     soundHint: "тапни видео чтобы включить звук",
     match: "У тебя мэтч с {name}!",
+    more: "ещё",
+    less: "свернуть",
   },
   profile: {
     verified: "верифицирован",
@@ -98,6 +100,8 @@ const ru: Dictionary = {
     customCategoryPlaceholder: "Своя категория",
     videoType: "Тип видео",
     skillType: "Навык",
+    description: "Описание",
+    descriptionPlaceholder: "Необязательно. Пара слов о видео.",
     skillTypeHint: "Появится в фиде для мэтчинга",
     randomType: "Случайное",
     randomTypeHint: "Удиви всех. Любое видео, без правил.",

@@ -51,6 +51,8 @@ const nl: Dictionary = {
     matches: "matches →",
     soundHint: "tik op de video voor geluid",
     match: "Een match met {name}!",
+    more: "meer",
+    less: "minder",
   },
   profile: {
     verified: "geverifieerd",
@@ -98,6 +100,8 @@ const nl: Dictionary = {
     customCategoryPlaceholder: "Eigen categorie",
     videoType: "Type video",
     skillType: "Vaardigheid",
+    description: "Beschrijving",
+    descriptionPlaceholder: "Optioneel. Een paar woorden over de video.",
     skillTypeHint: "Verschijnt in de feed voor matches",
     randomType: "Random",
     randomTypeHint: "Verras iedereen. Alles mag.",
