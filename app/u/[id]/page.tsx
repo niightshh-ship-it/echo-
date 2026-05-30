@@ -25,6 +25,8 @@ export async function generateMetadata(
     (profile.skills?.length
       ? `${profile.name} offers ${profile.skills.join(", ")} on Echo · ${profile.city}`
       : `${profile.name} on Echo · ${profile.city}`);
+  // Картинку (1200x630) генерирует opengraph-image.tsx в этом же сегменте —
+  // здесь только текстовые поля. Так превью одинаковое и в OG, и в Twitter.
   return {
     title,
     description,
@@ -32,13 +34,11 @@ export async function generateMetadata(
       title,
       description,
       type: "profile",
-      images: profile.avatar_url ? [{ url: profile.avatar_url }] : undefined,
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
-      images: profile.avatar_url ? [profile.avatar_url] : undefined,
     },
   };
 }

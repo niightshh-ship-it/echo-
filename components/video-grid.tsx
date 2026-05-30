@@ -19,12 +19,15 @@ export function VideoGrid({
   videos,
   author,
   currentUserId,
-  deleteButtonFor,
+  deleteButtons,
 }: {
   videos: SwiperVideo[];
   author: SwiperAuthor;
   currentUserId: string | null;
-  deleteButtonFor?: (videoId: string) => ReactNode;
+  /** Готовые кнопки удаления — параллельный массив той же длины и порядка, что и videos.
+   *  Передаётся уже отрендеренными нодами, потому что функции серверным компонентам
+   *  нельзя пробрасывать в клиентские. */
+  deleteButtons?: ReactNode[];
 }) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
@@ -52,9 +55,7 @@ export function VideoGrid({
                 {formatCount(v.viewsCount)}
               </div>
             </button>
-            {deleteButtonFor && (
-              <div className="absolute top-1 right-1 z-10">{deleteButtonFor(v.id)}</div>
-            )}
+            {deleteButtons?.[i]}
           </div>
         ))}
       </div>

@@ -232,7 +232,11 @@ function FeedColumn({
     if (!active || !activeId) return;
     if (viewedRef.current.has(activeId)) return;
     viewedRef.current.add(activeId);
-    createClient().rpc("increment_video_views", { p_video_id: activeId });
+    createClient()
+      .rpc("increment_video_views", { p_video_id: activeId })
+      .then(({ error }) => {
+        if (error) console.warn("[echo] view count failed:", error);
+      });
   }, [active, activeId]);
 
   useEffect(() => {

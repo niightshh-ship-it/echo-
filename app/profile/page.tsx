@@ -163,7 +163,9 @@ export default async function ProfilePage() {
               videos={skillVideos}
               author={author}
               currentUserId={user.id}
-              deleteButtonFor={(id) => <DeleteVideoButton videoId={id} />}
+              deleteButtons={skillVideos.map((v) => (
+                <DeleteVideoButton key={v.id} videoId={v.id} />
+              ))}
             />
           </div>
         )}
@@ -175,7 +177,9 @@ export default async function ProfilePage() {
               videos={randomVideos}
               author={author}
               currentUserId={user.id}
-              deleteButtonFor={(id) => <DeleteVideoButton videoId={id} />}
+              deleteButtons={randomVideos.map((v) => (
+                <DeleteVideoButton key={v.id} videoId={v.id} />
+              ))}
             />
           </>
         )}
