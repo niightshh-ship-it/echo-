@@ -51,6 +51,13 @@ export default async function AdminVerificationsPage() {
     })
   );
 
+  // Все пользователи — для общего обзора админом
+  const { data: allUsers } = await supabase
+    .from("profiles")
+    .select("id, name, city, avatar_url, verified, is_admin, created_at")
+    .order("created_at", { ascending: false })
+    .limit(500);
+
   return (
     <div className="min-h-screen bg-black text-white px-4 py-8">
       <div className="max-w-2xl mx-auto">
@@ -101,6 +108,57 @@ export default async function AdminVerificationsPage() {
               </div>
             </div>
           ))}
+        </div>
+
+        {/* === Список всех пользователей === */}
+        <div className="mt-16">
+          <div className="flex items-baseline justify-between mb-4">
+            <h2 className="text-2xl font-bold lowercase">{t.admin.allUsersTitle}</h2>
+            <span className="text-xs text-zinc-500">
+              {t.admin.allUsersCount.replace("{n}", String(allUsers?.length ?? 0))}
+            </span>
+          </div>
+
+          <div className="rounded-2xl border border-white/10 overflow-hidden divide-y divide-white/5">
+            {(allUsers ?? []).map((u) => (
+              <Link
+                key={u.id}
+                href={`/u/${u.id}`}
+                className="flex items-center gap-3 px-4 py-3 hover:bg-white/5 transition-colors"
+              >
+                <span className="relative h-10 w-10 shrink-0 rounded-full overflow-hidden border border-white/15 bg-white/5 flex items-center justify-center">
+                  {u.avatar_url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={u.avatar_url} alt="" className="h-full w-full object-cover" />
+                  ) : (
+                    <span className="text-sm">{u.name?.[0]?.toUpperCase() ?? "?"}</span>
+                  )}
+                </span>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <p className="font-medium text-sm truncate">{u.name}</p>
+                    {u.verified && (
+                      <span title="verified" className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />
+                    )}
+                    {u.is_admin && (
+                      <span className="text-[10px] uppercase tracking-wider bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded shrink-0">
+                        admin
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs text-zinc-500 truncate">
+                    {u.city} · {new Date(u.created_at).toLocaleDateString()}
+                  </p>
+                </div>
+                <span className="text-zinc-600 text-lg shrink-0">→</span>
+              </Link>
+            ))}
+            {(allUsers ?? []).length === 0 && (
+              <p className="text-zinc-500 text-sm text-center py-8">
+                {t.admin.allUsersEmpty}
+              </p>
+            )}
+          </div>
         </div>
       </div>
     </div>

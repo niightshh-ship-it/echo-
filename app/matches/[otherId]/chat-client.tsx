@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import { useT, useI18n } from "@/lib/i18n/provider";
 import { ReviewButton } from "./review-button";
+import { AmbientBg } from "@/components/ambient-bg";
 
 export type Message = {
   id: string;
@@ -271,9 +272,10 @@ export function ChatClient({
   }
 
   return (
-    <div className="flex flex-col h-[100dvh] bg-black text-white">
+    <div className="relative flex flex-col h-[100dvh] bg-black text-white overflow-hidden">
+      <AmbientBg variant="chat" />
       {/* Шапка */}
-      <div className="border-b border-white/10 px-3 py-3 flex items-center gap-3 sticky top-0 bg-black/85 backdrop-blur z-10">
+      <div className="relative z-10 border-b border-white/10 px-3 py-3 flex items-center gap-3 sticky top-0 bg-black/70 backdrop-blur">
         <Link
           href="/matches"
           className="text-zinc-300 hover:text-white px-2 py-1 -ml-1 text-base"
@@ -310,7 +312,7 @@ export function ChatClient({
       {/* Сообщения */}
       <div
         ref={scrollRef}
-        className="flex-1 overflow-y-auto px-3 py-4"
+        className="relative z-10 flex-1 overflow-y-auto px-3 py-4"
       >
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center px-6">
@@ -392,7 +394,7 @@ export function ChatClient({
       {/* Поле ввода */}
       <form
         onSubmit={send}
-        className="border-t border-white/10 px-3 pt-2 bg-black"
+        className="relative z-10 border-t border-white/10 px-3 pt-2 bg-black/70 backdrop-blur"
         style={{ paddingBottom: "max(env(safe-area-inset-bottom), 0.5rem)" }}
       >
         <div className="flex items-end gap-2">

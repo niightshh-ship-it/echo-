@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { ProfileActions } from "@/components/profile-actions";
 import { VideoGrid } from "@/components/video-grid";
 import { ShareButton } from "@/components/share-button";
+import { AmbientBg } from "@/components/ambient-bg";
 
 export async function generateMetadata(
   { params }: { params: Promise<{ id: string }> }
@@ -111,7 +112,7 @@ export default async function UserProfilePage({
 
   return (
     <div className="relative flex min-h-screen flex-col items-center bg-black text-white px-4 py-12">
-      <div className="pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 h-[280px] w-[460px] rounded-full bg-echo opacity-10 blur-[130px]" />
+      <AmbientBg variant="profile" />
 
       <div className="relative z-10 w-full max-w-md page-fade-in">
         <div className="mb-6 flex items-center justify-between">

@@ -54,43 +54,69 @@ export function FeedClient({
     });
   }, []);
 
+  const wrapperRef = useRef<HTMLDivElement>(null);
   const touchStart = useRef<{ x: number; y: number; dir: "unknown" | "h" | "v" } | null>(null);
+  // Ref для текущего drag и mode — нужны внутри нативных обработчиков без closure-лагов
+  const dragRef = useRef(0);
+  const modeRef = useRef<Mode>("skill");
+  useEffect(() => { modeRef.current = mode; }, [mode]);
 
-  // Старого автозакрытия больше нет — у мэтча своя кнопка «продолжить»
+  useEffect(() => {
+    const el = wrapperRef.current;
+    if (!el) return;
 
-  function onTouchStart(e: React.TouchEvent) {
-    touchStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY, dir: "unknown" };
-    setAnimating(false);
-  }
-  function onTouchMove(e: React.TouchEvent) {
-    if (!touchStart.current) return;
-    const dx = e.touches[0].clientX - touchStart.current.x;
-    const dy = e.touches[0].clientY - touchStart.current.y;
-    if (touchStart.current.dir === "unknown") {
-      if (Math.abs(dx) > 12 || Math.abs(dy) > 12) {
-        touchStart.current.dir = Math.abs(dx) > Math.abs(dy) ? "h" : "v";
+    function handleTouchStart(e: TouchEvent) {
+      touchStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY, dir: "unknown" };
+      setAnimating(false);
+    }
+
+    function handleTouchMove(e: TouchEvent) {
+      if (!touchStart.current) return;
+      const dx = e.touches[0].clientX - touchStart.current.x;
+      const dy = e.touches[0].clientY - touchStart.current.y;
+
+      if (touchStart.current.dir === "unknown") {
+        if (Math.abs(dx) > 10 || Math.abs(dy) > 10) {
+          touchStart.current.dir = Math.abs(dx) > Math.abs(dy) ? "h" : "v";
+        }
+      }
+
+      if (touchStart.current.dir === "h") {
+        // Блокируем вертикальный скролл браузера при горизонтальном свайпе
+        e.preventDefault();
+        const vw = window.innerWidth;
+        const currentMode = modeRef.current;
+        const maxRight = currentMode === "skill" ? 0 : vw;
+        const minLeft = currentMode === "random" ? 0 : -vw;
+        const clamped = Math.max(minLeft, Math.min(maxRight, dx));
+        dragRef.current = clamped;
+        setDrag(clamped);
       }
     }
-    if (touchStart.current.dir === "h") {
-      // Зажимаем drag так, чтобы карусель не уезжала за свои две колонки
-      const vw = typeof window !== "undefined" ? window.innerWidth : 0;
-      const maxRight = mode === "skill" ? 0 : vw; // вправо тянем только если на random
-      const minLeft = mode === "random" ? 0 : -vw; // влево тянем только если на skill
-      const clamped = Math.max(minLeft, Math.min(maxRight, dx));
-      setDrag(clamped);
+
+    function handleTouchEnd() {
+      if (!touchStart.current) return;
+      const wasH = touchStart.current.dir === "h";
+      const finalDrag = dragRef.current;
+      touchStart.current = null;
+      dragRef.current = 0;
+      setAnimating(true);
+      if (wasH && Math.abs(finalDrag) > 80) {
+        setMode(finalDrag < 0 ? "random" : "skill");
+      }
+      setDrag(0);
     }
-  }
-  function onTouchEnd() {
-    if (!touchStart.current) return;
-    const wasH = touchStart.current.dir === "h";
-    const finalDrag = drag;
-    touchStart.current = null;
-    setAnimating(true);
-    if (wasH && Math.abs(finalDrag) > 80) {
-      setMode(finalDrag < 0 ? "random" : "skill");
-    }
-    setDrag(0);
-  }
+
+    // passive: false — обязательно, иначе preventDefault() в touchmove игнорируется
+    el.addEventListener("touchstart", handleTouchStart, { passive: true });
+    el.addEventListener("touchmove", handleTouchMove, { passive: false });
+    el.addEventListener("touchend", handleTouchEnd, { passive: true });
+    return () => {
+      el.removeEventListener("touchstart", handleTouchStart);
+      el.removeEventListener("touchmove", handleTouchMove);
+      el.removeEventListener("touchend", handleTouchEnd);
+    };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   function switchTo(m: Mode) {
     setAnimating(true);
@@ -144,14 +170,12 @@ export function FeedClient({
 
   return (
     <div
+      ref={wrapperRef}
       className="h-screen w-screen overflow-hidden bg-black"
       style={{ touchAction: "pan-y" }}
-      onTouchStart={onTouchStart}
-      onTouchMove={onTouchMove}
-      onTouchEnd={onTouchEnd}
     >
       {/* Переключатель */}
-      <div className="fixed top-3 left-1/2 -translate-x-1/2 z-40 flex bg-black/60 backdrop-blur-md rounded-full p-1 gap-1 border border-white/10">
+      <div className="fixed top-3 left-1/2 -translate-x-1/2 z-40 flex bg-black/50 backdrop-blur-md rounded-full p-1 gap-1 shadow-[0_2px_16px_rgba(0,0,0,0.5)]">
         <button
           onClick={() => switchTo("skill")}
           className={`px-4 py-1.5 rounded-full text-xs font-medium transition-colors ${
@@ -184,11 +208,12 @@ export function FeedClient({
 
       {/* Карусель */}
       <div
-        className="flex h-screen"
+        className="flex h-screen bg-black"
         style={{
           width: "200vw",
           transform: `translateX(calc(${baseTx} + ${drag}px))`,
           transition: animating ? "transform 320ms cubic-bezier(0.22, 0.61, 0.36, 1)" : "none",
+          willChange: "transform",
         }}
       >
         <FeedColumn
@@ -459,7 +484,7 @@ function VideoSlide({
         className="h-full w-full object-contain bg-black"
       />
 
-      <div className="absolute bottom-16 left-0 right-20 p-6 bg-gradient-to-t from-black/80 to-transparent">
+      <div className="absolute bottom-20 left-0 right-20 p-6 pb-2 bg-gradient-to-t from-black/80 to-transparent">
         <Link
           href={`/u/${item.authorId}`}
           className="flex items-center gap-2.5 hover:opacity-80"
@@ -505,7 +530,7 @@ function VideoSlide({
       </div>
 
       {/* Колонка действий справа */}
-      <div className="absolute right-4 bottom-32 flex flex-col items-center gap-4">
+      <div className="absolute right-4 bottom-[5.5rem] flex flex-col items-center gap-4">
         <button onClick={handleLikeToggle} className="flex flex-col items-center gap-1">
           <div
             className={`rounded-full p-3 transition-colors ${

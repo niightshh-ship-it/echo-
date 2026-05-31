@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { CityAutocomplete } from "@/components/city-autocomplete";
 import { NotificationBell } from "@/components/notification-bell";
+import { AmbientBg } from "@/components/ambient-bg";
 import { useT } from "@/lib/i18n/provider";
 
 type Row = { id: string; name: string; city: string; skills: string[]; avatar_url: string | null };
@@ -56,19 +57,24 @@ export default function SearchPage() {
 
   const ql = query.trim().toLowerCase();
   const cl = city.trim().toLowerCase();
-  const results = all.filter((p) => {
-    if (hidden.has(p.id)) return false;
-    const matchesText =
-      !ql ||
-      p.name.toLowerCase().includes(ql) ||
-      (p.skills ?? []).some((s) => s.toLowerCase().includes(ql));
-    const matchesCity = !cl || (p.city ?? "").toLowerCase().includes(cl);
-    return matchesText && matchesCity;
-  });
+  // Пока юзер ничего не ввёл — не показываем гигантский список всех людей.
+  // Это сразу даёт ощущение «поиска», а не «случайной ленты людей».
+  const hasQuery = ql.length > 0 || cl.length > 0;
+  const results = !hasQuery
+    ? []
+    : all.filter((p) => {
+        if (hidden.has(p.id)) return false;
+        const matchesText =
+          !ql ||
+          p.name.toLowerCase().includes(ql) ||
+          (p.skills ?? []).some((s) => s.toLowerCase().includes(ql));
+        const matchesCity = !cl || (p.city ?? "").toLowerCase().includes(cl);
+        return matchesText && matchesCity;
+      });
 
   return (
     <div className="relative flex min-h-screen flex-col items-center bg-black text-white px-4 pt-12 pb-28">
-      <div className="pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 h-[280px] w-[460px] rounded-full bg-echo opacity-10 blur-[130px]" />
+      <AmbientBg variant="search" />
 
       <div className="relative z-10 w-full max-w-md page-fade-in">
         <div className="flex items-center justify-between mb-6">
@@ -94,7 +100,14 @@ export default function SearchPage() {
           />
         </div>
 
-        {results.length === 0 ? (
+        {!hasQuery ? (
+          <div className="text-center py-16">
+            <div className="text-5xl mb-4 opacity-60">🔍</div>
+            <p className="text-zinc-400 text-sm max-w-xs mx-auto leading-relaxed">
+              {t.search.emptyHint}
+            </p>
+          </div>
+        ) : results.length === 0 ? (
           <p className="text-zinc-500 text-sm py-10 text-center">{t.search.noResults}</p>
         ) : (
           <div className="space-y-3">

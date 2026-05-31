@@ -234,6 +234,9 @@ const ru: Dictionary = {
     cancel: "Отмена",
     rejectConfirm: "Отклонить",
     defaultReason: "Не подходит",
+    allUsersTitle: "все пользователи",
+    allUsersCount: "всего {n}",
+    allUsersEmpty: "Пока никого.",
     reportsTitle: "Жалобы",
     reportsEmpty: "Жалоб нет.",
     reportArrow: "на",
@@ -286,6 +289,7 @@ const ru: Dictionary = {
     placeholder: "Навык или имя...",
     allCities: "Все города",
     noResults: "Ничего не найдено",
+    emptyHint: "Напиши скилл, имя или город — найдём людей.",
   },
   home: {
     scrollHint: "листай вниз",

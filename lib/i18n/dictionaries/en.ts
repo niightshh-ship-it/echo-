@@ -232,6 +232,9 @@ const en = {
     cancel: "Cancel",
     rejectConfirm: "Reject",
     defaultReason: "Not suitable",
+    allUsersTitle: "all users",
+    allUsersCount: "{n} total",
+    allUsersEmpty: "No users yet.",
     reportsTitle: "Reports",
     reportsEmpty: "No reports.",
     reportArrow: "reported",
@@ -284,6 +287,7 @@ const en = {
     placeholder: "Skill or name...",
     allCities: "All cities",
     noResults: "Nothing found",
+    emptyHint: "Type a skill, name or city to find people.",
   },
   home: {
     scrollHint: "scroll to explore",

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getDictionary } from "@/lib/i18n/server";
 import { VerifyClient } from "./verify-client";
+import { AmbientBg } from "@/components/ambient-bg";
 
 export default async function VerifyPage() {
   const supabase = await createClient();
@@ -17,13 +18,16 @@ export default async function VerifyPage() {
     .single();
 
   if (!profile) redirect("/onboarding");
+  const authBg = <AmbientBg variant="auth" />;
+
   if (profile.verified) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-black text-white px-4 text-center">
-        <p className="text-5xl mb-4">✓</p>
-        <h1 className="text-2xl font-bold mb-2 lowercase">{t.verify.alreadyTitle}</h1>
-        <p className="text-zinc-400 mb-8">{t.verify.alreadyText}</p>
-        <Link href="/profile" className="text-echo-bright underline">{t.feed.backToProfile}</Link>
+      <div className="relative flex min-h-screen flex-col items-center justify-center bg-black text-white px-4 text-center overflow-hidden">
+        {authBg}
+        <p className="relative z-10 text-5xl mb-4">✓</p>
+        <h1 className="relative z-10 text-2xl font-bold mb-2 lowercase">{t.verify.alreadyTitle}</h1>
+        <p className="relative z-10 text-zinc-400 mb-8">{t.verify.alreadyText}</p>
+        <Link href="/profile" className="relative z-10 text-echo-bright underline">{t.feed.backToProfile}</Link>
       </div>
     );
   }
@@ -39,14 +43,15 @@ export default async function VerifyPage() {
 
   if (pending?.status === "pending") {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-black text-white px-4 text-center">
-        <p className="text-5xl mb-4">⌛</p>
-        <h1 className="text-2xl font-bold mb-2 lowercase">{t.verify.pendingTitle}</h1>
-        <p className="text-zinc-400 mb-1">
+      <div className="relative flex min-h-screen flex-col items-center justify-center bg-black text-white px-4 text-center overflow-hidden">
+        {authBg}
+        <p className="relative z-10 text-5xl mb-4">⌛</p>
+        <h1 className="relative z-10 text-2xl font-bold mb-2 lowercase">{t.verify.pendingTitle}</h1>
+        <p className="relative z-10 text-zinc-400 mb-1">
           {t.verify.pendingSent.replace("{date}", new Date(pending.submitted_at).toLocaleString())}
         </p>
-        <p className="text-zinc-500 text-sm mb-8">{t.verify.pendingNote}</p>
-        <Link href="/profile" className="text-echo-bright underline">{t.feed.backToProfile}</Link>
+        <p className="relative z-10 text-zinc-500 text-sm mb-8">{t.verify.pendingNote}</p>
+        <Link href="/profile" className="relative z-10 text-echo-bright underline">{t.feed.backToProfile}</Link>
       </div>
     );
   }

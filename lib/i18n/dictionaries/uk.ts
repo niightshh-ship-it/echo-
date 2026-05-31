@@ -234,6 +234,9 @@ const uk: Dictionary = {
     cancel: "Скасувати",
     rejectConfirm: "Відхилити",
     defaultReason: "Не підходить",
+    allUsersTitle: "усі користувачі",
+    allUsersCount: "усього {n}",
+    allUsersEmpty: "Поки нікого.",
     reportsTitle: "Скарги",
     reportsEmpty: "Скарг немає.",
     reportArrow: "на",
@@ -286,6 +289,7 @@ const uk: Dictionary = {
     placeholder: "Навичка або ім'я...",
     allCities: "Усі міста",
     noResults: "Нічого не знайдено",
+    emptyHint: "Напиши навичку, ім'я або місто — знайдемо людей.",
   },
   home: {
     scrollHint: "гортай вниз",

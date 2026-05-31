@@ -9,6 +9,7 @@ import { DeleteVideoButton } from "./delete-video-button";
 import { VideoGrid } from "@/components/video-grid";
 import { ShareButton } from "@/components/share-button";
 import { NotificationBell } from "@/components/notification-bell";
+import { AmbientBg } from "@/components/ambient-bg";
 
 export default async function ProfilePage() {
   const supabase = await createClient();
@@ -71,7 +72,7 @@ export default async function ProfilePage() {
 
   return (
     <div className="relative flex min-h-screen flex-col items-center bg-black text-white px-4 pt-12 pb-28">
-      <div className="pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 h-[300px] w-[500px] rounded-full bg-echo opacity-10 blur-[130px]" />
+      <AmbientBg variant="profile" />
 
       <div className="relative z-10 w-full max-w-md page-fade-in">
         <div className="flex items-center justify-between mb-8">

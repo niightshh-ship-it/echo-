@@ -234,6 +234,9 @@ const nl: Dictionary = {
     cancel: "Annuleren",
     rejectConfirm: "Afwijzen",
     defaultReason: "Niet geschikt",
+    allUsersTitle: "alle gebruikers",
+    allUsersCount: "totaal {n}",
+    allUsersEmpty: "Nog geen gebruikers.",
     reportsTitle: "Meldingen",
     reportsEmpty: "Geen meldingen.",
     reportArrow: "meldde",
@@ -286,6 +289,7 @@ const nl: Dictionary = {
     placeholder: "Vaardigheid of naam...",
     allCities: "Alle steden",
     noResults: "Niets gevonden",
+    emptyHint: "Typ een vaardigheid, naam of stad om mensen te vinden.",
   },
   home: {
     scrollHint: "scroll naar beneden",

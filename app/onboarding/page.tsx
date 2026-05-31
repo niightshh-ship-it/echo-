@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { CityAutocomplete } from "@/components/city-autocomplete";
 import { useT } from "@/lib/i18n/provider";
 import { LanguageSwitcher } from "@/components/language-switcher";
+import { AmbientBg } from "@/components/ambient-bg";
 
 export default function OnboardingPage() {
   const router = useRouter();
@@ -69,7 +70,7 @@ export default function OnboardingPage() {
 
   return (
     <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-black text-white px-4 py-12">
-      <div className="pointer-events-none absolute left-1/2 top-1/4 -translate-x-1/2 h-[360px] w-[360px] rounded-full bg-echo opacity-15 blur-[130px]" />
+      <AmbientBg variant="onboarding" />
 
       <div className="absolute top-5 right-5 z-20">
         <LanguageSwitcher />

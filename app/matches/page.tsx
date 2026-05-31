@@ -2,11 +2,10 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getDictionary } from "@/lib/i18n/server";
-import { Search } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { NotificationBell } from "@/components/notification-bell";
+import { AmbientBg } from "@/components/ambient-bg";
 
 export default async function MatchesPage() {
   const supabase = await createClient();
@@ -74,18 +73,13 @@ export default async function MatchesPage() {
 
   return (
     <div className="relative flex min-h-screen flex-col items-center bg-black text-white px-4 pt-12 pb-28">
-      <div className="pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 h-[300px] w-[500px] rounded-full bg-echo opacity-10 blur-[130px]" />
+      <AmbientBg variant="matches" />
 
       <div className="relative z-10 w-full max-w-md page-fade-in">
         <div className="flex items-center justify-between mb-8">
           <Link href="/" className="text-2xl font-bold lowercase text-gradient-echo">echo</Link>
           <div className="flex items-center gap-1">
             <NotificationBell userId={user.id} />
-            <Link href="/search">
-              <Button variant="ghost" className="text-zinc-400 hover:text-white hover:bg-white/5 rounded-full h-9 w-9 p-0">
-                <Search className="w-5 h-5" />
-              </Button>
-            </Link>
             <LanguageSwitcher />
           </div>
         </div>

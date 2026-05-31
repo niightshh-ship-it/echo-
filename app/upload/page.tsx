@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useT } from "@/lib/i18n/provider";
+import { AmbientBg } from "@/components/ambient-bg";
 
 type Kind = "skill" | "random";
 
@@ -135,7 +136,7 @@ export default function UploadPage() {
 
   return (
     <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-black text-white px-4 pt-12 pb-28">
-      <div className="pointer-events-none absolute left-1/2 top-1/4 -translate-x-1/2 h-[320px] w-[320px] rounded-full bg-echo opacity-12 blur-[130px]" />
+      <AmbientBg variant="upload" />
 
       <div className="relative z-10 w-full max-w-md page-fade-in">
         <div className="flex items-center justify-between mb-8">

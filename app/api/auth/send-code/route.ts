@@ -2,10 +2,70 @@
 // Шаг 1: Supabase admin.generateLink (генерирует OTP, письмо НЕ шлёт).
 // Шаг 2: мы сами шлём письмо через Brevo SMTP с локализованным шаблоном.
 // Шаблоны Supabase (Magic Link / Confirm signup) больше не задействованы.
+//
+// Rate limiting: не более 3 запросов на email за 10 минут.
+// Попытки хранятся в таблице public.rate_limits (миграция 017).
 
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import nodemailer from "nodemailer";
+
+const RATE_LIMIT_MAX = 3;          // максимум запросов
+const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000; // 10 минут в миллисекундах
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function checkRateLimit(
+  admin: any,
+  email: string
+): Promise<{ allowed: boolean; retryAfterSec?: number }> {
+  const key = `send-code:${email.toLowerCase()}`;
+  const windowStart = new Date(Date.now() - RATE_LIMIT_WINDOW_MS).toISOString();
+
+  // Считаем попытки за последние 10 минут
+  const { count, error } = await admin
+    .from("rate_limits")
+    .select("*", { count: "exact", head: true })
+    .eq("key", key)
+    .gte("created_at", windowStart);
+
+  if (error) {
+    // Если таблица недоступна — пропускаем проверку, чтобы не блокировать вход
+    console.error("rate_limits check failed:", error.message);
+    return { allowed: true };
+  }
+
+  if ((count ?? 0) >= RATE_LIMIT_MAX) {
+    // Находим самую раннюю запись в окне, чтобы сообщить когда можно повторить
+    const { data } = await admin
+      .from("rate_limits")
+      .select("created_at")
+      .eq("key", key)
+      .gte("created_at", windowStart)
+      .order("created_at", { ascending: true })
+      .limit(1)
+      .single();
+    // Supabase-типы не знают про rate_limits, поэтому каст
+    const oldest = data as { created_at: string } | null;
+
+    const retryAfterSec = oldest
+      ? Math.ceil(
+          (new Date(oldest.created_at).getTime() + RATE_LIMIT_WINDOW_MS - Date.now()) / 1000
+        )
+      : 600;
+
+    return { allowed: false, retryAfterSec: Math.max(retryAfterSec, 1) };
+  }
+
+  // Записываем эту попытку (каст — таблицы нет в Supabase-типах)
+  await admin.from("rate_limits").insert({ key } as never);
+
+  // Периодически чистим старые записи (каждый ~10-й запрос)
+  if (Math.random() < 0.1) {
+    await admin.rpc("cleanup_rate_limits");
+  }
+
+  return { allowed: true };
+}
 
 type Locale = "en" | "ru" | "nl" | "uk";
 const LOCALES: Locale[] = ["en", "ru", "nl", "uk"];
@@ -77,13 +137,26 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "invalid email" }, { status: 400 });
   }
 
-  // Генерируем OTP через admin (письмо при этом НЕ отправляется)
+  // Admin-клиент нужен и для rate limiting, и для генерации OTP
   const admin = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
     { auth: { persistSession: false, autoRefreshToken: false } }
   );
 
+  // Проверяем rate limit ДО генерации OTP и отправки письма
+  const { allowed, retryAfterSec } = await checkRateLimit(admin, email);
+  if (!allowed) {
+    return NextResponse.json(
+      { error: "too_many_requests", retryAfterSec },
+      {
+        status: 429,
+        headers: { "Retry-After": String(retryAfterSec) },
+      }
+    );
+  }
+
+  // Генерируем OTP через admin (письмо при этом НЕ отправляется)
   const { data, error: genErr } = await admin.auth.admin.generateLink({
     type: "magiclink",
     email,
