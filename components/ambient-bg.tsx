@@ -1,15 +1,15 @@
 "use client";
 
 /**
- * AmbientBg — ненавязчивый анимированный фон в стиле Echo.
- * Рендерит два медленно дрейфующих blob-а с разными позициями для каждой страницы.
- * Использует CSS-анимации blob-drift-1/2 из globals.css.
+ * AmbientBg — заметный анимированный фон в стиле Echo.
+ * Два медленно дрейфующих blob-а (фиолет + фуксия) с разными
+ * раскладками для каждой страницы.
  */
 
 type BlobConfig = {
   size: string;
   color: string;
-  opacity: string;
+  opacity: number;
   top?: string;
   bottom?: string;
   left?: string;
@@ -28,51 +28,44 @@ type Variant =
   | "onboarding"
   | "auth";
 
+// Достаточно заметные значения — на чёрном фоне явно видна окраска,
+// но не настолько ярко чтоб мешать читаемости текста.
 const VARIANTS: Record<Variant, [BlobConfig, BlobConfig]> = {
-  // Профиль — фиолет сверху по центру, фуксия снизу справа
   profile: [
-    { size: "500px", color: "#7c5cff", opacity: "0.09", top: "-80px", left: "calc(50% - 250px)", blur: "130px" },
-    { size: "360px", color: "#e455ff", opacity: "0.06", bottom: "80px", right: "-60px", blur: "110px" },
+    { size: "560px", color: "#7c5cff", opacity: 0.22, top: "-100px", left: "calc(50% - 280px)", blur: "120px" },
+    { size: "420px", color: "#e455ff", opacity: 0.16, bottom: "60px", right: "-80px", blur: "110px" },
   ],
-  // Мэтчи — фиолет сверху слева, фуксия снизу по центру
   matches: [
-    { size: "420px", color: "#7c5cff", opacity: "0.09", top: "-60px", left: "-80px", blur: "120px" },
-    { size: "380px", color: "#e455ff", opacity: "0.06", bottom: "40px", left: "calc(50% - 190px)", blur: "120px" },
+    { size: "480px", color: "#7c5cff", opacity: 0.22, top: "-80px", left: "-100px", blur: "120px" },
+    { size: "440px", color: "#e455ff", opacity: 0.16, bottom: "20px", left: "calc(50% - 220px)", blur: "120px" },
   ],
-  // Чат — оба блоба по бокам, создают мягкий туннель
   chat: [
-    { size: "340px", color: "#7c5cff", opacity: "0.08", top: "10%", left: "-80px", blur: "100px" },
-    { size: "300px", color: "#e455ff", opacity: "0.06", bottom: "15%", right: "-60px", blur: "100px" },
+    { size: "400px", color: "#7c5cff", opacity: 0.20, top: "5%", left: "-100px", blur: "100px" },
+    { size: "360px", color: "#e455ff", opacity: 0.14, bottom: "12%", right: "-80px", blur: "100px" },
   ],
-  // Настройки — тихо, почти неощутимо, сверху по центру
   settings: [
-    { size: "450px", color: "#7c5cff", opacity: "0.07", top: "-100px", left: "calc(50% - 225px)", blur: "140px" },
-    { size: "300px", color: "#9b7cff", opacity: "0.05", bottom: "60px", right: "20px", blur: "120px" },
+    { size: "520px", color: "#7c5cff", opacity: 0.20, top: "-120px", left: "calc(50% - 260px)", blur: "130px" },
+    { size: "360px", color: "#e455ff", opacity: 0.14, bottom: "40px", right: "0px", blur: "120px" },
   ],
-  // Поиск — фиолет справа сверху, фуксия слева снизу
   search: [
-    { size: "380px", color: "#7c5cff", opacity: "0.08", top: "-40px", right: "-60px", blur: "120px" },
-    { size: "320px", color: "#e455ff", opacity: "0.05", bottom: "60px", left: "-40px", blur: "110px" },
+    { size: "440px", color: "#7c5cff", opacity: 0.22, top: "-60px", right: "-80px", blur: "120px" },
+    { size: "380px", color: "#e455ff", opacity: 0.16, bottom: "40px", left: "-60px", blur: "110px" },
   ],
-  // Загрузка — акцент по центру, создаёт ощущение "spotlight"
   upload: [
-    { size: "480px", color: "#7c5cff", opacity: "0.10", top: "calc(50% - 320px)", left: "calc(50% - 240px)", blur: "130px" },
-    { size: "300px", color: "#e455ff", opacity: "0.06", bottom: "80px", right: "0px", blur: "110px" },
+    { size: "540px", color: "#7c5cff", opacity: 0.24, top: "calc(50% - 340px)", left: "calc(50% - 270px)", blur: "120px" },
+    { size: "360px", color: "#e455ff", opacity: 0.16, bottom: "60px", right: "-20px", blur: "110px" },
   ],
-  // Онбординг — крупный фиолет по центру, лёгкая фуксия снизу
   onboarding: [
-    { size: "520px", color: "#7c5cff", opacity: "0.10", top: "-100px", left: "calc(50% - 260px)", blur: "140px" },
-    { size: "280px", color: "#e455ff", opacity: "0.07", bottom: "40px", right: "10px", blur: "100px" },
+    { size: "580px", color: "#7c5cff", opacity: 0.24, top: "-120px", left: "calc(50% - 290px)", blur: "130px" },
+    { size: "340px", color: "#e455ff", opacity: 0.18, bottom: "20px", right: "0px", blur: "100px" },
   ],
-  // Авторизация/верификация — симметрично, как портал
   auth: [
-    { size: "400px", color: "#7c5cff", opacity: "0.10", top: "calc(50% - 300px)", left: "calc(50% - 200px)", blur: "130px" },
-    { size: "300px", color: "#e455ff", opacity: "0.07", bottom: "calc(50% - 250px)", right: "calc(50% - 150px)", blur: "110px" },
+    { size: "460px", color: "#7c5cff", opacity: 0.26, top: "calc(50% - 320px)", left: "calc(50% - 230px)", blur: "120px" },
+    { size: "360px", color: "#e455ff", opacity: 0.18, bottom: "calc(50% - 280px)", right: "calc(50% - 180px)", blur: "110px" },
   ],
-  // Default — безопасный вариант для остальных страниц
   default: [
-    { size: "450px", color: "#7c5cff", opacity: "0.08", top: "-80px", left: "calc(50% - 225px)", blur: "130px" },
-    { size: "320px", color: "#e455ff", opacity: "0.05", bottom: "60px", right: "-40px", blur: "110px" },
+    { size: "500px", color: "#7c5cff", opacity: 0.20, top: "-80px", left: "calc(50% - 250px)", blur: "120px" },
+    { size: "380px", color: "#e455ff", opacity: 0.14, bottom: "40px", right: "-40px", blur: "110px" },
   ],
 };
 
@@ -91,6 +84,7 @@ function Blob({ cfg, animClass }: { cfg: BlobConfig; animClass: string }) {
         left: cfg.left,
         right: cfg.right,
         filter: `blur(${cfg.blur})`,
+        willChange: "transform",
       }}
     />
   );
