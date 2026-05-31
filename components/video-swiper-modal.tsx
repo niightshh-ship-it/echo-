@@ -6,7 +6,9 @@ import Link from "next/link";
 import { Heart, MessageCircle, X } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useBackButtonClose } from "@/lib/use-back-button-close";
+import { useT } from "@/lib/i18n/provider";
 import { CommentsPanel } from "./comments-panel";
+import { EditDescriptionButton } from "./edit-video-description";
 
 export type SwiperVideo = {
   id: string;
@@ -126,6 +128,7 @@ function SwiperSlide({
   currentUserId: string | null;
   setVideoRef: (el: HTMLVideoElement | null) => void;
 }) {
+  const t = useT();
   const supabase = createClient();
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
@@ -187,6 +190,8 @@ function SwiperSlide({
     }
   }
 
+  const isOwner = currentUserId === author.id;
+
   return (
     <div
       data-id={video.id}
@@ -198,9 +203,13 @@ function SwiperSlide({
         loop
         muted={muted}
         playsInline
+        preload="auto"
         onClick={() => setMuted((m) => !m)}
         className="h-full w-full object-contain bg-black cursor-pointer"
       />
+
+      {/* Затемнение снизу — чтобы текст читался без отдельной плашки */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-72 bg-gradient-to-t from-black/85 via-black/40 to-transparent" />
 
       <div className="absolute bottom-6 left-0 right-20 px-5">
         <Link href={`/u/${author.id}`} className="flex items-center gap-2.5">
@@ -215,21 +224,36 @@ function SwiperSlide({
             )}
           </span>
           <div>
-            <p className="text-white font-semibold text-base leading-tight">
+            <p className="text-white font-semibold text-base leading-tight drop-shadow">
               {author.name}
             </p>
-            <p className="text-zinc-300 text-xs">{author.city}</p>
+            <p className="text-zinc-300 text-xs drop-shadow">{author.city}</p>
           </div>
         </Link>
         {video.skill && (
-          <p className="text-white text-sm mt-2 bg-white/10 inline-block px-2 py-0.5 rounded">
-            {video.skill}
+          <p className="text-white text-xs mt-2 bg-white/15 backdrop-blur-sm inline-block px-2.5 py-1 rounded-full drop-shadow font-medium">
+            🎯 {video.skill}
           </p>
         )}
-        {video.description && (
-          <p className="text-white text-sm mt-2 leading-snug whitespace-pre-wrap max-h-28 overflow-y-auto bg-black/30 p-2 rounded">
-            {video.description}
-          </p>
+        {(video.description || isOwner) && (
+          <div className="mt-2 flex items-start gap-2">
+            {video.description ? (
+              <p className="text-white text-[13px] leading-relaxed whitespace-pre-wrap max-h-28 overflow-y-auto drop-shadow flex-1 min-w-0">
+                {video.description}
+              </p>
+            ) : isOwner ? (
+              <p className="text-zinc-400 italic text-[13px] flex-1">
+                {t.editVideo.addDescriptionHint}
+              </p>
+            ) : null}
+            {isOwner && (
+              <EditDescriptionButton
+                videoId={video.id}
+                initialDescription={video.description}
+                className="shrink-0 mt-0.5"
+              />
+            )}
+          </div>
         )}
       </div>
 

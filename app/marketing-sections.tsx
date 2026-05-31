@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Reveal } from "@/components/reveal";
 import { SkillWall } from "@/components/skill-wall";
 import { EchoPulse } from "@/components/echo-pulse";
+import { SocialLinks } from "@/components/social-links";
 
 // Подсвечивает слово "Echo" в строке — градиент + эхо-пульсация как на главной
 function withEcho(text: string) {
@@ -190,12 +191,13 @@ export async function MarketingSections({ isLoggedIn }: { isLoggedIn: boolean })
 
         {/* Footer */}
         <footer className="border-t border-white/10 px-6 py-10">
-          <div className="mx-auto max-w-5xl flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="mx-auto max-w-5xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
             <div>
               <span className="text-xl font-bold lowercase tracking-tighter text-gradient-echo">echo</span>
               <p className="text-xs text-zinc-500 mt-1">{t.home.footerTagline}</p>
+              <SocialLinks variant="inline" className="mt-4" />
             </div>
-            <div className="flex flex-col items-center sm:items-end gap-1">
+            <div className="flex flex-col sm:items-end gap-1">
               <Link href="/install" className="text-xs text-echo-bright hover:underline">
                 📱 {t.install.cta}
               </Link>

@@ -477,14 +477,19 @@ function VideoSlide({
       <video
         ref={(el) => setVideoRef(item.id, el)}
         src={item.url}
+        poster={`${item.url}#t=0.1`}
         loop
         muted={muted}
         playsInline
+        preload="metadata"
         onClick={onMuteToggle}
         className="h-full w-full object-contain bg-black"
       />
 
-      <div className="absolute bottom-20 left-0 right-20 p-6 pb-2 bg-gradient-to-t from-black/80 to-transparent">
+      {/* Большой плавный градиент снизу — текст читается без отдельной плашки */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-80 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+
+      <div className="absolute bottom-20 left-0 right-20 px-5 pb-1">
         <Link
           href={`/u/${item.authorId}`}
           className="flex items-center gap-2.5 hover:opacity-80"
@@ -498,20 +503,20 @@ function VideoSlide({
             )}
           </span>
           <div>
-            <p className="text-white font-semibold text-lg leading-tight">{item.authorName}</p>
-            <p className="text-zinc-300 text-sm">{item.authorCity}</p>
+            <p className="text-white font-semibold text-base leading-tight drop-shadow">{item.authorName}</p>
+            <p className="text-zinc-300 text-xs drop-shadow">{item.authorCity}</p>
           </div>
         </Link>
         {item.skill && (
-          <p className="text-white text-sm mt-2 bg-white/10 inline-block px-2 py-0.5 rounded">
-            {item.skill}
+          <p className="text-white text-xs mt-2 bg-white/15 backdrop-blur-sm inline-block px-2.5 py-1 rounded-full drop-shadow font-medium">
+            🎯 {item.skill}
           </p>
         )}
         {hasDescription && (
           <div className="mt-2">
             <p
               ref={descRef}
-              className={`text-white text-sm leading-snug whitespace-pre-wrap ${
+              className={`text-white text-[13px] leading-relaxed whitespace-pre-wrap drop-shadow ${
                 expanded ? "" : "line-clamp-2"
               }`}
             >
@@ -520,7 +525,7 @@ function VideoSlide({
             {(overflows || expanded) && (
               <button
                 onClick={() => setExpanded((e) => !e)}
-                className="text-xs text-zinc-300 mt-1 underline"
+                className="text-xs text-zinc-400 hover:text-white mt-1 font-medium transition-colors"
               >
                 {expanded ? t.feed.less : t.feed.more}
               </button>

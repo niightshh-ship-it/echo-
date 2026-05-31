@@ -8,8 +8,11 @@ import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { NotificationBell } from "@/components/notification-bell";
+import { SocialLinks } from "@/components/social-links";
 import { useT } from "@/lib/i18n/provider";
 import { AmbientBg } from "@/components/ambient-bg";
+import { MessageSquare } from "lucide-react";
+import { FEEDBACK_EMAIL } from "@/lib/config";
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -165,6 +168,27 @@ export default function SettingsPage() {
             </span>
           </button>
         </div>
+
+        {/* Follow / community */}
+        <div className="rounded-2xl glass border border-white/10 p-5 mb-4">
+          <p className="text-xs uppercase tracking-wider text-zinc-500 mb-1">
+            {t.settings.followUs}
+          </p>
+          <p className="text-xs text-zinc-500 mb-3">{t.settings.followHint}</p>
+          <SocialLinks variant="grid" />
+        </div>
+
+        {/* Feedback */}
+        <a
+          href={`mailto:${FEEDBACK_EMAIL}?subject=Echo%20feedback`}
+          className="w-full rounded-2xl border border-white/10 p-5 mb-4 flex items-center justify-between hover:bg-white/5 transition-colors"
+        >
+          <div>
+            <p className="text-sm">{t.settings.feedback}</p>
+            <p className="text-xs text-zinc-500 mt-0.5">{t.settings.feedbackHint}</p>
+          </div>
+          <MessageSquare className="w-4 h-4 text-zinc-400" />
+        </a>
 
         {/* Sign out */}
         <button
