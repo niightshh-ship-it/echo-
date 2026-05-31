@@ -1,13 +1,12 @@
 "use client";
 
-import { useState, useRef, useEffect, useLayoutEffect } from "react";
+import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { Star } from "lucide-react";
+import { Star, X } from "lucide-react";
+import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { useT } from "@/lib/i18n/provider";
 import { useBackButtonClose } from "@/lib/use-back-button-close";
-
-const PANEL_WIDTH = 280;
 
 export function ReviewButton({
   revieweeId,
@@ -20,67 +19,70 @@ export function ReviewButton({
 }) {
   const t = useT();
   const [open, setOpen] = useState(false);
-  const [rating, setRating] = useState(0);
-  const [hover, setHover] = useState(0);
-  const [body, setBody] = useState("");
   const [done, setDone] = useState(alreadyReviewed);
-  const [busy, setBusy] = useState(false);
-  const [pos, setPos] = useState<{ top: number; left: number } | null>(null);
-  const buttonRef = useRef<HTMLButtonElement>(null);
-  const panelRef = useRef<HTMLDivElement>(null);
-
-  // Кликнул вне попапа — закрываем
-  useEffect(() => {
-    if (!open) return;
-    function onDown(e: MouseEvent) {
-      const t = e.target as Node;
-      if (buttonRef.current?.contains(t)) return;
-      if (panelRef.current?.contains(t)) return;
-      setOpen(false);
-    }
-    document.addEventListener("mousedown", onDown);
-    return () => document.removeEventListener("mousedown", onDown);
-  }, [open]);
-
-  // На скролл/ресайз закрываем — позиция протухнет
-  useEffect(() => {
-    if (!open) return;
-    function close() {
-      setOpen(false);
-    }
-    window.addEventListener("scroll", close, true);
-    window.addEventListener("resize", close);
-    return () => {
-      window.removeEventListener("scroll", close, true);
-      window.removeEventListener("resize", close);
-    };
-  }, [open]);
-
-  // Считаем позицию когда открыли
-  useLayoutEffect(() => {
-    if (!open || !buttonRef.current) return;
-    const rect = buttonRef.current.getBoundingClientRect();
-    setPos({
-      top: rect.bottom + 8,
-      left: Math.max(8, rect.right - PANEL_WIDTH),
-    });
-  }, [open]);
-
-  // Back-кнопка телефона закрывает попап
-  useBackButtonClose(open, () => setOpen(false));
 
   if (done) {
     return <span className="text-xs text-emerald-400">✓</span>;
   }
 
+  return (
+    <>
+      <button
+        onClick={() => setOpen(true)}
+        className="flex items-center gap-1 text-sm text-zinc-300 hover:text-white px-2 py-1 rounded-lg hover:bg-white/5 transition-colors"
+      >
+        <Star className="w-4 h-4" /> {t.chat.rate}
+      </button>
+      {open && (
+        <ReviewSheet
+          revieweeId={revieweeId}
+          revieweeName={revieweeName}
+          onClose={() => setOpen(false)}
+          onDone={() => {
+            setDone(true);
+            setOpen(false);
+          }}
+        />
+      )}
+    </>
+  );
+}
+
+function ReviewSheet({
+  revieweeId,
+  revieweeName,
+  onClose,
+  onDone,
+}: {
+  revieweeId: string;
+  revieweeName: string;
+  onClose: () => void;
+  onDone: () => void;
+}) {
+  const t = useT();
+  const [mounted, setMounted] = useState(false);
+  const [rating, setRating] = useState(0);
+  const [hover, setHover] = useState(0);
+  const [body, setBody] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useBackButtonClose(true, onClose);
+
   async function submit() {
-    if (rating < 1) return;
+    if (rating < 1 || busy) return;
     setBusy(true);
     const supabase = createClient();
     const {
       data: { user },
     } = await supabase.auth.getUser();
-    if (!user) return;
+    if (!user) {
+      setBusy(false);
+      return;
+    }
     const { error } = await supabase.from("reviews").insert({
       reviewer_id: user.id,
       reviewee_id: revieweeId,
@@ -88,75 +90,118 @@ export function ReviewButton({
       body: body.trim() || null,
     });
     setBusy(false);
-    if (!error) {
-      setDone(true);
-      setOpen(false);
+    if (error) {
+      toast.error(t.chat.rateError);
+      return;
     }
+    toast.success(t.chat.rateThanks);
+    onDone();
   }
 
-  return (
-    <>
-      <button
-        ref={buttonRef}
-        onClick={() => setOpen((o) => !o)}
-        className="flex items-center gap-1 text-sm text-zinc-400 hover:text-white px-2 py-1 rounded-lg transition-colors"
-      >
-        <Star className="w-4 h-4" /> {t.chat.rate}
-      </button>
+  if (!mounted) return null;
 
-      {open && pos && typeof document !== "undefined"
-        ? createPortal(
-            <div
-              ref={panelRef}
-              style={{
-                position: "fixed",
-                top: pos.top,
-                left: pos.left,
-                width: PANEL_WIDTH,
-                zIndex: 100,
-              }}
-              className="rounded-2xl border border-white/10 bg-zinc-950/98 backdrop-blur p-4 shadow-2xl animate-in fade-in zoom-in-95 duration-150"
+  const active = hover || rating;
+  const label =
+    active > 0
+      ? t.chat.rateLabels[active - 1]
+      : t.chat.rateChoose;
+
+  return createPortal(
+    <>
+      {/* Подложка */}
+      <div
+        className="fixed inset-0 z-[60] bg-black/60 animate-in fade-in duration-200"
+        onClick={onClose}
+      />
+      {/* Лист снизу */}
+      <div className="fixed inset-x-0 bottom-0 z-[61] bg-zinc-950 border-t border-white/10 rounded-t-3xl flex flex-col max-h-[85vh] animate-in slide-in-from-bottom duration-250">
+        {/* Хэндл сверху как в нативных bottom sheet */}
+        <div className="pt-3 pb-2 flex justify-center">
+          <div className="w-10 h-1 rounded-full bg-white/15" />
+        </div>
+
+        {/* Шапка */}
+        <div className="px-5 pb-2 flex items-start justify-between gap-2">
+          <div className="flex-1 min-w-0">
+            <h3 className="font-semibold text-white text-lg leading-tight">
+              {t.chat.rateTitle.replace("{name}", revieweeName)}
+            </h3>
+            <p className="text-zinc-400 text-xs mt-1 leading-snug">
+              {t.chat.ratePurpose}
+            </p>
+          </div>
+          <button
+            onClick={onClose}
+            aria-label="close"
+            className="text-zinc-400 hover:text-white p-1 -mt-1 -mr-1"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        <div className="px-5 py-6 flex-1 overflow-y-auto">
+          {/* Звёзды + подпись */}
+          <div className="flex flex-col items-center gap-3 mb-6">
+            <div className="flex gap-1">
+              {[1, 2, 3, 4, 5].map((n) => (
+                <button
+                  key={n}
+                  type="button"
+                  onMouseEnter={() => setHover(n)}
+                  onMouseLeave={() => setHover(0)}
+                  onClick={() => setRating(n)}
+                  className="p-1.5 transition-transform active:scale-90 hover:scale-110"
+                  aria-label={`${n}`}
+                >
+                  <Star
+                    className="w-10 h-10 transition-colors"
+                    fill={active >= n ? "#7c5cff" : "none"}
+                    stroke={active >= n ? "#7c5cff" : "rgb(120, 120, 135)"}
+                    strokeWidth={1.5}
+                  />
+                </button>
+              ))}
+            </div>
+            <p
+              className={`text-sm font-medium transition-colors min-h-[20px] ${
+                active > 0 ? "text-white" : "text-zinc-500"
+              }`}
             >
-              <p className="text-sm mb-3 text-white">
-                {t.chat.rateTitle.replace("{name}", revieweeName)}
-              </p>
-              <div className="flex gap-1 mb-3 justify-center">
-                {[1, 2, 3, 4, 5].map((n) => (
-                  <button
-                    key={n}
-                    type="button"
-                    onMouseEnter={() => setHover(n)}
-                    onMouseLeave={() => setHover(0)}
-                    onClick={() => setRating(n)}
-                    className="p-1 hover:scale-110 transition-transform"
-                  >
-                    <Star
-                      className="w-7 h-7"
-                      fill={(hover || rating) >= n ? "#7c5cff" : "none"}
-                      stroke={(hover || rating) >= n ? "#7c5cff" : "currentColor"}
-                    />
-                  </button>
-                ))}
-              </div>
-              <textarea
-                value={body}
-                onChange={(e) => setBody(e.target.value)}
-                placeholder={t.chat.reviewPlaceholder}
-                rows={2}
-                maxLength={500}
-                className="w-full bg-white/5 border border-white/10 rounded-lg p-2 text-sm text-white placeholder:text-zinc-500 resize-none mb-3 focus:outline-none focus:border-echo/50"
-              />
-              <button
-                onClick={submit}
-                disabled={rating < 1 || busy}
-                className="w-full bg-echo text-white hover:bg-echo-bright rounded-full h-10 text-sm font-medium disabled:opacity-50 transition-colors"
-              >
-                {t.chat.rateSubmit}
-              </button>
-            </div>,
-            document.body
-          )
-        : null}
-    </>
+              {label}
+            </p>
+          </div>
+
+          {/* Опциональный комментарий */}
+          <label className="block">
+            <span className="block text-xs text-zinc-400 mb-2">
+              {t.chat.reviewOptional}
+            </span>
+            <textarea
+              value={body}
+              onChange={(e) => setBody(e.target.value)}
+              placeholder={t.chat.reviewPlaceholder}
+              rows={3}
+              maxLength={500}
+              className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-sm text-white placeholder:text-zinc-500 resize-none focus:outline-none focus:border-echo/50"
+            />
+          </label>
+        </div>
+
+        {/* Submit */}
+        <div
+          className="px-5 pt-2 pb-4 border-t border-white/5 bg-zinc-950"
+          style={{ paddingBottom: "max(env(safe-area-inset-bottom), 1rem)" }}
+        >
+          <button
+            onClick={submit}
+            disabled={rating < 1 || busy}
+            className="w-full bg-echo text-white hover:bg-echo-bright rounded-full h-12 font-semibold disabled:opacity-40 disabled:cursor-not-allowed transition-colors glow-echo disabled:shadow-none"
+          >
+            {busy ? "..." : t.chat.rateSubmit}
+          </button>
+        </div>
+      </div>
+    </>,
+    document.body
   );
 }
