@@ -181,11 +181,14 @@ export function FeedClient({
   return (
     <div
       ref={wrapperRef}
-      className="h-screen w-screen overflow-hidden bg-black"
+      className="h-[100dvh] w-screen overflow-hidden bg-black"
       style={{ touchAction: "pan-y" }}
     >
-      {/* Переключатель */}
-      <div className="fixed top-3 left-1/2 -translate-x-1/2 z-40 flex bg-black/50 backdrop-blur-md rounded-full p-1 gap-1 shadow-[0_2px_16px_rgba(0,0,0,0.5)]">
+      {/* Переключатель — учитываем чёлку/safe-area в PWA */}
+      <div
+        className="fixed left-1/2 -translate-x-1/2 z-40 flex bg-black/50 backdrop-blur-md rounded-full p-1 gap-1 shadow-[0_2px_16px_rgba(0,0,0,0.5)]"
+        style={{ top: "max(env(safe-area-inset-top), 0.75rem)" }}
+      >
         <button
           onClick={() => switchTo("skill")}
           className={`px-4 py-1.5 rounded-full text-xs font-medium transition-colors ${
@@ -218,7 +221,7 @@ export function FeedClient({
 
       {/* Карусель */}
       <div
-        className="flex h-screen bg-black"
+        className="flex h-[100dvh] bg-black"
         style={{
           width: "200vw",
           transform: `translateX(calc(${baseTx} + ${drag}px))`,
@@ -295,7 +298,9 @@ function FeedColumn({
           if (!id) continue;
           const video = videoRefs.current.get(id);
           if (!video) continue;
-          if (entry.isIntersecting && entry.intersectionRatio > 0.7) {
+          // Порог 0.6 — надёжнее ловит активный слайд даже если snap
+          // остановился чуть-чуть не идеально (мобильные браузеры)
+          if (entry.isIntersecting && entry.intersectionRatio > 0.6) {
             setActiveId(id);
             video.play().catch(() => {});
           } else {
@@ -304,11 +309,50 @@ function FeedColumn({
           }
         }
       },
-      { root: container, threshold: [0, 0.7, 1] }
+      { root: container, threshold: [0, 0.6, 1] }
     );
     const slides = container.querySelectorAll("[data-id]");
     slides.forEach((s) => io.observe(s));
     return () => io.disconnect();
+  }, [active, items]);
+
+  // Фоллбэк: если по какой-то причине ни одно видео не играет
+  // (snap застрял между слайдами) — после остановки скролла находим
+  // самый видимый слайд и запускаем его.
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container || !active) return;
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    function onScroll() {
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(() => {
+        const c = containerRef.current;
+        if (!c) return;
+        const center = c.scrollTop + c.clientHeight / 2;
+        let bestId: string | null = null;
+        let bestDist = Infinity;
+        c.querySelectorAll<HTMLElement>("[data-id]").forEach((el) => {
+          const mid = el.offsetTop + el.offsetHeight / 2;
+          const dist = Math.abs(mid - center);
+          if (dist < bestDist) {
+            bestDist = dist;
+            bestId = el.getAttribute("data-id");
+          }
+        });
+        if (bestId) {
+          const v = videoRefs.current.get(bestId);
+          if (v && v.paused) {
+            setActiveId(bestId);
+            v.play().catch(() => {});
+          }
+        }
+      }, 150);
+    }
+    container.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      container.removeEventListener("scroll", onScroll);
+      if (timer) clearTimeout(timer);
+    };
   }, [active, items]);
 
   useEffect(() => {
@@ -320,7 +364,7 @@ function FeedColumn({
 
   if (items.length === 0) {
     return (
-      <div className="w-screen h-screen shrink-0 flex flex-col items-center justify-center text-center px-6 bg-black">
+      <div className="w-screen h-[100dvh] shrink-0 flex flex-col items-center justify-center text-center px-6 bg-black">
         <div className="text-6xl mb-5 select-none animate-pulse">
           {mode === "skill" ? "🎯" : "✨"}
         </div>
@@ -354,7 +398,7 @@ function FeedColumn({
   return (
     <div
       ref={containerRef}
-      className="w-screen h-screen shrink-0 overflow-y-scroll snap-y snap-mandatory bg-black scrollbar-hide"
+      className="w-screen h-[100dvh] shrink-0 overflow-y-scroll snap-y snap-mandatory bg-black scrollbar-hide"
       style={{ scrollbarWidth: "none" }}
     >
       {items.map((item) => (
@@ -482,7 +526,7 @@ function VideoSlide({
   return (
     <div
       data-id={item.id}
-      className="relative h-screen w-full snap-start snap-always flex items-center justify-center"
+      className="relative h-[100dvh] w-full snap-start snap-always flex items-center justify-center overflow-hidden bg-black"
     >
       <video
         ref={(el) => setVideoRef(item.id, el)}
@@ -493,7 +537,7 @@ function VideoSlide({
         playsInline
         preload="metadata"
         onClick={onMuteToggle}
-        className="h-full w-full object-contain bg-black"
+        className="h-full w-full object-cover"
       />
 
       {/* Большой плавный градиент снизу — текст читается без отдельной плашки */}
@@ -509,7 +553,10 @@ function VideoSlide({
 
       {/* Бейдж «твоё видео» — мягкое стекло, ненавязчиво */}
       {item.isMine && (
-        <div className="absolute top-16 left-1/2 -translate-x-1/2 z-10 bg-black/40 backdrop-blur-md border border-echo/30 text-white/90 text-xs font-medium px-3 py-1.5 rounded-full flex items-center gap-1.5">
+        <div
+          className="fixed left-1/2 -translate-x-1/2 z-[11] bg-black/40 backdrop-blur-md border border-echo/30 text-white/90 text-xs font-medium px-3 py-1.5 rounded-full flex items-center gap-1.5"
+          style={{ top: "calc(max(env(safe-area-inset-top), 0.75rem) + 3.25rem)" }}
+        >
           <span className="text-echo-bright">✨</span> {t.feed.yourVideo}
         </div>
       )}
@@ -610,8 +657,8 @@ function VideoSlide({
         />
       </div>
 
-      {showSoundHint && (
-        <div className="absolute top-20 left-1/2 -translate-x-1/2 bg-black/60 text-white text-xs px-3 py-1.5 rounded-full">
+      {showSoundHint && !item.isMine && (
+        <div className="absolute bottom-44 left-1/2 -translate-x-1/2 bg-black/55 backdrop-blur-sm text-white/90 text-xs px-3 py-1.5 rounded-full pointer-events-none animate-pulse">
           {t.feed.soundHint}
         </div>
       )}

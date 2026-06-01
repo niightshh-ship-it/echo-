@@ -70,7 +70,7 @@ export function VideoSwiperModal({
           if (!id) continue;
           const v = videoRefs.current.get(id);
           if (!v) continue;
-          if (entry.isIntersecting && entry.intersectionRatio > 0.7) {
+          if (entry.isIntersecting && entry.intersectionRatio > 0.6) {
             v.play().catch(() => {});
           } else {
             v.pause();
@@ -78,7 +78,7 @@ export function VideoSwiperModal({
           }
         }
       },
-      { root: c, threshold: [0, 0.7, 1] }
+      { root: c, threshold: [0, 0.6, 1] }
     );
     c.querySelectorAll("[data-id]").forEach((el) => io.observe(el));
     return () => io.disconnect();
@@ -97,7 +97,7 @@ export function VideoSwiperModal({
       </button>
       <div
         ref={containerRef}
-        className="h-screen w-screen overflow-y-scroll snap-y snap-mandatory scrollbar-hide"
+        className="h-[100dvh] w-screen overflow-y-scroll snap-y snap-mandatory scrollbar-hide"
         style={{ scrollbarWidth: "none" }}
       >
         {videos.map((v) => (
@@ -214,7 +214,7 @@ function SwiperSlide({
   return (
     <div
       data-id={video.id}
-      className="relative h-screen w-full snap-start snap-always flex items-center justify-center"
+      className="relative h-[100dvh] w-full snap-start snap-always flex items-center justify-center overflow-hidden bg-black"
     >
       <video
         ref={setVideoRef}
@@ -224,7 +224,7 @@ function SwiperSlide({
         playsInline
         preload="auto"
         onClick={() => setMuted((m) => !m)}
-        className="h-full w-full object-contain bg-black cursor-pointer"
+        className="h-full w-full object-cover cursor-pointer"
       />
 
       {/* Затемнение снизу — чтобы текст читался без отдельной плашки */}

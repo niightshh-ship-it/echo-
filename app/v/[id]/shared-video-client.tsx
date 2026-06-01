@@ -104,7 +104,7 @@ export function SharedVideoClient({
   }
 
   return (
-    <div className="fixed inset-0 bg-black flex items-center justify-center">
+    <div className="fixed inset-0 bg-black flex items-center justify-center overflow-hidden">
       {/* Назад / закрыть */}
       <Link
         href="/"
@@ -132,7 +132,7 @@ export function SharedVideoClient({
         playsInline
         preload="auto"
         onClick={() => setMuted((m) => !m)}
-        className="max-h-screen max-w-full object-contain bg-black cursor-pointer"
+        className="h-full w-full object-cover cursor-pointer"
       />
 
       {/* Затемнение снизу */}

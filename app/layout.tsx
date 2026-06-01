@@ -51,6 +51,14 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: "#000000",
+  // Без viewport-fit:cover переменные env(safe-area-inset-*) всегда 0,
+  // и в PWA контент налезает на чёлку/индикатор. Это включает их.
+  viewportFit: "cover",
+  // Не даём зумить интерфейс двойным тапом / pinch — это TikTok-стиль фид
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 export default async function RootLayout({
