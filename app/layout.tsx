@@ -4,6 +4,7 @@ import "./globals.css";
 import { getDictionary } from "@/lib/i18n/server";
 import { I18nProvider } from "@/lib/i18n/provider";
 import { BottomNav } from "@/components/bottom-nav";
+import { NotificationToaster } from "@/components/notification-toaster";
 import { Analytics } from "@vercel/analytics/react";
 import { Toaster } from "sonner";
 
@@ -67,6 +68,7 @@ export default async function RootLayout({
         <I18nProvider dict={dict} locale={locale}>
           {children}
           <BottomNav />
+          <NotificationToaster />
         </I18nProvider>
         <Toaster
           theme="dark"

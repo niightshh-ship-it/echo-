@@ -99,9 +99,13 @@ const en = {
   notifications: {
     title: "Notifications",
     empty: "No notifications yet",
+    emptyHint: "Matches, messages and reviews will show up here.",
+    unreadCount: "{n} unread",
     markAllRead: "Mark all read",
+    open: "Open",
     typeMatch: "{name} matched with you",
     typeMessage: "{name}: {preview}",
+    typeReview: "{name} left you a review",
     justNow: "just now",
     minutesAgo: "{n}m",
     hoursAgo: "{n}h",

@@ -101,9 +101,13 @@ const uk: Dictionary = {
   notifications: {
     title: "Сповіщення",
     empty: "Поки немає сповіщень",
+    emptyHint: "Метчі, повідомлення та відгуки з'являться тут.",
+    unreadCount: "нових: {n}",
     markAllRead: "Позначити всі",
+    open: "Відкрити",
     typeMatch: "У тебе метч з {name}",
     typeMessage: "{name}: {preview}",
+    typeReview: "{name} залишив тобі відгук",
     justNow: "щойно",
     minutesAgo: "{n} хв",
     hoursAgo: "{n} год",

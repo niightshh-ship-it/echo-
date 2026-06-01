@@ -101,9 +101,13 @@ const ru: Dictionary = {
   notifications: {
     title: "Уведомления",
     empty: "Пока нет уведомлений",
+    emptyHint: "Мэтчи, сообщения и отзывы появятся здесь.",
+    unreadCount: "новых: {n}",
     markAllRead: "Прочитать все",
+    open: "Открыть",
     typeMatch: "У тебя мэтч с {name}",
     typeMessage: "{name}: {preview}",
+    typeReview: "{name} оставил тебе отзыв",
     justNow: "только что",
     minutesAgo: "{n} мин",
     hoursAgo: "{n} ч",

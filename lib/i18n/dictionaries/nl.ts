@@ -101,9 +101,13 @@ const nl: Dictionary = {
   notifications: {
     title: "Meldingen",
     empty: "Nog geen meldingen",
+    emptyHint: "Matches, berichten en reviews komen hier te staan.",
+    unreadCount: "{n} ongelezen",
     markAllRead: "Markeer alles gelezen",
+    open: "Openen",
     typeMatch: "Je hebt een match met {name}",
     typeMessage: "{name}: {preview}",
+    typeReview: "{name} liet je een review achter",
     justNow: "zojuist",
     minutesAgo: "{n} min",
     hoursAgo: "{n} u",
