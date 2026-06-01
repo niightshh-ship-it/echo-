@@ -83,11 +83,12 @@ function ReviewSheet({
       setBusy(false);
       return;
     }
+    const reviewBody = body.trim() || null;
     const { error } = await supabase.from("reviews").insert({
       reviewer_id: user.id,
       reviewee_id: revieweeId,
       rating,
-      body: body.trim() || null,
+      body: reviewBody,
     });
     setBusy(false);
     if (error) {
@@ -95,6 +96,16 @@ function ReviewSheet({
       return;
     }
     toast.success(t.chat.rateThanks);
+    // Письмо адресату отзыва (троттлится раз в час на сервере)
+    fetch("/api/notify/review", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        revieweeId,
+        rating,
+        body: reviewBody,
+      }),
+    }).catch(() => {});
     onDone();
   }
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { ArrowUp, Heart, Play } from "lucide-react";
+import { ArrowUp, ChevronUp, Heart, Play } from "lucide-react";
 import { useT } from "@/lib/i18n/provider";
 
 // ============================================================
@@ -31,11 +31,13 @@ function StepUploadIllustration() {
 
 function StepSwipeIllustration() {
   return (
-    <div className="relative h-48 w-48 flex items-center justify-center">
+    <div className="relative h-48 w-48 flex items-center justify-center overflow-hidden">
+      {/* Карточка позади — «следующее видео» подглядывает снизу */}
       <div
-        className="absolute h-36 w-28 rounded-2xl border border-white/10 bg-zinc-900/60 backdrop-blur"
-        style={{ transform: "translateX(-6px) translateY(6px) rotate(-3deg)" }}
+        className="absolute h-36 w-28 rounded-2xl border border-white/10 bg-zinc-900/70 backdrop-blur"
+        style={{ transform: "translateY(20px) scale(0.94)" }}
       />
+      {/* Карточка спереди, свайпается ВВЕРХ */}
       <div className="wt-swipe-card relative h-36 w-28 rounded-2xl border border-echo/40 bg-gradient-to-br from-echo/25 via-zinc-900 to-echo-fuchsia/20 overflow-hidden shadow-xl">
         <div className="absolute top-3 left-1/2 -translate-x-1/2 h-10 w-10 rounded-full bg-white/20 border border-white/30 flex items-center justify-center text-base font-bold text-white">
           A
@@ -45,8 +47,13 @@ function StepSwipeIllustration() {
           <div className="h-1 w-12 bg-white/40 rounded-full mx-auto" />
         </div>
       </div>
-      <div className="wt-heart absolute top-12 right-4">
-        <Heart className="w-9 h-9 text-echo" fill="#7c5cff" />
+      {/* Стрелка «↑» сбоку — намёк на вертикальный жест */}
+      <div className="wt-scroll-hint absolute -right-1 top-1/2 -translate-y-1/2 text-echo-bright">
+        <ChevronUp className="w-7 h-7" strokeWidth={3} />
+      </div>
+      {/* Сердечко — лайк */}
+      <div className="wt-heart absolute top-10 -left-1">
+        <Heart className="w-8 h-8 text-echo" fill="#7c5cff" />
       </div>
     </div>
   );

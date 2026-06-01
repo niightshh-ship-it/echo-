@@ -30,6 +30,10 @@ const STRINGS: Record<
     msgTitle: (name: string) => string;
     msgBody: (name: string, preview: string) => string;
     msgCta: string;
+    reviewSubject: (name: string, rating: number) => string;
+    reviewTitle: (name: string, rating: number) => string;
+    reviewBody: (name: string, rating: number, body: string | null) => string;
+    reviewCta: string;
     footer: string;
     unsubHint: string;
   }
@@ -43,6 +47,13 @@ const STRINGS: Record<
     msgTitle: (n) => `New message from ${n}`,
     msgBody: (n, preview) => `<strong>${n}</strong>: <em>${escape(preview)}</em>`,
     msgCta: "Open chat",
+    reviewSubject: (n, r) => `${n} left you a ${stars(r)} review on Echo`,
+    reviewTitle: (n, r) => `${n} reviewed you · ${stars(r)}`,
+    reviewBody: (n, r, body) =>
+      `<strong>${n}</strong> rated you <strong>${stars(r)}</strong>${
+        body ? `<br><br><em style="color:#444">"${escape(body)}"</em>` : ""
+      }<br><br>It now shows up on your profile.`,
+    reviewCta: "View on profile",
     footer: "Echo · trade skills, no money",
     unsubHint: "You can disable these emails any time in Echo settings.",
   },
@@ -55,6 +66,13 @@ const STRINGS: Record<
     msgTitle: (n) => `Новое сообщение от ${n}`,
     msgBody: (n, preview) => `<strong>${n}</strong>: <em>${escape(preview)}</em>`,
     msgCta: "Открыть чат",
+    reviewSubject: (n, r) => `${n} оставил тебе отзыв ${stars(r)} в Echo`,
+    reviewTitle: (n, r) => `${n} оценил тебя · ${stars(r)}`,
+    reviewBody: (n, r, body) =>
+      `<strong>${n}</strong> поставил тебе <strong>${stars(r)}</strong>${
+        body ? `<br><br><em style="color:#444">«${escape(body)}»</em>` : ""
+      }<br><br>Отзыв уже виден у тебя в профиле.`,
+    reviewCta: "Открыть профиль",
     footer: "Echo · обмен навыками, без денег",
     unsubHint: "Письма можно отключить в любой момент в настройках Echo.",
   },
@@ -67,6 +85,13 @@ const STRINGS: Record<
     msgTitle: (n) => `Nieuw bericht van ${n}`,
     msgBody: (n, preview) => `<strong>${n}</strong>: <em>${escape(preview)}</em>`,
     msgCta: "Chat openen",
+    reviewSubject: (n, r) => `${n} liet je een ${stars(r)} review achter op Echo`,
+    reviewTitle: (n, r) => `${n} beoordeelde je · ${stars(r)}`,
+    reviewBody: (n, r, body) =>
+      `<strong>${n}</strong> gaf je <strong>${stars(r)}</strong>${
+        body ? `<br><br><em style="color:#444">"${escape(body)}"</em>` : ""
+      }<br><br>De review staat nu op je profiel.`,
+    reviewCta: "Profiel openen",
     footer: "Echo · vaardigheden ruilen, geen geld",
     unsubHint: "Je kunt deze e-mails altijd uitzetten in de Echo-instellingen.",
   },
@@ -79,10 +104,22 @@ const STRINGS: Record<
     msgTitle: (n) => `Нове повідомлення від ${n}`,
     msgBody: (n, preview) => `<strong>${n}</strong>: <em>${escape(preview)}</em>`,
     msgCta: "Відкрити чат",
+    reviewSubject: (n, r) => `${n} залишив тобі відгук ${stars(r)} в Echo`,
+    reviewTitle: (n, r) => `${n} оцінив тебе · ${stars(r)}`,
+    reviewBody: (n, r, body) =>
+      `<strong>${n}</strong> поставив тобі <strong>${stars(r)}</strong>${
+        body ? `<br><br><em style="color:#444">«${escape(body)}»</em>` : ""
+      }<br><br>Відгук уже на твоєму профілі.`,
+    reviewCta: "Відкрити профіль",
     footer: "Echo · обмін навичками, без грошей",
     unsubHint: "Листи можна вимкнути будь-коли в налаштуваннях Echo.",
   },
 };
+
+function stars(n: number) {
+  const safe = Math.max(0, Math.min(5, Math.round(n)));
+  return "★".repeat(safe) + "☆".repeat(5 - safe);
+}
 
 function escape(s: string) {
   return s
@@ -96,23 +133,57 @@ function pickLocale(raw: string | null | undefined): Locale {
   return "en";
 }
 
-/** Возвращает {email, name, avatar, locale, email_notifications} или null. */
+/** Возвращает {email, name, avatar, locale, email_notifications} или null.
+ *  Устойчиво к тому что колонок `locale` или `email_notifications` ещё нет
+ *  в БД (если миграция 014 не накатана) — фоллбечится на минимальный
+ *  запрос и считает что письма включены, а локаль 'en'. */
 async function fetchRecipient(userId: string) {
   const a = admin();
-  const [{ data: profile }, { data: authUser }] = await Promise.all([
-    a
+  const [{ data: profile, error: profileErr }, { data: authUser, error: authErr }] =
+    await Promise.all([
+      a
+        .from("profiles")
+        .select("name, locale, email_notifications")
+        .eq("id", userId)
+        .maybeSingle(),
+      a.auth.admin.getUserById(userId),
+    ]);
+
+  if (authErr) {
+    console.error("[notify-email] auth.admin.getUserById failed:", authErr.message);
+  }
+
+  if (profileErr) {
+    console.error(
+      "[notify-email] profiles select failed (миграция 014?):",
+      profileErr.message
+    );
+    // Пробуем фоллбэк-запрос без новых колонок
+    const { data: fallback } = await a
       .from("profiles")
-      .select("name, locale, email_notifications")
+      .select("name")
       .eq("id", userId)
-      .maybeSingle(),
-    a.auth.admin.getUserById(userId),
-  ]);
-  if (!profile || !authUser.user?.email) return null;
+      .maybeSingle();
+    if (!fallback || !authUser?.user?.email) return null;
+    return {
+      email: authUser.user.email,
+      name: (fallback as { name?: string }).name ?? "?",
+      locale: "en" as Locale,
+      enabled: true,
+    };
+  }
+
+  if (!profile || !authUser?.user?.email) {
+    console.error(
+      `[notify-email] no recipient: profile=${!!profile} email=${!!authUser?.user?.email}`
+    );
+    return null;
+  }
   return {
     email: authUser.user.email,
     name: profile.name ?? "?",
-    locale: pickLocale((profile as { locale?: string }).locale),
-    enabled: profile.email_notifications !== false,
+    locale: pickLocale((profile as { locale?: string | null }).locale ?? null),
+    enabled: (profile as { email_notifications?: boolean }).email_notifications !== false,
   };
 }
 
@@ -139,9 +210,24 @@ async function shouldThrottle(recipientId: string, actorId: string, type: string
 }
 
 async function logEmail(recipientId: string, actorId: string, type: string) {
-  await admin()
+  const { error } = await admin()
     .from("email_log")
     .insert({ recipient_id: recipientId, actor_id: actorId, type });
+  if (error) {
+    console.error("[notify-email] email_log insert failed:", error.message);
+  }
+}
+
+/** Шлёт письмо и логирует ошибку при сбое SMTP. */
+async function safeSend(args: { to: string; subject: string; html: string; tag: string }) {
+  try {
+    await sendMail({ to: args.to, subject: args.subject, html: args.html });
+    return true;
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    console.error(`[notify-email] SMTP send failed (${args.tag}): ${msg}`);
+    return false;
+  }
 }
 
 export async function notifyMatchByEmail(opts: {
@@ -149,14 +235,18 @@ export async function notifyMatchByEmail(opts: {
   actorId: string;
 }) {
   const recipient = await fetchRecipient(opts.recipientId);
-  if (!recipient || !recipient.enabled) return { sent: false, reason: "disabled" };
+  if (!recipient) {
+    console.warn("[notify-email] match skipped: no recipient");
+    return { sent: false, reason: "no-recipient" };
+  }
+  if (!recipient.enabled) return { sent: false, reason: "disabled" };
   if (await shouldThrottle(opts.recipientId, opts.actorId, "match"))
     return { sent: false, reason: "throttled" };
 
   const actorName = await fetchActorName(opts.actorId);
   const s = STRINGS[recipient.locale];
   const ctaUrl = `${SITE_URL}/matches/${opts.actorId}`;
-  await sendMail({
+  const ok = await safeSend({
     to: recipient.email,
     subject: s.matchSubject(actorName),
     html: emailShell({
@@ -166,7 +256,9 @@ export async function notifyMatchByEmail(opts: {
       ctaUrl,
       footer: s.footer,
     }),
+    tag: "match",
   });
+  if (!ok) return { sent: false, reason: "smtp" };
   await logEmail(opts.recipientId, opts.actorId, "match");
   return { sent: true };
 }
@@ -177,14 +269,18 @@ export async function notifyMessageByEmail(opts: {
   preview: string;
 }) {
   const recipient = await fetchRecipient(opts.recipientId);
-  if (!recipient || !recipient.enabled) return { sent: false, reason: "disabled" };
+  if (!recipient) {
+    console.warn("[notify-email] message skipped: no recipient");
+    return { sent: false, reason: "no-recipient" };
+  }
+  if (!recipient.enabled) return { sent: false, reason: "disabled" };
   if (await shouldThrottle(opts.recipientId, opts.actorId, "message"))
     return { sent: false, reason: "throttled" };
 
   const actorName = await fetchActorName(opts.actorId);
   const s = STRINGS[recipient.locale];
   const ctaUrl = `${SITE_URL}/matches/${opts.actorId}`;
-  await sendMail({
+  const ok = await safeSend({
     to: recipient.email,
     subject: s.msgSubject(actorName),
     html: emailShell({
@@ -194,7 +290,44 @@ export async function notifyMessageByEmail(opts: {
       ctaUrl,
       footer: s.footer,
     }),
+    tag: "message",
   });
+  if (!ok) return { sent: false, reason: "smtp" };
   await logEmail(opts.recipientId, opts.actorId, "message");
+  return { sent: true };
+}
+
+export async function notifyReviewByEmail(opts: {
+  recipientId: string;
+  actorId: string;
+  rating: number;
+  body: string | null;
+}) {
+  const recipient = await fetchRecipient(opts.recipientId);
+  if (!recipient) {
+    console.warn("[notify-email] review skipped: no recipient");
+    return { sent: false, reason: "no-recipient" };
+  }
+  if (!recipient.enabled) return { sent: false, reason: "disabled" };
+  if (await shouldThrottle(opts.recipientId, opts.actorId, "review"))
+    return { sent: false, reason: "throttled" };
+
+  const actorName = await fetchActorName(opts.actorId);
+  const s = STRINGS[recipient.locale];
+  const ctaUrl = `${SITE_URL}/profile`;
+  const ok = await safeSend({
+    to: recipient.email,
+    subject: s.reviewSubject(actorName, opts.rating),
+    html: emailShell({
+      title: s.reviewTitle(actorName, opts.rating),
+      body: `${s.reviewBody(actorName, opts.rating, opts.body)}<br><br><span style="color:#888;font-size:13px">${s.unsubHint}</span>`,
+      ctaLabel: s.reviewCta,
+      ctaUrl,
+      footer: s.footer,
+    }),
+    tag: "review",
+  });
+  if (!ok) return { sent: false, reason: "smtp" };
+  await logEmail(opts.recipientId, opts.actorId, "review");
   return { sent: true };
 }
