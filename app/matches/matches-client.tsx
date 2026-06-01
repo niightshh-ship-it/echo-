@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Heart } from "lucide-react";
+import { Heart, MessageCircle } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useT } from "@/lib/i18n/provider";
 import { Badge } from "@/components/ui/badge";
@@ -102,17 +102,20 @@ export function MatchesClient({
       </div>
 
       {/* Табы */}
-      <div className="flex gap-1 p-1 bg-white/5 rounded-2xl mb-6 border border-white/10">
+      <div className="flex gap-1.5 p-1.5 bg-white/[0.04] rounded-2xl mb-5 border border-white/10">
         <button
           onClick={() => setTab("matches")}
-          className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-sm font-medium transition-colors ${
-            tab === "matches" ? "bg-white text-black" : "text-zinc-400 hover:text-white"
+          className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+            tab === "matches"
+              ? "bg-gradient-to-r from-echo to-echo-fuchsia text-white glow-echo"
+              : "text-zinc-400 hover:text-white"
           }`}
         >
-          💜 {t.matches.tabMatches}
+          <TwinHearts active={tab === "matches"} />
+          {t.matches.tabMatches}
           {matches.length > 0 && (
             <span
-              className={`text-xs ${tab === "matches" ? "text-zinc-500" : "text-zinc-600"}`}
+              className={`text-xs ${tab === "matches" ? "text-white/70" : "text-zinc-600"}`}
             >
               {matches.length}
             </span>
@@ -120,17 +123,17 @@ export function MatchesClient({
         </button>
         <button
           onClick={() => setTab("likes")}
-          className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-sm font-medium transition-colors relative ${
+          className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all relative ${
             tab === "likes" ? "bg-white text-black" : "text-zinc-400 hover:text-white"
           }`}
         >
-          ❤️ {t.matches.tabLikes}
+          <Heart
+            className={`w-4 h-4 ${tab === "likes" ? "text-echo" : "text-zinc-400"}`}
+            fill={tab === "likes" ? "currentColor" : "none"}
+          />
+          {t.matches.tabLikes}
           {likes.length > 0 && (
-            <span
-              className={`min-w-[18px] h-[18px] px-1 rounded-full text-[10px] font-bold flex items-center justify-center ${
-                tab === "likes" ? "bg-echo text-white" : "bg-echo text-white glow-echo"
-              }`}
-            >
+            <span className="min-w-[18px] h-[18px] px-1 rounded-full text-[10px] font-bold flex items-center justify-center bg-echo text-white glow-echo">
               {likes.length}
             </span>
           )}
@@ -143,6 +146,10 @@ export function MatchesClient({
           <EmptyState title={t.matches.emptyTitle} text={t.matches.emptyText} />
         ) : (
           <div className="space-y-3">
+            <p className="flex items-center gap-1.5 text-zinc-400 text-sm mb-1">
+              <MessageCircle className="w-4 h-4 text-echo-bright" />
+              {t.matches.chatsHint}
+            </p>
             {matches.map((m) => (
               <Link
                 key={m.id}
@@ -275,5 +282,25 @@ function EmptyState({ title, text }: { title: string; text: string }) {
       <p className="text-zinc-500 mb-2">{title}</p>
       <p className="text-zinc-600 text-sm">{text}</p>
     </div>
+  );
+}
+
+// Два соединяющихся сердца — фирменная иконка таба «Мэтчи»
+function TwinHearts({ active }: { active: boolean }) {
+  // На активном табе фон уже градиентный, поэтому сердца белые.
+  // На неактивном — фиолет + фуксия.
+  return (
+    <span className="relative inline-flex items-center w-5 h-4">
+      <Heart
+        className={`absolute left-0 w-4 h-4 ${active ? "text-white" : "text-echo"}`}
+        fill="currentColor"
+        style={{ transform: "rotate(-18deg)" }}
+      />
+      <Heart
+        className={`absolute left-1.5 w-4 h-4 ${active ? "text-white/85" : "text-echo-fuchsia"}`}
+        fill="currentColor"
+        style={{ transform: "rotate(18deg)" }}
+      />
+    </span>
   );
 }

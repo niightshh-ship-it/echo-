@@ -209,6 +209,7 @@ const en = {
     backFeed: "← feed",
     tabMatches: "Matches",
     tabLikes: "Likes you",
+    chatsHint: "Tap a match to open the chat",
     likesSubtitle: "These people liked your skill. Like back to match.",
     likesEmptyTitle: "No likes yet.",
     likesEmptyText: "Post videos of your skills — when someone likes them, they show up here.",

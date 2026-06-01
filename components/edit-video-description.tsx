@@ -100,7 +100,7 @@ function EditSheet({
         className="fixed inset-0 z-[60] bg-black/60 animate-in fade-in duration-200"
         onClick={onClose}
       />
-      <div className="fixed inset-x-0 bottom-0 z-[61] bg-zinc-950 border-t border-white/10 rounded-t-3xl flex flex-col max-h-[85vh] animate-in slide-in-from-bottom duration-250">
+      <div className="fixed inset-x-0 bottom-0 z-[61] sm:left-1/2 sm:-translate-x-1/2 sm:max-w-lg w-full bg-zinc-950 border-t border-x border-white/10 rounded-t-3xl flex flex-col max-h-[85vh] animate-in slide-in-from-bottom duration-250">
         <div className="pt-3 pb-2 flex justify-center">
           <div className="w-10 h-1 rounded-full bg-white/15" />
         </div>

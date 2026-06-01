@@ -173,7 +173,7 @@ function ShareSheet({
         className="fixed inset-0 z-[60] bg-black/60 animate-in fade-in duration-200"
         onClick={onClose}
       />
-      <div className="fixed inset-x-0 bottom-0 z-[61] bg-zinc-950 border-t border-white/10 rounded-t-3xl flex flex-col max-h-[82vh] animate-in slide-in-from-bottom duration-250">
+      <div className="fixed inset-x-0 bottom-0 z-[61] sm:left-1/2 sm:-translate-x-1/2 sm:max-w-lg w-full bg-zinc-950 border-t border-x border-white/10 rounded-t-3xl flex flex-col max-h-[82vh] animate-in slide-in-from-bottom duration-250">
         {/* свечения как у AmbientBg */}
         <div
           className="pointer-events-none absolute -top-10 right-10 h-40 w-40 rounded-full"

@@ -211,6 +211,7 @@ const ru: Dictionary = {
     backFeed: "← фид",
     tabMatches: "Мэтчи",
     tabLikes: "Лайкнули",
+    chatsHint: "Нажми на мэтч чтобы открыть чат",
     likesSubtitle: "Эти люди лайкнули твой скилл. Лайкни в ответ — будет мэтч.",
     likesEmptyTitle: "Пока нет лайков.",
     likesEmptyText: "Выкладывай видео своих навыков — когда кто-то лайкнет, он появится здесь.",

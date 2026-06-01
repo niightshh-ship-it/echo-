@@ -211,6 +211,7 @@ const nl: Dictionary = {
     backFeed: "← feed",
     tabMatches: "Matches",
     tabLikes: "Vinden jou leuk",
+    chatsHint: "Tik op een match om de chat te openen",
     likesSubtitle: "Deze mensen vonden je vaardigheid leuk. Like terug om te matchen.",
     likesEmptyTitle: "Nog geen likes.",
     likesEmptyText: "Plaats video's van je vaardigheden — als iemand ze liket, verschijnen ze hier.",
