@@ -216,16 +216,8 @@ function SwiperSlide({
       data-id={video.id}
       className="relative h-[100dvh] w-full snap-start snap-always overflow-hidden bg-black"
     >
-      {/* Размытый кадр-фон */}
-      <video
-        src={`${video.url}#t=0.1`}
-        muted
-        playsInline
-        preload="metadata"
-        aria-hidden
-        tabIndex={-1}
-        className="pointer-events-none absolute inset-0 h-full w-full object-cover scale-110 blur-2xl opacity-40"
-      />
+      {/* Дешёвый градиент-фон (без второго video — экономит GPU/сеть) */}
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-zinc-900 via-black to-zinc-900" />
       {/* Основное видео — целиком */}
       <div className="absolute inset-0 flex items-center justify-center">
         <video

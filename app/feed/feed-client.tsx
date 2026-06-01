@@ -362,28 +362,47 @@ function FeedColumn({
     }
   }, [active, items]);
 
-  // Надёжный автоплей: когда меняется активное видео (или колонка стала
-  // активной) — явно запускаем его. IntersectionObserver иногда не
-  // срабатывает на первой загрузке (видео ещё не готово), поэтому дублируем.
+  // Ленивая загрузка + автоплей в одном проходе.
+  // Грузим только активное видео и соседей (±1), далёкие выгружаем
+  // (главный фикс лагов на мобиле). Затем явно играем активное —
+  // с ретраями, т.к. IntersectionObserver не всегда успевает на загрузке.
   useEffect(() => {
     if (!active || !activeId) return;
-    const v = videoRefs.current.get(activeId);
-    if (!v) return;
+    const idx = items.findIndex((i) => i.id === activeId);
+    if (idx < 0) return;
+
+    items.forEach((it, i) => {
+      const v = videoRefs.current.get(it.id);
+      if (!v) return;
+      const near = Math.abs(i - idx) <= 1;
+      if (near) {
+        if (v.getAttribute("src") !== it.url) {
+          v.setAttribute("src", it.url);
+          v.load();
+        }
+        v.preload = "auto";
+      } else if (v.getAttribute("src")) {
+        // Далёкое — выгружаем, освобождаем сеть/память
+        v.removeAttribute("src");
+        v.load();
+      }
+    });
+
+    const av = videoRefs.current.get(activeId);
+    if (!av) return;
     let cancelled = false;
     const tryPlay = () => {
-      if (cancelled) return;
-      v.play().catch(() => {});
+      if (!cancelled) av.play().catch(() => {});
     };
     tryPlay();
-    // Если видео ещё грузится — играем как только сможет
-    v.addEventListener("canplay", tryPlay, { once: true });
+    av.addEventListener("canplay", tryPlay, { once: true });
     const t = setTimeout(tryPlay, 300);
     return () => {
       cancelled = true;
-      v.removeEventListener("canplay", tryPlay);
+      av.removeEventListener("canplay", tryPlay);
       clearTimeout(t);
     };
-  }, [active, activeId]);
+  }, [active, activeId, items]);
 
   if (items.length === 0) {
     return (
@@ -551,30 +570,20 @@ function VideoSlide({
       data-id={item.id}
       className="relative h-[100dvh] w-full snap-start snap-always overflow-hidden bg-black"
     >
-      {/* Размытый кадр-фон — заполняет чёрные поля у не-9:16 видео.
-          preload=metadata + poster: показывает первый кадр, НЕ декодирует
-          поток (не играет), поэтому почти не грузит устройство. */}
-      <video
-        src={`${item.url}#t=0.1`}
-        muted
-        playsInline
-        preload="metadata"
-        aria-hidden
-        tabIndex={-1}
-        className="pointer-events-none absolute inset-0 h-full w-full object-cover scale-110 blur-2xl opacity-40"
-      />
+      {/* Дешёвый тёмный градиент-фон вместо второго video (тот сильно лагал
+          на мобиле: лишний поток + постоянный GPU-blur на каждом слайде). */}
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-zinc-900 via-black to-zinc-900" />
 
       {/* Основное видео — целиком, не обрезается. На десктопе — вертикальная
-          полоса по центру (макс ширина под 9:16), как в TikTok web. */}
+          полоса по центру (макс ширина под 9:16), как в TikTok web.
+          preload управляется из FeedColumn: грузим только активное + соседние. */}
       <div className="absolute inset-0 flex items-center justify-center">
         <video
           ref={(el) => setVideoRef(item.id, el)}
-          src={item.url}
-          poster={`${item.url}#t=0.1`}
           loop
           muted={muted}
           playsInline
-          preload="metadata"
+          preload="none"
           onClick={onMuteToggle}
           className="relative z-[1] h-full w-auto max-w-full object-contain"
         />

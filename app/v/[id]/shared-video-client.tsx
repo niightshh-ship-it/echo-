@@ -124,16 +124,8 @@ export function SharedVideoClient({
         />
       </div>
 
-      {/* Размытый кадр-фон */}
-      <video
-        src={`${videoUrl}#t=0.1`}
-        muted
-        playsInline
-        preload="metadata"
-        aria-hidden
-        tabIndex={-1}
-        className="pointer-events-none absolute inset-0 h-full w-full object-cover scale-110 blur-2xl opacity-40"
-      />
+      {/* Дешёвый градиент-фон */}
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-zinc-900 via-black to-zinc-900" />
       {/* Основное видео — целиком */}
       <video
         src={videoUrl}
