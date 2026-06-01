@@ -98,6 +98,11 @@ const ru: Dictionary = {
     signInToLike: "Войди чтобы лайкать",
     signInToComment: "Войди чтобы комментить",
   },
+  shareVideo: {
+    guestTitle: "Смотри скилл {name} →",
+    guestText: "Войди в Echo чтобы лайкать, мэтчиться и меняться",
+    guestCta: "Войти в Echo",
+  },
   notifications: {
     title: "Уведомления",
     empty: "Пока нет уведомлений",

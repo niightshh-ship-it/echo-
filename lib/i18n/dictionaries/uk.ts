@@ -98,6 +98,11 @@ const uk: Dictionary = {
     signInToLike: "Увійди щоб лайкати",
     signInToComment: "Увійди щоб коментувати",
   },
+  shareVideo: {
+    guestTitle: "Дивись навичку {name} →",
+    guestText: "Увійди в Echo щоб лайкати, метчитися і мінятися",
+    guestCta: "Увійти в Echo",
+  },
   notifications: {
     title: "Сповіщення",
     empty: "Поки немає сповіщень",

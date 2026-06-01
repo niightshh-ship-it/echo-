@@ -98,6 +98,11 @@ const nl: Dictionary = {
     signInToLike: "Log in om te liken",
     signInToComment: "Log in om te reageren",
   },
+  shareVideo: {
+    guestTitle: "Bekijk {name}'s vaardigheid →",
+    guestText: "Meld je aan bij Echo om te liken, matchen en ruilen",
+    guestCta: "Aanmelden",
+  },
   notifications: {
     title: "Meldingen",
     empty: "Nog geen meldingen",

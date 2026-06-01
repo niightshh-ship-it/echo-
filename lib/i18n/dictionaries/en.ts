@@ -96,6 +96,11 @@ const en = {
     signInToLike: "Sign in to like",
     signInToComment: "Sign in to comment",
   },
+  shareVideo: {
+    guestTitle: "Watch {name}'s skill →",
+    guestText: "Join Echo to like, match and trade skills",
+    guestCta: "Join Echo",
+  },
   notifications: {
     title: "Notifications",
     empty: "No notifications yet",

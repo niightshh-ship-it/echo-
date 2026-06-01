@@ -571,6 +571,13 @@ function VideoSlide({
             <span className="text-white text-xs font-medium">{commentCount}</span>
           </button>
         )}
+        {/* Share — копирует ссылку или открывает share sheet */}
+        <ShareButton
+          url={`/v/${item.id}`}
+          title={`${item.authorName} on Echo`}
+          text={item.description ?? item.skill ?? "Watch on Echo"}
+          className="bg-white/20 hover:bg-white/30 backdrop-blur-sm w-13 h-13 flex items-center justify-center"
+        />
       </div>
 
       {showSoundHint && (
