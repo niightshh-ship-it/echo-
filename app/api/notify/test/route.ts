@@ -78,12 +78,17 @@ export async function POST() {
     profileError,
     smtpOk,
     smtpError,
-    hint: smtpOk
-      ? "Письмо послано. Проверь почту (включая папку Спам)."
-      : profileError
-      ? "Скорее всего миграция 014 не накатана — нет колонок locale / email_notifications. SQL в supabase/migrations/014_email_notifications.sql"
-      : !env.BREVO_SMTP_KEY
-      ? "Нет BREVO_SMTP_USER / BREVO_SMTP_KEY / BREVO_SENDER_EMAIL в env Vercel"
-      : "Ошибка SMTP — смотри smtpError",
+    hint:
+      profileError && profileError.includes("permission denied")
+        ? "Service-role не имеет прав на profiles. Накати миграцию 018 (supabase/migrations/018_service_role_grants.sql)"
+        : profileError && profileError.includes("does not exist")
+        ? "Колонок locale/email_notifications нет — накати миграцию 014"
+        : !env.BREVO_SMTP_KEY
+        ? "Нет BREVO_SMTP_USER / BREVO_SMTP_KEY / BREVO_SENDER_EMAIL в env Vercel"
+        : !smtpOk
+        ? "SMTP не отвечает — смотри smtpError"
+        : profileError
+        ? `Профиль не читается: ${profileError}`
+        : "✅ Всё ок — SMTP работает, профиль читается. Письма должны идти.",
   });
 }
