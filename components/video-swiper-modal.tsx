@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import { Heart, MessageCircle, X } from "lucide-react";
@@ -136,7 +136,17 @@ function SwiperSlide({
   const [showComments, setShowComments] = useState(false);
   const [heartPop, setHeartPop] = useState(0);
   const [muted, setMuted] = useState(true);
+  const [expanded, setExpanded] = useState(false);
+  const [overflows, setOverflows] = useState(false);
+  const descRef = useRef<HTMLParagraphElement>(null);
   const viewedRef = useRef(false);
+
+  // Определяем переполняется ли описание (для показа "more")
+  useLayoutEffect(() => {
+    const el = descRef.current;
+    if (!el || expanded) return;
+    setOverflows(el.scrollHeight > el.offsetHeight + 1);
+  }, [video.description, expanded]);
 
   useEffect(() => {
     (async () => {
@@ -211,6 +221,14 @@ function SwiperSlide({
       {/* Затемнение снизу — чтобы текст читался без отдельной плашки */}
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-72 bg-gradient-to-t from-black/85 via-black/40 to-transparent" />
 
+      {/* Бэкдроп когда описание развёрнуто */}
+      {video.description && expanded && (
+        <div
+          className="pointer-events-none absolute inset-x-0 bottom-0 bg-black/45 backdrop-blur-md animate-in fade-in duration-200"
+          style={{ height: "55%" }}
+        />
+      )}
+
       <div className="absolute bottom-6 left-0 right-20 px-5">
         <Link href={`/u/${author.id}`} className="flex items-center gap-2.5">
           <span className="relative h-10 w-10 shrink-0 rounded-full overflow-hidden border border-white/25 bg-white/10 flex items-center justify-center">
@@ -238,9 +256,24 @@ function SwiperSlide({
         {(video.description || isOwner) && (
           <div className="mt-2 flex items-start gap-2">
             {video.description ? (
-              <p className="text-white text-[13px] leading-relaxed whitespace-pre-wrap max-h-28 overflow-y-auto drop-shadow flex-1 min-w-0">
-                {video.description}
-              </p>
+              <div className="flex-1 min-w-0">
+                <p
+                  ref={descRef}
+                  className={`text-white text-[13px] leading-relaxed whitespace-pre-wrap drop-shadow transition-all ${
+                    expanded ? "max-h-60 overflow-y-auto pr-2" : "line-clamp-2"
+                  }`}
+                >
+                  {video.description}
+                </p>
+                {(overflows || expanded) && (
+                  <button
+                    onClick={() => setExpanded((e) => !e)}
+                    className="text-xs text-zinc-300 hover:text-white mt-1 font-semibold transition-colors"
+                  >
+                    {expanded ? t.feed.less : t.feed.more}
+                  </button>
+                )}
+              </div>
             ) : isOwner ? (
               <p className="text-zinc-400 italic text-[13px] flex-1">
                 {t.editVideo.addDescriptionHint}

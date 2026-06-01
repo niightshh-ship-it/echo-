@@ -60,7 +60,10 @@ export function BottomNav() {
   };
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-white/10 bg-black/80 backdrop-blur-xl">
+    <nav
+      className="fixed bottom-0 left-0 right-0 z-40 border-t border-white/10 bg-black/80 backdrop-blur-xl"
+      style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+    >
       <div className="mx-auto max-w-md flex items-center justify-around h-16 px-2">
         {tab("/feed", t.nav.feed, Play)}
         {tab("/matches", t.nav.matches, Heart, unread)}

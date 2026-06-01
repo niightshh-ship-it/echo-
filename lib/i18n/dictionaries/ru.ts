@@ -59,6 +59,9 @@ const ru: Dictionary = {
     next: "Дальше",
     done: "Поехали",
     skip: "Пропустить",
+    chatHi: "👋 Привет!",
+    chatSwap: "Хочешь меняться? 💜",
+    chatMeet: "Давай в субботу ✨",
   },
   feed: {
     emptyTitle: "Ты тут первый ✨",

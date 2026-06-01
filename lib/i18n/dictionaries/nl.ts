@@ -59,6 +59,9 @@ const nl: Dictionary = {
     next: "Volgende",
     done: "Aan de slag",
     skip: "Overslaan",
+    chatHi: "👋 Hoi!",
+    chatSwap: "Zin om te ruilen? 💜",
+    chatMeet: "Zaterdag afspreken? ✨",
   },
   feed: {
     emptyTitle: "Je bent vroeg ✨",

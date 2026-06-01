@@ -57,6 +57,9 @@ const en = {
     next: "Next",
     done: "Let's go",
     skip: "Skip",
+    chatHi: "👋 Hi!",
+    chatSwap: "Want to swap? 💜",
+    chatMeet: "Let's meet Saturday ✨",
   },
   feed: {
     emptyTitle: "You're early ✨",

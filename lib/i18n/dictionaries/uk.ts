@@ -59,6 +59,9 @@ const uk: Dictionary = {
     next: "Далі",
     done: "Поїхали",
     skip: "Пропустити",
+    chatHi: "👋 Привіт!",
+    chatSwap: "Хочеш мінятися? 💜",
+    chatMeet: "Давай у суботу ✨",
   },
   feed: {
     emptyTitle: "Ти тут перший ✨",

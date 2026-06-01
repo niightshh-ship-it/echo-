@@ -489,7 +489,15 @@ function VideoSlide({
       {/* Большой плавный градиент снизу — текст читается без отдельной плашки */}
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-80 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
 
-      <div className="absolute bottom-20 left-0 right-20 px-5 pb-1">
+      {/* Затемнённый бэкдроп под текстом когда описание развёрнуто — видео остаётся видно */}
+      {hasDescription && expanded && (
+        <div
+          className="pointer-events-none absolute inset-x-0 bottom-0 bg-black/45 backdrop-blur-md animate-in fade-in duration-200"
+          style={{ height: "60%" }}
+        />
+      )}
+
+      <div className="absolute bottom-28 left-0 right-20 px-5 pb-1">
         <Link
           href={`/u/${item.authorId}`}
           className="flex items-center gap-2.5 hover:opacity-80"
@@ -516,8 +524,8 @@ function VideoSlide({
           <div className="mt-2">
             <p
               ref={descRef}
-              className={`text-white text-[13px] leading-relaxed whitespace-pre-wrap drop-shadow ${
-                expanded ? "" : "line-clamp-2"
+              className={`text-white text-[13px] leading-relaxed whitespace-pre-wrap drop-shadow transition-all ${
+                expanded ? "max-h-60 overflow-y-auto pr-2" : "line-clamp-2"
               }`}
             >
               {item.description}
@@ -525,7 +533,7 @@ function VideoSlide({
             {(overflows || expanded) && (
               <button
                 onClick={() => setExpanded((e) => !e)}
-                className="text-xs text-zinc-400 hover:text-white mt-1 font-medium transition-colors"
+                className="text-xs text-zinc-300 hover:text-white mt-1 font-semibold transition-colors"
               >
                 {expanded ? t.feed.less : t.feed.more}
               </button>
@@ -535,7 +543,7 @@ function VideoSlide({
       </div>
 
       {/* Колонка действий справа */}
-      <div className="absolute right-4 bottom-[5.5rem] flex flex-col items-center gap-4">
+      <div className="absolute right-4 bottom-32 flex flex-col items-center gap-4">
         <button onClick={handleLikeToggle} className="flex flex-col items-center gap-1">
           <div
             className={`rounded-full p-3 transition-colors ${
