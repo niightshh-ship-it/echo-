@@ -103,6 +103,14 @@ const nl: Dictionary = {
     guestText: "Meld je aan bij Echo om te liken, matchen en ruilen",
     guestCta: "Aanmelden",
   },
+  sendVideo: {
+    title: "Naar een match sturen",
+    send: "Sturen",
+    sent: "Verstuurd naar {name}",
+    done: "Verstuurd",
+    error: "Versturen lukt niet",
+    noMatches: "Nog geen matches — like video's om er te krijgen.",
+  },
   notifications: {
     title: "Meldingen",
     empty: "Nog geen meldingen",

@@ -103,6 +103,14 @@ const ru: Dictionary = {
     guestText: "Войди в Echo чтобы лайкать, мэтчиться и меняться",
     guestCta: "Войти в Echo",
   },
+  sendVideo: {
+    title: "Отправить мэтчу",
+    send: "Отправить",
+    sent: "Отправлено {name}",
+    done: "Готово",
+    error: "Не получилось отправить",
+    noMatches: "Пока нет мэтчей — лайкай видео чтобы появились.",
+  },
   notifications: {
     title: "Уведомления",
     empty: "Пока нет уведомлений",

@@ -82,6 +82,13 @@ export function NotificationToaster() {
             type="button"
             onClick={() => {
               toast.dismiss(id);
+              // Помечаем прочитанным — колокольчик подхватит через UPDATE-realtime
+              // и сам декрементит красный значок
+              supabase
+                .from("notifications")
+                .update({ read_at: new Date().toISOString() })
+                .eq("id", raw.id)
+                .then(() => {});
               router.push(href);
             }}
             className="w-[360px] max-w-[calc(100vw-2rem)] text-left flex items-start gap-3 rounded-2xl bg-zinc-950/95 border border-echo/30 px-4 py-3 backdrop-blur-md shadow-2xl shadow-echo/20 hover:border-echo/50 active:scale-[0.98] transition-all"

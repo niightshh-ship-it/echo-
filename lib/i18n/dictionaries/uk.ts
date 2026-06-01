@@ -103,6 +103,14 @@ const uk: Dictionary = {
     guestText: "Увійди в Echo щоб лайкати, метчитися і мінятися",
     guestCta: "Увійти в Echo",
   },
+  sendVideo: {
+    title: "Надіслати метчу",
+    send: "Надіслати",
+    sent: "Надіслано {name}",
+    done: "Готово",
+    error: "Не вдалося надіслати",
+    noMatches: "Поки немає метчів — лайкай відео щоб з'явились.",
+  },
   notifications: {
     title: "Сповіщення",
     empty: "Поки немає сповіщень",

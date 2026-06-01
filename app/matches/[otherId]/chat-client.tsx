@@ -8,6 +8,7 @@ import type { RealtimeChannel } from "@supabase/supabase-js";
 import { useT, useI18n } from "@/lib/i18n/provider";
 import { ReviewButton } from "./review-button";
 import { AmbientBg } from "@/components/ambient-bg";
+import { parseVideoMessage, VideoMessageCard } from "@/components/video-message-card";
 
 export type Message = {
   id: string;
@@ -475,6 +476,8 @@ function MessageRow({
     ? "rounded-2xl rounded-tl-md rounded-bl-md"
     : "rounded-2xl rounded-tl-md rounded-bl-md";
 
+  const videoMsgId = parseVideoMessage(message.body);
+
   return (
     <div
       className={`flex items-end gap-2 ${mine ? "justify-end" : "justify-start"} ${
@@ -486,30 +489,50 @@ function MessageRow({
         <div className="w-7 shrink-0">{isLastOfGroup ? <Avatar other={other} /> : null}</div>
       )}
 
-      <div
-        className={`max-w-[78%] px-3 py-2 ${corners} ${
-          mine
-            ? "bg-echo text-white"
-            : "bg-zinc-800 text-white"
-        } msg-in`}
-      >
-        <p className="whitespace-pre-wrap break-words text-sm leading-snug">{message.body}</p>
-        {isLastOfGroup && (
-          <div
-            className={`flex items-center justify-end gap-1 text-[10px] mt-1 ${
-              mine ? "text-white/65" : "text-zinc-400"
-            }`}
-          >
-            <span>{formatTime(message.created_at)}</span>
-            {mine &&
-              (message.read_at ? (
-                <CheckCheck className="w-3.5 h-3.5" aria-label={readLabel} />
-              ) : (
-                <Check className="w-3.5 h-3.5" />
-              ))}
-          </div>
-        )}
-      </div>
+      {videoMsgId ? (
+        // Видео-сообщение — карточка-превью вместо пузыря
+        <div className="max-w-[78%] msg-in flex flex-col gap-1">
+          <VideoMessageCard videoId={videoMsgId} mine={mine} />
+          {isLastOfGroup && (
+            <div
+              className={`flex items-center gap-1 text-[10px] px-1 ${
+                mine ? "justify-end text-zinc-500" : "justify-start text-zinc-500"
+              }`}
+            >
+              <span>{formatTime(message.created_at)}</span>
+              {mine &&
+                (message.read_at ? (
+                  <CheckCheck className="w-3.5 h-3.5" aria-label={readLabel} />
+                ) : (
+                  <Check className="w-3.5 h-3.5" />
+                ))}
+            </div>
+          )}
+        </div>
+      ) : (
+        <div
+          className={`max-w-[78%] px-3 py-2 ${corners} ${
+            mine ? "bg-echo text-white" : "bg-zinc-800 text-white"
+          } msg-in`}
+        >
+          <p className="whitespace-pre-wrap break-words text-sm leading-snug">{message.body}</p>
+          {isLastOfGroup && (
+            <div
+              className={`flex items-center justify-end gap-1 text-[10px] mt-1 ${
+                mine ? "text-white/65" : "text-zinc-400"
+              }`}
+            >
+              <span>{formatTime(message.created_at)}</span>
+              {mine &&
+                (message.read_at ? (
+                  <CheckCheck className="w-3.5 h-3.5" aria-label={readLabel} />
+                ) : (
+                  <Check className="w-3.5 h-3.5" />
+                ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

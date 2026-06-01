@@ -101,6 +101,14 @@ const en = {
     guestText: "Join Echo to like, match and trade skills",
     guestCta: "Join Echo",
   },
+  sendVideo: {
+    title: "Send to a match",
+    send: "Send",
+    sent: "Sent to {name}",
+    done: "Sent",
+    error: "Couldn't send",
+    noMatches: "No matches yet — like videos to get some.",
+  },
   notifications: {
     title: "Notifications",
     empty: "No notifications yet",

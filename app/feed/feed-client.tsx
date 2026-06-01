@@ -8,6 +8,7 @@ import { useT } from "@/lib/i18n/provider";
 import { CommentsPanel } from "@/components/comments-panel";
 import { MatchCelebration } from "@/components/match-celebration";
 import { ShareButton } from "@/components/share-button";
+import { SendVideoToChatButton } from "@/components/send-video-to-chat";
 
 export type FeedItem = {
   id: string;
@@ -571,6 +572,8 @@ function VideoSlide({
             <span className="text-white text-xs font-medium">{commentCount}</span>
           </button>
         )}
+        {/* Отправить в чат — только залогиненным */}
+        {currentUserId && <SendVideoToChatButton videoId={item.id} />}
         {/* Share — копирует ссылку или открывает share sheet */}
         <ShareButton
           url={`/v/${item.id}`}

@@ -60,10 +60,33 @@ export function NotificationBell({
       .then(({ count }) => setUnreadCount(count ?? 0));
   }, [supabase, userId, initialUnreadCount]);
 
-  // Realtime: новые уведомления → подкручиваем счётчик
+  // Realtime: новые уведомления → подкручиваем счётчик,
+  //           UPDATE (пометили прочитанным где-то ещё, например из тоста) → декрементим
   useEffect(() => {
     const channel = supabase
       .channel(`notifications:${userId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "notifications",
+          filter: `user_id=eq.${userId}`,
+        },
+        (payload) => {
+          const oldRow = payload.old as { read_at: string | null };
+          const newRow = payload.new as { id: string; read_at: string | null };
+          // Если переход unread → read — декрементим счётчик и помечаем в локальном списке
+          if (!oldRow.read_at && newRow.read_at) {
+            setUnreadCount((c) => Math.max(0, c - 1));
+            setItems((prev) =>
+              prev.map((i) =>
+                i.id === newRow.id ? { ...i, read_at: newRow.read_at } : i
+              )
+            );
+          }
+        }
+      )
       .on(
         "postgres_changes",
         {
