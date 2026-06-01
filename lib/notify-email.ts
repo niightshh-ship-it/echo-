@@ -8,7 +8,7 @@ type Locale = "en" | "ru" | "nl" | "uk";
 // Дросселим: не чаще раза в час на пару recipient+actor+type
 const THROTTLE_MS = 60 * 60 * 1000;
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://echo-brown-chi.vercel.app";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://echo-global.vercel.app";
 
 function admin() {
   return createAdmin(
