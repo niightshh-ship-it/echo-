@@ -132,12 +132,19 @@
     font-feature-settings: "kern" 1, "liga" 1, "calt" 1, "ss01" 1;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    /* Приложение всегда тёмное — жёстко чёрный фон, иначе body --background
+       (белый по умолчанию в :root) проглядывает в safe-area областях
+       standalone-PWA (под чёлкой / home indicator) белыми полосами. */
+    background-color: #000;
   }
   body {
-    @apply bg-background text-foreground;
+    background-color: #000;
+    @apply text-foreground;
     overflow-x: clip;
     /* Чуть более воздушные строки для читаемости */
     line-height: 1.55;
+    /* Перетягивание/баунс-скролл не показывает белый фон */
+    overscroll-behavior: none;
   }
   h1, h2, h3, h4, h5, h6 {
     /* Заголовки чуть плотнее по высоте */

@@ -71,9 +71,9 @@ export default async function RootLayout({
   return (
     <html
       lang={locale}
-      className={`${bodyFont.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${bodyFont.variable} ${geistMono.variable} h-full antialiased bg-black`}
     >
-      <body className="min-h-full flex flex-col">
+      <body className="min-h-full flex flex-col bg-black">
         <I18nProvider dict={dict} locale={locale}>
           <CursorGlow />
           {children}
