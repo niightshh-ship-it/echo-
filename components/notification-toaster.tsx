@@ -19,7 +19,7 @@ import { useT } from "@/lib/i18n/provider";
 type RawNotif = {
   id: string;
   actor_id: string | null;
-  type: "match" | "message" | "review";
+  type: "match" | "message" | "review" | "like";
   payload: { preview?: string };
   created_at: string;
   read_at: string | null;
@@ -66,11 +66,14 @@ export function NotificationToaster() {
           ? t.notifications.typeMessage
               .replace("{name}", actorName)
               .replace("{preview}", raw.payload.preview ?? "")
+          : raw.type === "like"
+          ? t.notifications.typeLike.replace("{name}", actorName)
           : t.notifications.typeReview.replace("{name}", actorName);
 
-      const href = `/matches/${actorId}`;
+      // Лайк ведёт на /matches (таб «Лайкнули»), остальное — в чат
+      const href = raw.type === "like" ? "/matches" : `/matches/${actorId}`;
       const Icon =
-        raw.type === "match"
+        raw.type === "match" || raw.type === "like"
           ? Heart
           : raw.type === "review"
           ? Star

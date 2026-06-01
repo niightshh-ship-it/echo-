@@ -9,7 +9,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useT, useI18n } from "@/lib/i18n/provider";
 import { LanguageSwitcher } from "@/components/language-switcher";
-import { CursorGlow } from "@/components/cursor-glow";
 import { EchoPulse } from "@/components/echo-pulse";
 
 export default function SignInPage() {
@@ -83,8 +82,7 @@ export default function SignInPage() {
 
   return (
     <div className="echo-aurora relative flex min-h-screen flex-col items-center justify-center overflow-hidden text-white px-4">
-      {/* Свечение за курсором — как на главной */}
-      <CursorGlow />
+      {/* CursorGlow теперь глобальный — в layout.tsx */}
 
       {/* Дрейфующее свечение фона */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">

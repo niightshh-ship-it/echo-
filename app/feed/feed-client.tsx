@@ -163,6 +163,13 @@ export function FeedClient({
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ otherId: item.authorId }),
         }).catch(() => {});
+      } else {
+        // Не мэтч — шлём письмо «тебя лайкнули» автору видео
+        fetch("/api/notify/like", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ videoId: item.id }),
+        }).catch(() => {});
       }
     }
   }

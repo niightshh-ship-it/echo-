@@ -84,6 +84,12 @@ export function SharedVideoClient({
         toast.success(
           t.feed.matchTitle + " " + author.name + " 💜"
         );
+      } else {
+        fetch("/api/notify/like", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ videoId }),
+        }).catch(() => {});
       }
     }
   }

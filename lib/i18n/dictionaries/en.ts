@@ -122,6 +122,7 @@ const en = {
     typeMatch: "{name} matched with you",
     typeMessage: "{name}: {preview}",
     typeReview: "{name} left you a review",
+    typeLike: "{name} liked your skill",
     justNow: "just now",
     minutesAgo: "{n}m",
     hoursAgo: "{n}h",

@@ -124,6 +124,7 @@ const nl: Dictionary = {
     typeMatch: "Je hebt een match met {name}",
     typeMessage: "{name}: {preview}",
     typeReview: "{name} liet je een review achter",
+    typeLike: "{name} vond je vaardigheid leuk",
     justNow: "zojuist",
     minutesAgo: "{n} min",
     hoursAgo: "{n} u",

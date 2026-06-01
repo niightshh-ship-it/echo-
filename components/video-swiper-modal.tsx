@@ -197,7 +197,15 @@ function SwiperSlide({
     if (wasLiked) {
       await supabase.rpc("unlike_video", { p_video_id: video.id });
     } else {
-      await supabase.rpc("like_video", { p_video_id: video.id });
+      const { data } = await supabase.rpc("like_video", { p_video_id: video.id });
+      // Не мэтч — письмо «тебя лайкнули» автору
+      if (!data?.matched) {
+        fetch("/api/notify/like", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ videoId: video.id }),
+        }).catch(() => {});
+      }
     }
   }
 

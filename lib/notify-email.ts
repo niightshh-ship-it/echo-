@@ -34,6 +34,10 @@ const STRINGS: Record<
     reviewTitle: (name: string, rating: number) => string;
     reviewBody: (name: string, rating: number, body: string | null) => string;
     reviewCta: string;
+    likeSubject: (name: string) => string;
+    likeTitle: (name: string) => string;
+    likeBody: (name: string) => string;
+    likeCta: string;
     footer: string;
     unsubHint: string;
   }
@@ -54,6 +58,10 @@ const STRINGS: Record<
         body ? `<br><br><em style="color:#444">"${escape(body)}"</em>` : ""
       }<br><br>It now shows up on your profile.`,
     reviewCta: "View on profile",
+    likeSubject: (n) => `${n} liked your skill on Echo`,
+    likeTitle: (n) => `${n} liked your skill ❤️`,
+    likeBody: (n) => `<strong>${n}</strong> liked one of your videos. Like them back and you'll match — then you can chat.`,
+    likeCta: "See who liked you",
     footer: "Echo · trade skills, no money",
     unsubHint: "You can disable these emails any time in Echo settings.",
   },
@@ -73,6 +81,10 @@ const STRINGS: Record<
         body ? `<br><br><em style="color:#444">«${escape(body)}»</em>` : ""
       }<br><br>Отзыв уже виден у тебя в профиле.`,
     reviewCta: "Открыть профиль",
+    likeSubject: (n) => `${n} лайкнул твой скилл в Echo`,
+    likeTitle: (n) => `${n} лайкнул твой скилл ❤️`,
+    likeBody: (n) => `<strong>${n}</strong> лайкнул одно из твоих видео. Лайкни в ответ — будет мэтч, и сможете общаться.`,
+    likeCta: "Кто меня лайкнул",
     footer: "Echo · обмен навыками, без денег",
     unsubHint: "Письма можно отключить в любой момент в настройках Echo.",
   },
@@ -92,6 +104,10 @@ const STRINGS: Record<
         body ? `<br><br><em style="color:#444">"${escape(body)}"</em>` : ""
       }<br><br>De review staat nu op je profiel.`,
     reviewCta: "Profiel openen",
+    likeSubject: (n) => `${n} vond je vaardigheid leuk op Echo`,
+    likeTitle: (n) => `${n} vond je vaardigheid leuk ❤️`,
+    likeBody: (n) => `<strong>${n}</strong> vond een van je video's leuk. Like terug en jullie matchen — dan kun je chatten.`,
+    likeCta: "Zie wie je leuk vond",
     footer: "Echo · vaardigheden ruilen, geen geld",
     unsubHint: "Je kunt deze e-mails altijd uitzetten in de Echo-instellingen.",
   },
@@ -111,6 +127,10 @@ const STRINGS: Record<
         body ? `<br><br><em style="color:#444">«${escape(body)}»</em>` : ""
       }<br><br>Відгук уже на твоєму профілі.`,
     reviewCta: "Відкрити профіль",
+    likeSubject: (n) => `${n} лайкнув твою навичку в Echo`,
+    likeTitle: (n) => `${n} лайкнув твою навичку ❤️`,
+    likeBody: (n) => `<strong>${n}</strong> лайкнув одне з твоїх відео. Лайкни у відповідь — буде метч, і зможете спілкуватися.`,
+    likeCta: "Хто мене лайкнув",
     footer: "Echo · обмін навичками, без грошей",
     unsubHint: "Листи можна вимкнути будь-коли в налаштуваннях Echo.",
   },
@@ -294,6 +314,39 @@ export async function notifyMessageByEmail(opts: {
   });
   if (!ok) return { sent: false, reason: "smtp" };
   await logEmail(opts.recipientId, opts.actorId, "message");
+  return { sent: true };
+}
+
+export async function notifyLikeByEmail(opts: {
+  recipientId: string;
+  actorId: string;
+}) {
+  const recipient = await fetchRecipient(opts.recipientId);
+  if (!recipient) {
+    console.warn("[notify-email] like skipped: no recipient");
+    return { sent: false, reason: "no-recipient" };
+  }
+  if (!recipient.enabled) return { sent: false, reason: "disabled" };
+  if (await shouldThrottle(opts.recipientId, opts.actorId, "like"))
+    return { sent: false, reason: "throttled" };
+
+  const actorName = await fetchActorName(opts.actorId);
+  const s = STRINGS[recipient.locale];
+  const ctaUrl = `${SITE_URL}/matches`;
+  const ok = await safeSend({
+    to: recipient.email,
+    subject: s.likeSubject(actorName),
+    html: emailShell({
+      title: s.likeTitle(actorName),
+      body: `${s.likeBody(actorName)}<br><br><span style="color:#888;font-size:13px">${s.unsubHint}</span>`,
+      ctaLabel: s.likeCta,
+      ctaUrl,
+      footer: s.footer,
+    }),
+    tag: "like",
+  });
+  if (!ok) return { sent: false, reason: "smtp" };
+  await logEmail(opts.recipientId, opts.actorId, "like");
   return { sent: true };
 }
 

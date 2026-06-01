@@ -124,6 +124,7 @@ const uk: Dictionary = {
     typeMatch: "У тебе метч з {name}",
     typeMessage: "{name}: {preview}",
     typeReview: "{name} залишив тобі відгук",
+    typeLike: "{name} лайкнув твою навичку",
     justNow: "щойно",
     minutesAgo: "{n} хв",
     hoursAgo: "{n} год",

@@ -124,6 +124,7 @@ const ru: Dictionary = {
     typeMatch: "У тебя мэтч с {name}",
     typeMessage: "{name}: {preview}",
     typeReview: "{name} оставил тебе отзыв",
+    typeLike: "{name} лайкнул твой скилл",
     justNow: "только что",
     minutesAgo: "{n} мин",
     hoursAgo: "{n} ч",

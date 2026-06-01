@@ -1,7 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { Hero } from "./hero";
 import { MarketingSections } from "./marketing-sections";
-import { CursorGlow } from "@/components/cursor-glow";
 
 export default async function Home() {
   const supabase = await createClient();
@@ -10,8 +9,7 @@ export default async function Home() {
 
   return (
     <main className="echo-aurora relative overflow-x-clip text-white">
-      {/* Свечение за курсором — на весь экран, следует за мышкой при скролле */}
-      <CursorGlow />
+      {/* CursorGlow теперь глобальный — рендерится в layout.tsx */}
 
       {/* Единый слой свечения на всю страницу — не режется по секциям */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">

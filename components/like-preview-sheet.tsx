@@ -122,7 +122,9 @@ export function LikePreviewSheet({
                 </div>
               </div>
               <div className="flex items-center gap-2 mt-4">
-                <h2 className="text-2xl font-bold tracking-tight">{liker.name}</h2>
+                <h2 className="text-2xl font-bold tracking-tight text-white">
+                  {liker.name}
+                </h2>
                 {liker.verified && (
                   <span
                     className="inline-block w-2 h-2 rounded-full bg-emerald-400"

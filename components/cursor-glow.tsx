@@ -23,10 +23,13 @@ export function CursorGlow() {
     <div
       ref={ref}
       aria-hidden
-      className="pointer-events-none fixed inset-0 z-0 hidden md:block"
+      className="pointer-events-none fixed inset-0 z-[5] hidden md:block"
       style={{
+        // mix-blend-screen — свечение «осветляет» тёмный фон, но не трогает
+        // белый текст, поэтому фонарь виден поверх bg-black любой страницы.
+        mixBlendMode: "screen",
         background:
-          "radial-gradient(480px circle at var(--mx, 50%) var(--my, 50%), rgba(124,92,255,0.11), transparent 70%)",
+          "radial-gradient(460px circle at var(--mx, 50%) var(--my, 50%), rgba(124,92,255,0.14), rgba(228,85,255,0.05) 45%, transparent 70%)",
       }}
     />
   );

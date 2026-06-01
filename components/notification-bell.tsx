@@ -12,7 +12,7 @@ type RawNotification = {
   id: string;
   user_id: string;
   actor_id: string | null;
-  type: "match" | "message";
+  type: "match" | "message" | "review" | "like";
   payload: { preview?: string };
   read_at: string | null;
   created_at: string;
@@ -315,7 +315,13 @@ function NotificationsPanel({
                     key={n.id}
                     item={n}
                     onClick={() => {
-                      const href = n.actor_id ? `/matches/${n.actor_id}` : "#";
+                      // Лайк ведёт на /matches (таб «Лайкнули»), остальное — в чат
+                      const href =
+                        n.type === "like"
+                          ? "/matches"
+                          : n.actor_id
+                          ? `/matches/${n.actor_id}`
+                          : "#";
                       onItemClick(n.id, href);
                     }}
                   />
@@ -341,6 +347,10 @@ function NotificationRow({
   const text =
     item.type === "match"
       ? t.notifications.typeMatch.replace("{name}", item.actorName)
+      : item.type === "like"
+      ? t.notifications.typeLike.replace("{name}", item.actorName)
+      : item.type === "review"
+      ? t.notifications.typeReview.replace("{name}", item.actorName)
       : t.notifications.typeMessage
           .replace("{name}", item.actorName)
           .replace("{preview}", item.payload.preview ?? "");
@@ -377,6 +387,16 @@ function NotificationRow({
           {item.type === "message" && (
             <span className="absolute -bottom-1 -right-1 text-xs bg-zinc-950 rounded-full p-0.5">
               💬
+            </span>
+          )}
+          {item.type === "like" && (
+            <span className="absolute -bottom-1 -right-1 text-xs bg-zinc-950 rounded-full p-0.5">
+              ❤️
+            </span>
+          )}
+          {item.type === "review" && (
+            <span className="absolute -bottom-1 -right-1 text-xs bg-zinc-950 rounded-full p-0.5">
+              ⭐
             </span>
           )}
         </span>
