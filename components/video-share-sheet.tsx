@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { Send, X, Check } from "lucide-react";
+import { Share2, Link2, Check, X, Send } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { useT } from "@/lib/i18n/provider";
@@ -15,42 +15,55 @@ type MatchProfile = {
   avatar_url: string | null;
 };
 
-export function SendVideoToChatButton({
+export function VideoShareButton({
   videoId,
+  title,
+  text,
   className = "",
 }: {
   videoId: string;
+  title: string;
+  text: string;
   className?: string;
 }) {
   const t = useT();
   const [open, setOpen] = useState(false);
-
   return (
     <>
       <button
         type="button"
         onClick={() => setOpen(true)}
-        aria-label={t.sendVideo.title}
+        aria-label={t.share.share}
         className={`rounded-full p-3 bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white transition-colors ${className}`}
       >
-        <Send className="w-6 h-6" />
+        <Share2 className="w-6 h-6" />
       </button>
       {open && (
-        <SendSheet videoId={videoId} onClose={() => setOpen(false)} />
+        <ShareSheet
+          videoId={videoId}
+          title={title}
+          text={text}
+          onClose={() => setOpen(false)}
+        />
       )}
     </>
   );
 }
 
-function SendSheet({
+function ShareSheet({
   videoId,
+  title,
+  text,
   onClose,
 }: {
   videoId: string;
+  title: string;
+  text: string;
   onClose: () => void;
 }) {
   const t = useT();
   const [mounted, setMounted] = useState(false);
+  const [copied, setCopied] = useState(false);
   const [loading, setLoading] = useState(true);
   const [matches, setMatches] = useState<MatchProfile[]>([]);
   const [sentTo, setSentTo] = useState<Set<string>>(new Set());
@@ -94,6 +107,36 @@ function SendSheet({
     })();
   }, []);
 
+  function fullUrl() {
+    const path = `/v/${videoId}`;
+    return typeof window !== "undefined"
+      ? `${window.location.origin}${path}`
+      : path;
+  }
+
+  async function copyLink() {
+    try {
+      await navigator.clipboard.writeText(fullUrl());
+      setCopied(true);
+      toast.success(t.share.copied);
+      setTimeout(() => setCopied(false), 1800);
+    } catch {
+      prompt(t.share.copyPrompt, fullUrl());
+    }
+  }
+
+  async function nativeShare() {
+    if (typeof navigator !== "undefined" && typeof navigator.share === "function") {
+      try {
+        await navigator.share({ url: fullUrl(), title, text });
+      } catch {
+        /* отменили — ок */
+      }
+    } else {
+      copyLink();
+    }
+  }
+
   async function sendTo(other: MatchProfile) {
     if (!myId || sendingTo || sentTo.has(other.id)) return;
     setSendingTo(other.id);
@@ -111,7 +154,6 @@ function SendSheet({
       return;
     }
     setSentTo((prev) => new Set(prev).add(other.id));
-    // Письмо-уведомление получателю (троттлится на сервере)
     fetch("/api/notify/message", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -122,38 +164,85 @@ function SendSheet({
 
   if (!mounted) return null;
 
+  const canNativeShare =
+    typeof navigator !== "undefined" && typeof navigator.share === "function";
+
   return createPortal(
     <>
       <div
         className="fixed inset-0 z-[60] bg-black/60 animate-in fade-in duration-200"
         onClick={onClose}
       />
-      <div className="fixed inset-x-0 bottom-0 z-[61] bg-zinc-950 border-t border-white/10 rounded-t-3xl flex flex-col max-h-[80vh] animate-in slide-in-from-bottom duration-250">
-        <div className="pt-3 pb-2 flex justify-center">
-          <div className="w-10 h-1 rounded-full bg-white/15" />
+      <div className="fixed inset-x-0 bottom-0 z-[61] bg-zinc-950 border-t border-white/10 rounded-t-3xl flex flex-col max-h-[82vh] animate-in slide-in-from-bottom duration-250">
+        {/* свечения как у AmbientBg */}
+        <div
+          className="pointer-events-none absolute -top-10 right-10 h-40 w-40 rounded-full"
+          style={{ background: "#7c5cff", opacity: 0.18, filter: "blur(80px)" }}
+        />
+
+        <div className="relative z-10 flex flex-col min-h-0">
+          <div className="pt-3 pb-2 flex justify-center">
+            <div className="w-10 h-1 rounded-full bg-white/15" />
+          </div>
+
+          <div className="px-5 pb-3 flex items-center justify-between">
+            <h3 className="font-semibold text-white text-lg">{t.share.share}</h3>
+            <button
+              onClick={onClose}
+              aria-label="close"
+              className="text-zinc-400 hover:text-white p-1"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          {/* Копировать / Поделиться */}
+          <div className="px-5 pb-4 grid grid-cols-2 gap-3">
+            <button
+              onClick={copyLink}
+              className="flex flex-col items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.03] hover:bg-white/[0.07] py-4 transition-colors"
+            >
+              <div className="rounded-full bg-echo/15 border border-echo/25 p-3">
+                {copied ? (
+                  <Check className="w-5 h-5 text-echo-bright" />
+                ) : (
+                  <Link2 className="w-5 h-5 text-echo-bright" />
+                )}
+              </div>
+              <span className="text-xs text-zinc-300 font-medium">
+                {copied ? t.share.copied : t.share.copyLink}
+              </span>
+            </button>
+            <button
+              onClick={nativeShare}
+              className="flex flex-col items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.03] hover:bg-white/[0.07] py-4 transition-colors"
+            >
+              <div className="rounded-full bg-echo/15 border border-echo/25 p-3">
+                <Share2 className="w-5 h-5 text-echo-bright" />
+              </div>
+              <span className="text-xs text-zinc-300 font-medium">
+                {canNativeShare ? t.share.shareVia : t.share.copyLink}
+              </span>
+            </button>
+          </div>
+
+          {/* Отправить мэтчу */}
+          <div className="px-5 pb-2">
+            <p className="text-xs uppercase tracking-wider text-zinc-500">
+              {t.sendVideo.title}
+            </p>
+          </div>
         </div>
 
-        <div className="px-5 pb-3 flex items-center justify-between border-b border-white/5">
-          <h3 className="font-semibold text-white text-lg">{t.sendVideo.title}</h3>
-          <button
-            onClick={onClose}
-            aria-label="close"
-            className="text-zinc-400 hover:text-white p-1"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-
-        <div className="flex-1 overflow-y-auto px-3 py-3">
+        <div className="relative z-10 flex-1 overflow-y-auto px-3 pb-4 min-h-0">
           {loading ? (
-            <div className="flex justify-center py-10">
+            <div className="flex justify-center py-8">
               <div className="w-6 h-6 border-2 border-white/10 border-t-echo rounded-full animate-spin" />
             </div>
           ) : matches.length === 0 ? (
-            <div className="text-center py-12 px-6">
-              <div className="text-5xl mb-3 opacity-60">💜</div>
-              <p className="text-sm text-zinc-400">{t.sendVideo.noMatches}</p>
-            </div>
+            <p className="text-sm text-zinc-500 text-center py-8 px-6">
+              {t.sendVideo.noMatches}
+            </p>
           ) : (
             <ul className="space-y-1">
               {matches.map((m) => {
@@ -189,7 +278,8 @@ function SendSheet({
                       ) : sending ? (
                         <span className="w-4 h-4 border-2 border-white/20 border-t-echo rounded-full animate-spin shrink-0" />
                       ) : (
-                        <span className="text-echo-bright text-xs font-semibold shrink-0">
+                        <span className="flex items-center gap-1 text-echo-bright text-xs font-semibold shrink-0">
+                          <Send className="w-3.5 h-3.5" />
                           {t.sendVideo.send}
                         </span>
                       )}

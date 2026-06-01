@@ -9,8 +9,7 @@ import { useBackButtonClose } from "@/lib/use-back-button-close";
 import { useT } from "@/lib/i18n/provider";
 import { CommentsPanel } from "./comments-panel";
 import { EditDescriptionButton } from "./edit-video-description";
-import { ShareButton } from "./share-button";
-import { SendVideoToChatButton } from "./send-video-to-chat";
+import { VideoShareButton } from "./video-share-sheet";
 
 export type SwiperVideo = {
   id: string;
@@ -322,14 +321,11 @@ function SwiperSlide({
             <span className="text-white text-xs font-medium">{commentCount}</span>
           </button>
         )}
-        {/* Отправить в чат мэтчу — только залогиненным */}
-        {currentUserId && <SendVideoToChatButton videoId={video.id} />}
-        {/* Share — копирует/шарит ссылку на этот конкретный видеоклип */}
-        <ShareButton
-          url={`/v/${video.id}`}
+        {/* Поделиться: копировать / нативный шаринг / отправить мэтчу */}
+        <VideoShareButton
+          videoId={video.id}
           title={`${author.name} on Echo`}
           text={video.description ?? video.skill ?? "Watch on Echo"}
-          className="bg-white/20 hover:bg-white/30 backdrop-blur-sm w-12 h-12 flex items-center justify-center"
         />
       </div>
 

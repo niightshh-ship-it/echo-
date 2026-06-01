@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { usePathname, useRouter } from "next/navigation";
-import { Bell, X } from "lucide-react";
+import { Bell, X, Trash2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useBackButtonClose } from "@/lib/use-back-button-close";
 import { useT } from "@/lib/i18n/provider";
@@ -157,30 +157,22 @@ export function NotificationBell({
     );
   }
 
-  async function markAllRead() {
-    const unreadIds = items.filter((i) => !i.read_at).map((i) => i.id);
-    if (unreadIds.length === 0) return;
-    const now = new Date().toISOString();
-    setItems((prev) => prev.map((i) => (i.read_at ? i : { ...i, read_at: now })));
+  // Очистить все — удаляем из БД и из списка
+  async function clearAll() {
+    if (items.length === 0) return;
+    setItems([]);
     setUnreadCount(0);
-    await supabase
-      .from("notifications")
-      .update({ read_at: now })
-      .in("id", unreadIds);
+    await supabase.from("notifications").delete().eq("user_id", userId);
   }
 
-  async function markOneRead(id: string) {
+  // При клике на уведомление — удаляем его (прочитано = больше не нужно висеть)
+  async function consumeOne(id: string) {
     const item = items.find((i) => i.id === id);
-    if (!item || item.read_at) return;
-    const now = new Date().toISOString();
-    setItems((prev) =>
-      prev.map((i) => (i.id === id ? { ...i, read_at: now } : i))
-    );
-    setUnreadCount((c) => Math.max(0, c - 1));
-    await supabase
-      .from("notifications")
-      .update({ read_at: now })
-      .eq("id", id);
+    setItems((prev) => prev.filter((i) => i.id !== id));
+    if (item && !item.read_at) {
+      setUnreadCount((c) => Math.max(0, c - 1));
+    }
+    await supabase.from("notifications").delete().eq("id", id);
   }
 
   return (
@@ -203,15 +195,15 @@ export function NotificationBell({
           items={items}
           onClose={() => setPanelOpen(false)}
           onItemClick={(id, href) => {
-            // Помечаем прочитанным и переходим. Закрытие панели — через
+            // Удаляем уведомление и переходим. Закрытие панели — через
             // pathname watcher (см. useEffect выше). Это критично:
             // если закрыть здесь синхронно — useBackButtonClose сделает
             // history.back() и сорвёт навигацию вперёд.
-            markOneRead(id);
+            consumeOne(id);
             router.push(href);
           }}
-          onMarkAllRead={markAllRead}
-          hasUnread={unreadCount > 0}
+          onClearAll={clearAll}
+          hasItems={items.length > 0}
         />
       )}
     </>
@@ -222,14 +214,14 @@ function NotificationsPanel({
   items,
   onClose,
   onItemClick,
-  onMarkAllRead,
-  hasUnread,
+  onClearAll,
+  hasItems,
 }: {
   items: Notification[];
   onClose: () => void;
   onItemClick: (id: string, href: string) => void;
-  onMarkAllRead: () => void;
-  hasUnread: boolean;
+  onClearAll: () => void;
+  hasItems: boolean;
 }) {
   const t = useT();
   const [mounted, setMounted] = useState(false);
@@ -291,14 +283,15 @@ function NotificationsPanel({
             </button>
           </div>
 
-          {/* "Прочитать всё" */}
-          {hasUnread && (
-            <div className="px-5 py-2.5 border-b border-white/[0.05]">
+          {/* "Очистить всё" */}
+          {hasItems && (
+            <div className="px-5 py-2.5 border-b border-white/[0.05] flex justify-end">
               <button
-                onClick={onMarkAllRead}
-                className="text-xs text-echo-bright hover:text-white transition-colors font-medium"
+                onClick={onClearAll}
+                className="flex items-center gap-1.5 text-xs text-zinc-400 hover:text-red-400 transition-colors font-medium"
               >
-                ✓ {t.notifications.markAllRead}
+                <Trash2 className="w-3.5 h-3.5" />
+                {t.notifications.clearAll}
               </button>
             </div>
           )}

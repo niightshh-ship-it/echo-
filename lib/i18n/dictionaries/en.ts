@@ -83,7 +83,9 @@ const en = {
   },
   share: {
     share: "Share",
-    copied: "Link copied",
+    copied: "Copied",
+    copyLink: "Copy link",
+    shareVia: "Share via…",
     copyPrompt: "Copy this link:",
     profileTitle: "{name} on Echo",
     profileText: "Trade skills with {name} on Echo.",
@@ -115,6 +117,7 @@ const en = {
     emptyHint: "Matches, messages and reviews will show up here.",
     unreadCount: "{n} unread",
     markAllRead: "Mark all read",
+    clearAll: "Clear all",
     open: "Open",
     typeMatch: "{name} matched with you",
     typeMessage: "{name}: {preview}",

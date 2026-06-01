@@ -85,7 +85,9 @@ const nl: Dictionary = {
   },
   share: {
     share: "Delen",
-    copied: "Link gekopieerd",
+    copied: "Gekopieerd",
+    copyLink: "Link kopiëren",
+    shareVia: "Delen via…",
     copyPrompt: "Kopieer deze link:",
     profileTitle: "{name} op Echo",
     profileText: "Ruil vaardigheden met {name} op Echo.",
@@ -117,6 +119,7 @@ const nl: Dictionary = {
     emptyHint: "Matches, berichten en reviews komen hier te staan.",
     unreadCount: "{n} ongelezen",
     markAllRead: "Markeer alles gelezen",
+    clearAll: "Alles wissen",
     open: "Openen",
     typeMatch: "Je hebt een match met {name}",
     typeMessage: "{name}: {preview}",

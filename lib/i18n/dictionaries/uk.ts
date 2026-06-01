@@ -85,7 +85,9 @@ const uk: Dictionary = {
   },
   share: {
     share: "Поділитися",
-    copied: "Посилання скопійовано",
+    copied: "Скопійовано",
+    copyLink: "Копіювати посилання",
+    shareVia: "Поділитися…",
     copyPrompt: "Скопіюй посилання:",
     profileTitle: "{name} в Echo",
     profileText: "Обмінюйся навичками з {name} на Echo.",
@@ -117,6 +119,7 @@ const uk: Dictionary = {
     emptyHint: "Метчі, повідомлення та відгуки з'являться тут.",
     unreadCount: "нових: {n}",
     markAllRead: "Позначити всі",
+    clearAll: "Очистити все",
     open: "Відкрити",
     typeMatch: "У тебе метч з {name}",
     typeMessage: "{name}: {preview}",

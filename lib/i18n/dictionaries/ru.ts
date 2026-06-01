@@ -85,7 +85,9 @@ const ru: Dictionary = {
   },
   share: {
     share: "Поделиться",
-    copied: "Ссылка скопирована",
+    copied: "Скопировано",
+    copyLink: "Копировать ссылку",
+    shareVia: "Поделиться…",
     copyPrompt: "Скопируй ссылку:",
     profileTitle: "{name} в Echo",
     profileText: "Меняйся скиллами с {name} на Echo.",
@@ -117,6 +119,7 @@ const ru: Dictionary = {
     emptyHint: "Мэтчи, сообщения и отзывы появятся здесь.",
     unreadCount: "новых: {n}",
     markAllRead: "Прочитать все",
+    clearAll: "Очистить все",
     open: "Открыть",
     typeMatch: "У тебя мэтч с {name}",
     typeMessage: "{name}: {preview}",
