@@ -222,6 +222,7 @@ const uk: Dictionary = {
     likedYourSkill: "лайкнув твою навичку",
     likeBack: "Лайкнути у відповідь",
     openProfile: "Відкрити профіль",
+    dismiss: "Сховати цей лайк",
     offers: "Вміє",
   },
   chat: {

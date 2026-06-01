@@ -222,6 +222,7 @@ const nl: Dictionary = {
     likedYourSkill: "vond je vaardigheid leuk",
     likeBack: "Like terug",
     openProfile: "Profiel openen",
+    dismiss: "Deze like verbergen",
     offers: "Kan",
   },
   chat: {

@@ -23,11 +23,13 @@ export function LikePreviewSheet({
   liker,
   onClose,
   onLikeBack,
+  onDismiss,
   onOpenProfile,
 }: {
   liker: Liker;
   onClose: () => void;
   onLikeBack: () => void;
+  onDismiss: () => void;
   onOpenProfile: () => void;
 }) {
   const t = useT();
@@ -209,24 +211,35 @@ export function LikePreviewSheet({
 
           {/* Кнопки */}
           <div
-            className="px-5 pt-3 pb-4 border-t border-white/10 shrink-0 flex gap-2.5"
+            className="px-5 pt-3 pb-4 border-t border-white/10 shrink-0"
             style={{ paddingBottom: "max(env(safe-area-inset-bottom), 1rem)" }}
           >
-            <button
-              onClick={onOpenProfile}
-              className="shrink-0 rounded-2xl h-12 w-12 flex items-center justify-center border border-white/15 bg-white/[0.04] text-zinc-300 hover:text-white hover:bg-white/[0.08] transition-colors"
-              aria-label={t.matches.openProfile}
-            >
-              <ExternalLink className="w-5 h-5" />
-            </button>
-            <button
-              onClick={handleLikeBack}
-              disabled={busy}
-              className="flex-1 bg-gradient-to-r from-echo to-echo-fuchsia text-white hover:opacity-95 rounded-2xl h-12 font-semibold transition-all glow-echo disabled:opacity-60 flex items-center justify-center gap-2 active:scale-[0.98]"
-            >
-              <Heart className="w-5 h-5" fill="currentColor" />
-              {t.matches.likeBack}
-            </button>
+            <div className="flex gap-2.5">
+              <button
+                onClick={onDismiss}
+                disabled={busy}
+                className="shrink-0 rounded-2xl h-12 w-12 flex items-center justify-center border border-white/15 bg-white/[0.04] text-zinc-400 hover:text-white hover:bg-white/[0.08] transition-colors disabled:opacity-50"
+                aria-label={t.matches.dismiss}
+                title={t.matches.dismiss}
+              >
+                <X className="w-5 h-5" />
+              </button>
+              <button
+                onClick={onOpenProfile}
+                className="shrink-0 rounded-2xl h-12 w-12 flex items-center justify-center border border-white/15 bg-white/[0.04] text-zinc-300 hover:text-white hover:bg-white/[0.08] transition-colors"
+                aria-label={t.matches.openProfile}
+              >
+                <ExternalLink className="w-5 h-5" />
+              </button>
+              <button
+                onClick={handleLikeBack}
+                disabled={busy}
+                className="flex-1 bg-gradient-to-r from-echo to-echo-fuchsia text-white hover:opacity-95 rounded-2xl h-12 font-semibold transition-all glow-echo disabled:opacity-60 flex items-center justify-center gap-2 active:scale-[0.98]"
+              >
+                <Heart className="w-5 h-5" fill="currentColor" />
+                {t.matches.likeBack}
+              </button>
+            </div>
           </div>
         </div>
       </div>

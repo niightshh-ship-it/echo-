@@ -222,6 +222,7 @@ const ru: Dictionary = {
     likedYourSkill: "лайкнул твой скилл",
     likeBack: "Лайкнуть в ответ",
     openProfile: "Открыть профиль",
+    dismiss: "Скрыть этот лайк",
     offers: "Умеет",
   },
   chat: {

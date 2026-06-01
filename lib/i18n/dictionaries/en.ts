@@ -220,6 +220,7 @@ const en = {
     likedYourSkill: "liked your skill",
     likeBack: "Like back",
     openProfile: "Open profile",
+    dismiss: "Hide this like",
     offers: "Offers",
   },
   chat: {

@@ -88,6 +88,14 @@ export function MatchesClient({
     }
   }
 
+  async function dismissLike(liker: LikeItem) {
+    // Оптимистично убираем из списка
+    setLikes((prev) => prev.filter((l) => l.id !== liker.id));
+    setPreview(null);
+    const supabase = createClient();
+    await supabase.rpc("dismiss_like", { p_liker_id: liker.id });
+  }
+
   return (
     <div className="relative z-10 w-full max-w-md page-fade-in">
       {/* Шапка */}
@@ -233,6 +241,7 @@ export function MatchesClient({
           liker={preview}
           onClose={() => setPreview(null)}
           onLikeBack={() => likeBack(preview)}
+          onDismiss={() => dismissLike(preview)}
           onOpenProfile={() => router.push(`/u/${preview.id}`)}
         />
       )}
