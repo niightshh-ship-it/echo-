@@ -507,10 +507,10 @@ function VideoSlide({
         />
       )}
 
-      {/* Бейдж «твоё видео» сверху */}
+      {/* Бейдж «твоё видео» — мягкое стекло, ненавязчиво */}
       {item.isMine && (
-        <div className="absolute top-16 left-1/2 -translate-x-1/2 z-10 bg-echo/90 backdrop-blur-sm text-white text-xs font-semibold px-3 py-1.5 rounded-full glow-echo flex items-center gap-1.5">
-          ✨ {t.feed.yourVideo}
+        <div className="absolute top-16 left-1/2 -translate-x-1/2 z-10 bg-black/40 backdrop-blur-md border border-echo/30 text-white/90 text-xs font-medium px-3 py-1.5 rounded-full flex items-center gap-1.5">
+          <span className="text-echo-bright">✨</span> {t.feed.yourVideo}
         </div>
       )}
 

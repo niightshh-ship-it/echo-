@@ -138,12 +138,12 @@ export function SharedVideoClient({
       {/* Затемнение снизу */}
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-72 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
 
-      {/* Гостевой призыв сверху */}
+      {/* Гостевой призыв сверху — мягкое стекло, не кричит */}
       {isGuest && (
-        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-20 bg-echo/95 backdrop-blur text-white px-4 py-2 rounded-full text-sm font-medium shadow-2xl shadow-echo/40 max-w-[calc(100vw-160px)]">
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-20 bg-black/40 backdrop-blur-md border border-echo/30 text-white/90 px-4 py-2 rounded-full text-sm font-medium max-w-[calc(100vw-160px)]">
           <Link href="/sign-in" className="flex items-center gap-2">
             <span className="line-clamp-1">{guestTitle}</span>
-            <span className="text-white/80">→</span>
+            <span className="text-echo-bright">→</span>
           </Link>
         </div>
       )}
@@ -217,15 +217,17 @@ export function SharedVideoClient({
         )}
       </div>
 
-      {/* Гостевой нижний банер */}
+      {/* Гостевой нижний банер — стеклянная карточка с мягким свечением */}
       {isGuest && (
-        <Link
-          href="/sign-in"
-          className="fixed bottom-0 left-0 right-0 z-20 bg-gradient-to-t from-echo/95 to-echo/80 backdrop-blur px-6 py-3 text-center"
-        >
-          <p className="text-sm font-semibold text-white">{guestText}</p>
-          <p className="text-xs text-white/80 mt-0.5">{guestCta} →</p>
-        </Link>
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-20 w-[calc(100%-2rem)] max-w-sm">
+          <Link
+            href="/sign-in"
+            className="block rounded-2xl bg-zinc-950/70 backdrop-blur-xl border border-white/10 px-5 py-3.5 text-center shadow-2xl shadow-echo/10 hover:border-echo/40 transition-colors"
+          >
+            <p className="text-sm font-semibold text-white">{guestText}</p>
+            <p className="text-xs text-echo-bright mt-1 font-medium">{guestCta} →</p>
+          </Link>
+        </div>
       )}
     </div>
   );
