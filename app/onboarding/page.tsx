@@ -10,6 +10,7 @@ import { CityAutocomplete } from "@/components/city-autocomplete";
 import { useT } from "@/lib/i18n/provider";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { AmbientBg } from "@/components/ambient-bg";
+import { Walkthrough, useWalkthroughSteps } from "@/components/walkthrough";
 
 export default function OnboardingPage() {
   const router = useRouter();
@@ -22,6 +23,10 @@ export default function OnboardingPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [checking, setChecking] = useState(true);
+  // После сохранения профиля показываем короткий walkthrough,
+  // только потом редирект на /profile
+  const [showWalkthrough, setShowWalkthrough] = useState(false);
+  const walkthroughSteps = useWalkthroughSteps();
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
@@ -54,8 +59,14 @@ export default function OnboardingPage() {
       setError(insertError.message);
       setSaving(false);
     } else {
-      router.replace("/profile");
+      // Профиль создан — показываем walkthrough перед редиректом
+      setSaving(false);
+      setShowWalkthrough(true);
     }
+  }
+
+  function finishWalkthrough() {
+    router.replace("/profile");
   }
 
   if (checking) {
@@ -67,6 +78,22 @@ export default function OnboardingPage() {
   }
 
   const placeholders = [t.onboarding.skill1, t.onboarding.skill2, t.onboarding.skill3];
+
+  // После заполнения профиля — анимированный walkthrough
+  if (showWalkthrough) {
+    return (
+      <div className="relative flex min-h-screen flex-col items-center overflow-hidden bg-black text-white px-4">
+        <AmbientBg variant="onboarding" />
+        <Walkthrough
+          steps={walkthroughSteps}
+          onDone={finishWalkthrough}
+          doneLabel={t.walkthrough.done}
+          nextLabel={t.walkthrough.next}
+          skipLabel={t.walkthrough.skip}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-black text-white px-4 py-12">

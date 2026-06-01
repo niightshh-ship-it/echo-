@@ -1,7 +1,8 @@
 // Единая точка для контактных данных и неизменяемых настроек.
-// Когда появится домен и почта на нём — поменять здесь, и подтянется везде.
-export const CONTACT_EMAIL = "hello@echo.app";
-export const LEGAL_EMAIL = "privacy@echo.app";
+// Сейчас все письма идут на личный gmail основателя.
+// Когда появится свой домен — заведи hello@домен и privacy@домен и поменяй здесь.
+export const CONTACT_EMAIL = "smartwoter@gmail.com";
+export const LEGAL_EMAIL = "smartwoter@gmail.com";
 
 // Соцсети — ники разные на разных платформах потому что что-то было занято.
 // Если когда-нибудь решишь унифицировать — меняй только здесь.
@@ -13,4 +14,4 @@ export const SOCIAL = {
 } as const;
 
 // Обратная связь — простой mailto, потом можно поменять на форму
-export const FEEDBACK_EMAIL = "feedback@echo.app";
+export const FEEDBACK_EMAIL = "smartwoter@gmail.com";
