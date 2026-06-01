@@ -27,6 +27,10 @@ export function useBackButtonClose(open: boolean, onClose: () => void) {
     if (!open || typeof window === "undefined") return;
 
     const marker = `echoModal-${Math.random().toString(36).slice(2, 10)}`;
+    // Запоминаем URL на момент открытия — если он изменился к моменту cleanup,
+    // значит юзер сам перешёл по ссылке (например, нажал на уведомление),
+    // и откатывать history.back() мы не должны — это сорвало бы навигацию.
+    const initialHref = window.location.href;
     window.history.pushState({ echoModalMarker: marker }, "");
 
     let closedViaPop = false;
@@ -40,6 +44,7 @@ export function useBackButtonClose(open: boolean, onClose: () => void) {
       window.removeEventListener("popstate", onPop);
       if (
         !closedViaPop &&
+        window.location.href === initialHref &&
         (window.history.state as { echoModalMarker?: string } | null)?.echoModalMarker === marker
       ) {
         window.history.back();
