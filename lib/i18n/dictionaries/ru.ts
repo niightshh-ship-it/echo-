@@ -75,6 +75,8 @@ const ru: Dictionary = {
     profile: "← профиль",
     matches: "мэтчи →",
     soundHint: "тапни видео чтобы включить звук",
+    yourVideo: "твоё видео",
+    you: "Ты",
     match: "У тебя мэтч с {name}!",
     matchTitle: "Это мэтч!",
     matchSubtitle: "Вы с {name} лайкнули друг друга.",

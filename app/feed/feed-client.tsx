@@ -16,6 +16,7 @@ export type FeedItem = {
   skill: string | null;
   description: string | null;
   isRandom: boolean;
+  isMine: boolean;
   authorName: string;
   authorCity: string;
   authorAvatar: string | null;
@@ -125,6 +126,7 @@ export function FeedClient({
   }
 
   async function toggleLike(item: FeedItem) {
+    if (item.isMine) return; // своё видео лайкать нельзя
     const supabase = createClient();
     const wasLiked = liked.has(item.id);
     setLiked((prev) => {
@@ -505,9 +507,16 @@ function VideoSlide({
         />
       )}
 
+      {/* Бейдж «твоё видео» сверху */}
+      {item.isMine && (
+        <div className="absolute top-16 left-1/2 -translate-x-1/2 z-10 bg-echo/90 backdrop-blur-sm text-white text-xs font-semibold px-3 py-1.5 rounded-full glow-echo flex items-center gap-1.5">
+          ✨ {t.feed.yourVideo}
+        </div>
+      )}
+
       <div className="absolute bottom-28 left-0 right-20 px-5 pb-1">
         <Link
-          href={`/u/${item.authorId}`}
+          href={item.isMine ? "/profile" : `/u/${item.authorId}`}
           className="flex items-center gap-2.5 hover:opacity-80"
         >
           <span className="relative h-10 w-10 shrink-0 rounded-full overflow-hidden border border-white/25 bg-white/10 flex items-center justify-center">
@@ -519,7 +528,9 @@ function VideoSlide({
             )}
           </span>
           <div>
-            <p className="text-white font-semibold text-base leading-tight drop-shadow">{item.authorName}</p>
+            <p className="text-white font-semibold text-base leading-tight drop-shadow">
+              {item.isMine ? t.feed.you : item.authorName}
+            </p>
             <p className="text-zinc-300 text-xs drop-shadow">{item.authorCity}</p>
           </div>
         </Link>
@@ -552,22 +563,34 @@ function VideoSlide({
 
       {/* Колонка действий справа */}
       <div className="absolute right-4 bottom-32 flex flex-col items-center gap-4">
-        <button onClick={handleLikeToggle} className="flex flex-col items-center gap-1">
-          <div
-            className={`rounded-full p-3 transition-colors ${
-              isLiked ? "bg-echo glow-echo" : "bg-white/20"
-            }`}
-          >
-            <Heart
-              key={heartPop}
-              className={`w-7 h-7 text-white ${heartPop > 0 ? "heart-pop" : ""}`}
-              fill={isLiked ? "white" : "none"}
-            />
-          </div>
-          {mode === "random" && (
+        {/* Лайк — на своих видео скрываем (себя лайкать нельзя), вместо него счётчик просмотров уже есть в профиле */}
+        {!item.isMine && (
+          <button onClick={handleLikeToggle} className="flex flex-col items-center gap-1">
+            <div
+              className={`rounded-full p-3 transition-colors ${
+                isLiked ? "bg-echo glow-echo" : "bg-white/20"
+              }`}
+            >
+              <Heart
+                key={heartPop}
+                className={`w-7 h-7 text-white ${heartPop > 0 ? "heart-pop" : ""}`}
+                fill={isLiked ? "white" : "none"}
+              />
+            </div>
+            {mode === "random" && (
+              <span className="text-white text-xs font-medium">{likeCount}</span>
+            )}
+          </button>
+        )}
+        {/* Лайк-счётчик на своих random видео — показываем сколько лайков набрало */}
+        {item.isMine && mode === "random" && (
+          <div className="flex flex-col items-center gap-1">
+            <div className="rounded-full p-3 bg-white/10">
+              <Heart className="w-7 h-7 text-white/70" />
+            </div>
             <span className="text-white text-xs font-medium">{likeCount}</span>
-          )}
-        </button>
+          </div>
+        )}
         {mode === "random" && (
           <button
             onClick={() => setShowComments(true)}

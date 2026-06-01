@@ -7,12 +7,12 @@ export default async function FeedPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/sign-in");
 
-  // Параллелим всё что не зависит друг от друга
+  // Параллелим всё что не зависит друг от друга.
+  // Свои видео тоже включаем — пометим isMine, чтобы юзер видел что они в ленте.
   const [videosRes, blocksRes, likedRes, myProfileRes] = await Promise.all([
     supabase
       .from("videos")
       .select("id, user_id, skill, storage_path, created_at, is_random, description")
-      .neq("user_id", user.id)
       .order("created_at", { ascending: false }),
     supabase
       .from("blocks")
@@ -49,6 +49,7 @@ export default async function FeedPage() {
       skill: v.skill,
       description: v.description ?? null,
       isRandom: !!v.is_random,
+      isMine: v.user_id === user.id,
       authorName: author?.name ?? "?",
       authorCity: author?.city ?? "",
       authorAvatar: author?.avatar_url ?? null,

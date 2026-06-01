@@ -75,6 +75,8 @@ const nl: Dictionary = {
     profile: "← profiel",
     matches: "matches →",
     soundHint: "tik op de video voor geluid",
+    yourVideo: "jouw video",
+    you: "Jij",
     match: "Een match met {name}!",
     matchTitle: "Het is een match!",
     matchSubtitle: "Jij en {name} hebben elkaar geliket.",

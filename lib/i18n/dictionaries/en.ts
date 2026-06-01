@@ -73,6 +73,8 @@ const en = {
     profile: "← profile",
     matches: "matches →",
     soundHint: "tap the video to turn on sound",
+    yourVideo: "your video",
+    you: "You",
     match: "It's a match with {name}!",
     matchTitle: "It's a match!",
     matchSubtitle: "You and {name} liked each other.",

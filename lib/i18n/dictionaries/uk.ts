@@ -75,6 +75,8 @@ const uk: Dictionary = {
     profile: "← профіль",
     matches: "метчі →",
     soundHint: "торкнись відео щоб увімкнути звук",
+    yourVideo: "твоє відео",
+    you: "Ти",
     match: "У тебе метч з {name}!",
     matchTitle: "Це метч!",
     matchSubtitle: "Ви з {name} лайкнули одне одного.",
