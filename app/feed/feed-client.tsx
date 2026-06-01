@@ -362,6 +362,29 @@ function FeedColumn({
     }
   }, [active, items]);
 
+  // Надёжный автоплей: когда меняется активное видео (или колонка стала
+  // активной) — явно запускаем его. IntersectionObserver иногда не
+  // срабатывает на первой загрузке (видео ещё не готово), поэтому дублируем.
+  useEffect(() => {
+    if (!active || !activeId) return;
+    const v = videoRefs.current.get(activeId);
+    if (!v) return;
+    let cancelled = false;
+    const tryPlay = () => {
+      if (cancelled) return;
+      v.play().catch(() => {});
+    };
+    tryPlay();
+    // Если видео ещё грузится — играем как только сможет
+    v.addEventListener("canplay", tryPlay, { once: true });
+    const t = setTimeout(tryPlay, 300);
+    return () => {
+      cancelled = true;
+      v.removeEventListener("canplay", tryPlay);
+      clearTimeout(t);
+    };
+  }, [active, activeId]);
+
   if (items.length === 0) {
     return (
       <div className="w-screen h-[100dvh] shrink-0 flex flex-col items-center justify-center text-center px-6 bg-black">
@@ -526,42 +549,60 @@ function VideoSlide({
   return (
     <div
       data-id={item.id}
-      className="relative h-[100dvh] w-full snap-start snap-always flex items-center justify-center overflow-hidden bg-black"
+      className="relative h-[100dvh] w-full snap-start snap-always overflow-hidden bg-black"
     >
+      {/* Размытый кадр-фон — заполняет чёрные поля у не-9:16 видео.
+          preload=metadata + poster: показывает первый кадр, НЕ декодирует
+          поток (не играет), поэтому почти не грузит устройство. */}
       <video
-        ref={(el) => setVideoRef(item.id, el)}
-        src={item.url}
-        poster={`${item.url}#t=0.1`}
-        loop
-        muted={muted}
+        src={`${item.url}#t=0.1`}
+        muted
         playsInline
         preload="metadata"
-        onClick={onMuteToggle}
-        className="h-full w-full object-cover"
+        aria-hidden
+        tabIndex={-1}
+        className="pointer-events-none absolute inset-0 h-full w-full object-cover scale-110 blur-2xl opacity-40"
       />
 
-      {/* Большой плавный градиент снизу — текст читается без отдельной плашки */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-80 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+      {/* Основное видео — целиком, не обрезается. На десктопе — вертикальная
+          полоса по центру (макс ширина под 9:16), как в TikTok web. */}
+      <div className="absolute inset-0 flex items-center justify-center">
+        <video
+          ref={(el) => setVideoRef(item.id, el)}
+          src={item.url}
+          poster={`${item.url}#t=0.1`}
+          loop
+          muted={muted}
+          playsInline
+          preload="metadata"
+          onClick={onMuteToggle}
+          className="relative z-[1] h-full w-auto max-w-full object-contain"
+        />
+      </div>
 
-      {/* Затемнённый бэкдроп под текстом когда описание развёрнуто — видео остаётся видно */}
+      {/* Большой плавный градиент снизу — текст читается без отдельной плашки */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-80 bg-gradient-to-t from-black/90 via-black/40 to-transparent z-[2]" />
+
+      {/* Затемнённый бэкдроп под текстом когда описание развёрнуто */}
       {hasDescription && expanded && (
         <div
-          className="pointer-events-none absolute inset-x-0 bottom-0 bg-black/45 backdrop-blur-md animate-in fade-in duration-200"
+          className="pointer-events-none absolute inset-x-0 bottom-0 bg-black/45 backdrop-blur-md animate-in fade-in duration-200 z-[2]"
           style={{ height: "60%" }}
         />
       )}
 
-      {/* Бейдж «твоё видео» — мягкое стекло, ненавязчиво */}
+      {/* Бейдж «твоё видео» — absolute (не fixed! карусель имеет transform),
+          с отступом под чёлку */}
       {item.isMine && (
         <div
-          className="fixed left-1/2 -translate-x-1/2 z-[11] bg-black/40 backdrop-blur-md border border-echo/30 text-white/90 text-xs font-medium px-3 py-1.5 rounded-full flex items-center gap-1.5"
+          className="absolute left-1/2 -translate-x-1/2 z-[12] bg-black/40 backdrop-blur-md border border-echo/30 text-white/90 text-xs font-medium px-3 py-1.5 rounded-full flex items-center gap-1.5"
           style={{ top: "calc(max(env(safe-area-inset-top), 0.75rem) + 3.25rem)" }}
         >
           <span className="text-echo-bright">✨</span> {t.feed.yourVideo}
         </div>
       )}
 
-      <div className="absolute bottom-28 left-0 right-20 px-5 pb-1">
+      <div className="absolute bottom-28 left-0 right-20 px-5 pb-1 z-10">
         <Link
           href={item.isMine ? "/profile" : `/u/${item.authorId}`}
           className="flex items-center gap-2.5 hover:opacity-80"
@@ -609,7 +650,7 @@ function VideoSlide({
       </div>
 
       {/* Колонка действий справа */}
-      <div className="absolute right-4 bottom-32 flex flex-col items-center gap-4">
+      <div className="absolute right-4 bottom-32 flex flex-col items-center gap-4 z-10">
         {/* Лайк — на своих видео скрываем (себя лайкать нельзя), вместо него счётчик просмотров уже есть в профиле */}
         {!item.isMine && (
           <button onClick={handleLikeToggle} className="flex flex-col items-center gap-1">
@@ -658,7 +699,7 @@ function VideoSlide({
       </div>
 
       {showSoundHint && !item.isMine && (
-        <div className="absolute bottom-44 left-1/2 -translate-x-1/2 bg-black/55 backdrop-blur-sm text-white/90 text-xs px-3 py-1.5 rounded-full pointer-events-none animate-pulse">
+        <div className="absolute bottom-44 left-1/2 -translate-x-1/2 z-10 bg-black/55 backdrop-blur-sm text-white/90 text-xs px-3 py-1.5 rounded-full pointer-events-none animate-pulse">
           {t.feed.soundHint}
         </div>
       )}

@@ -124,6 +124,17 @@ export function SharedVideoClient({
         />
       </div>
 
+      {/* Размытый кадр-фон */}
+      <video
+        src={`${videoUrl}#t=0.1`}
+        muted
+        playsInline
+        preload="metadata"
+        aria-hidden
+        tabIndex={-1}
+        className="pointer-events-none absolute inset-0 h-full w-full object-cover scale-110 blur-2xl opacity-40"
+      />
+      {/* Основное видео — целиком */}
       <video
         src={videoUrl}
         autoPlay
@@ -132,11 +143,11 @@ export function SharedVideoClient({
         playsInline
         preload="auto"
         onClick={() => setMuted((m) => !m)}
-        className="h-full w-full object-cover cursor-pointer"
+        className="relative z-[1] h-full w-auto max-w-full object-contain cursor-pointer"
       />
 
       {/* Затемнение снизу */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-72 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-72 bg-gradient-to-t from-black/90 via-black/40 to-transparent z-[2]" />
 
       {/* Гостевой призыв сверху — мягкое стекло, не кричит */}
       {isGuest && (
@@ -149,7 +160,7 @@ export function SharedVideoClient({
       )}
 
       {/* Автор + skill + описание */}
-      <div className="absolute bottom-6 left-0 right-20 px-5">
+      <div className="absolute bottom-6 left-0 right-20 px-5 z-10">
         <Link
           href={`/u/${author.id}`}
           className="flex items-center gap-2.5"

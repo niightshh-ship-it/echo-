@@ -214,21 +214,34 @@ function SwiperSlide({
   return (
     <div
       data-id={video.id}
-      className="relative h-[100dvh] w-full snap-start snap-always flex items-center justify-center overflow-hidden bg-black"
+      className="relative h-[100dvh] w-full snap-start snap-always overflow-hidden bg-black"
     >
+      {/* Размытый кадр-фон */}
       <video
-        ref={setVideoRef}
-        src={video.url}
-        loop
-        muted={muted}
+        src={`${video.url}#t=0.1`}
+        muted
         playsInline
-        preload="auto"
-        onClick={() => setMuted((m) => !m)}
-        className="h-full w-full object-cover cursor-pointer"
+        preload="metadata"
+        aria-hidden
+        tabIndex={-1}
+        className="pointer-events-none absolute inset-0 h-full w-full object-cover scale-110 blur-2xl opacity-40"
       />
+      {/* Основное видео — целиком */}
+      <div className="absolute inset-0 flex items-center justify-center">
+        <video
+          ref={setVideoRef}
+          src={video.url}
+          loop
+          muted={muted}
+          playsInline
+          preload="auto"
+          onClick={() => setMuted((m) => !m)}
+          className="relative z-[1] h-full w-auto max-w-full object-contain cursor-pointer"
+        />
+      </div>
 
       {/* Затемнение снизу — чтобы текст читался без отдельной плашки */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-72 bg-gradient-to-t from-black/85 via-black/40 to-transparent" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-72 bg-gradient-to-t from-black/85 via-black/40 to-transparent z-[2]" />
 
       {/* Бэкдроп когда описание развёрнуто */}
       {video.description && expanded && (
@@ -238,7 +251,7 @@ function SwiperSlide({
         />
       )}
 
-      <div className="absolute bottom-6 left-0 right-20 px-5">
+      <div className="absolute bottom-6 left-0 right-20 px-5 z-10">
         <Link href={`/u/${author.id}`} className="flex items-center gap-2.5">
           <span className="relative h-10 w-10 shrink-0 rounded-full overflow-hidden border border-white/25 bg-white/10 flex items-center justify-center">
             {author.avatar ? (
@@ -299,7 +312,7 @@ function SwiperSlide({
         )}
       </div>
 
-      <div className="absolute right-4 bottom-24 flex flex-col items-center gap-4">
+      <div className="absolute right-4 bottom-24 flex flex-col items-center gap-4 z-10">
         <button
           onClick={toggleLike}
           disabled={!currentUserId}

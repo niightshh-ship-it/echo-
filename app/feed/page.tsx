@@ -2,6 +2,16 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { FeedClient, type FeedItem } from "./feed-client";
 
+// Перемешивание (Fisher-Yates) — для рандомной ленты
+function shuffle<T>(arr: T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
 export default async function FeedPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -58,7 +68,8 @@ export default async function FeedPage() {
   });
 
   const skillItems = allItems.filter((i) => !i.isRandom);
-  const randomItems = allItems.filter((i) => i.isRandom);
+  // Random-лента — реально перемешанная (Fisher-Yates), а не по дате
+  const randomItems = shuffle(allItems.filter((i) => i.isRandom));
   const initiallyLiked = (likedRows ?? []).map((r) => r.video_id);
 
   return (
