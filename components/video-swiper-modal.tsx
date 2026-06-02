@@ -218,7 +218,9 @@ function SwiperSlide({
     >
       {/* Дешёвый градиент-фон (без второго video — экономит GPU/сеть) */}
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-zinc-900 via-black to-zinc-900" />
-      {/* Основное видео — целиком */}
+      {/* Основное видео — целиком. preload=none: качаем только когда слайд
+          становится активным (IntersectionObserver вызывает play). Иначе
+          все видео профиля грузились бы разом = лишний трафик. */}
       <div className="absolute inset-0 flex items-center justify-center">
         <video
           ref={setVideoRef}
@@ -226,7 +228,7 @@ function SwiperSlide({
           loop
           muted={muted}
           playsInline
-          preload="auto"
+          preload="none"
           onClick={() => setMuted((m) => !m)}
           className="relative z-[1] h-full w-auto max-w-full object-contain cursor-pointer"
         />

@@ -374,15 +374,20 @@ function FeedColumn({
     items.forEach((it, i) => {
       const v = videoRefs.current.get(it.id);
       if (!v) return;
-      const near = Math.abs(i - idx) <= 1;
-      if (near) {
+      const dist = Math.abs(i - idx);
+      if (dist <= 1) {
+        // Активное + соседи: грузим
         if (v.getAttribute("src") !== it.url) {
           v.setAttribute("src", it.url);
           v.load();
         }
         v.preload = "auto";
+      } else if (dist <= 5) {
+        // Окно удержания: НЕ трогаем уже загруженное, чтобы скролл
+        // туда-обратно не перекачивал видео заново (экономия трафика).
+        v.preload = "none";
       } else if (v.getAttribute("src")) {
-        // Далёкое — выгружаем, освобождаем сеть/память
+        // Только очень далёкие выгружаем — освобождаем память.
         v.removeAttribute("src");
         v.load();
       }

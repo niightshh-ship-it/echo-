@@ -101,7 +101,12 @@ export default function UploadPage() {
 
     const { error: uploadError } = await supabase.storage
       .from("videos")
-      .upload(path, file, { contentType: file.type });
+      // cacheControl: год — видео неизменяемое, пусть браузер/CDN кешируют
+      // и не качают повторно (это главный источник перерасхода трафика).
+      .upload(path, file, {
+        contentType: file.type,
+        cacheControl: "31536000",
+      });
 
     if (uploadError) {
       setError(uploadError.message);
