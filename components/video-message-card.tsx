@@ -63,32 +63,21 @@ export function VideoMessageCard({
       onClick={() => router.push(`/v/${videoId}`)}
       className="block w-44 rounded-2xl overflow-hidden border border-white/15 bg-black relative group"
     >
-      {url ? (
-        <>
-          {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
-          <video
-            src={`${url}#t=0.1`}
-            preload="metadata"
-            muted
-            playsInline
-            className="w-full aspect-[9/16] object-cover"
-          />
-          <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/10 transition-colors">
-            <span className="rounded-full bg-white/25 backdrop-blur-sm p-3">
-              <Play className="w-5 h-5 text-white" fill="white" />
-            </span>
-          </div>
-          {skill && (
-            <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 to-transparent px-2 py-1.5">
-              <p className="text-white text-[11px] font-medium drop-shadow line-clamp-1">
-                🎯 {skill}
-              </p>
-            </div>
-          )}
-        </>
-      ) : (
-        <div className="w-full aspect-[9/16] flex items-center justify-center bg-zinc-900">
+      {/* Плейсхолдер без загрузки видео — само видео откроется на /v по клику */}
+      <div className="w-full aspect-[9/16] flex items-center justify-center bg-gradient-to-br from-zinc-800 via-zinc-900 to-black">
+        {url ? (
+          <span className="rounded-full bg-white/20 backdrop-blur-sm p-3 group-hover:bg-white/30 transition-colors">
+            <Play className="w-5 h-5 text-white" fill="white" />
+          </span>
+        ) : (
           <div className="w-6 h-6 border-2 border-white/10 border-t-echo rounded-full animate-spin" />
+        )}
+      </div>
+      {skill && (
+        <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 to-transparent px-2 py-1.5">
+          <p className="text-white text-[11px] font-medium drop-shadow line-clamp-1">
+            🎯 {skill}
+          </p>
         </div>
       )}
     </button>

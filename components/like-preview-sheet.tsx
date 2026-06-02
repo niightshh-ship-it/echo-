@@ -187,23 +187,21 @@ export function LikePreviewSheet({
               </div>
             )}
 
-            {/* Видео лайкера */}
+            {/* Видео лайкера — плейсхолдеры без загрузки (полные видео
+                смотрятся на его профиле). Раньше грузили видео = трафик. */}
             {videos.length > 0 && (
               <div className="grid grid-cols-3 gap-2 mb-2">
                 {videos.map((v) => (
-                  <div
+                  <button
                     key={v.id}
-                    className="rounded-xl overflow-hidden border border-white/10 bg-zinc-900 aspect-[9/16]"
+                    type="button"
+                    onClick={onOpenProfile}
+                    className="rounded-xl overflow-hidden border border-white/10 aspect-[9/16] bg-gradient-to-br from-zinc-800 via-zinc-900 to-black flex items-center justify-center hover:border-echo/40 transition-colors"
                   >
-                    {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
-                    <video
-                      src={`${v.url}#t=0.1`}
-                      preload="metadata"
-                      muted
-                      playsInline
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
+                    <span className="rounded-full bg-white/10 p-2">
+                      <ExternalLink className="w-4 h-4 text-white/80" />
+                    </span>
+                  </button>
                 ))}
               </div>
             )}
