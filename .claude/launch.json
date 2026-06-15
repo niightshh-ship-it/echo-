@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "dvizh",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--prefix", "C:\\Users\\niigh\\Desktop\\dvizh"],
+      "port": 5173
+    }
+  ]
+}
