@@ -291,64 +291,6 @@
     66%      { transform: translate(45px, -25px) scale(1.12); }
   }
 
-  /* ============ HERO «ЖИВОЕ ЭХО» ============ */
-
-  /* Кинематографичный въезд: каждый слой со своей задержкой, пружинно */
-  @keyframes hero-rise {
-    0%   { opacity: 0; transform: translateY(28px) scale(0.96); filter: blur(8px); }
-    60%  { filter: blur(0); }
-    100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
-  }
-  .hero-rise { animation: hero-rise 0.9s cubic-bezier(0.18, 0.7, 0.25, 1) both; }
-  .hero-d1 { animation-delay: 0.05s; }
-  .hero-d2 { animation-delay: 0.22s; }
-  .hero-d3 { animation-delay: 0.40s; }
-  .hero-d4 { animation-delay: 0.58s; }
-  .hero-d5 { animation-delay: 0.74s; }
-
-  /* Стартовый «выстрел» волны от логотипа при загрузке (one-shot) */
-  @keyframes hero-shock {
-    0%   { opacity: 0; transform: scale(0.1); border-width: 3px; }
-    8%   { opacity: 0.9; }
-    100% { opacity: 0; transform: scale(3.4); border-width: 0.5px; }
-  }
-  .hero-shock {
-    position: absolute;
-    border-radius: 9999px;
-    border: 2px solid rgba(155, 124, 255, 0.5);
-    pointer-events: none;
-    animation: hero-shock 1.4s cubic-bezier(0.16, 0.7, 0.3, 1) both;
-  }
-  .hero-shock-1 { animation-delay: 0.15s; }
-  .hero-shock-2 { animation-delay: 0.35s; }
-  .hero-shock-3 { animation-delay: 0.55s; }
-
-  /* Дрейфующие скилл-частицы фона — медленный полёт + лёгкое мерцание */
-  @keyframes skill-float {
-    0%   { transform: translate(0, 0); opacity: 0; }
-    10%  { opacity: var(--skill-op, 0.5); }
-    50%  { transform: translate(var(--skill-dx, 20px), var(--skill-dy, -30px)); }
-    90%  { opacity: var(--skill-op, 0.5); }
-    100% { transform: translate(0, 0); opacity: 0; }
-  }
-  .skill-particle {
-    animation: skill-float var(--skill-dur, 16s) ease-in-out infinite;
-    animation-delay: var(--skill-delay, 0s);
-    will-change: transform, opacity;
-  }
-
-  /* Аврора-меш под героем — два слоя плывут в противофазе, дышат */
-  @keyframes hero-aurora {
-    0%, 100% { transform: translate(-50%, -50%) rotate(0deg) scale(1); }
-    50%      { transform: translate(-50%, -50%) rotate(8deg) scale(1.12); }
-  }
-
-  /* Магнитная подсветка CTA при наведении */
-  @keyframes cta-shimmer {
-    0%   { background-position: -120% 0; }
-    100% { background-position: 220% 0; }
-  }
-
   /* Логотип Echo: при наведении расходится эхо-пинг */
   .echo-logo {
     position: relative;
@@ -649,9 +591,6 @@
     .wt-bubble-2,
     .wt-bubble-3,
     .wt-scroll-hint { animation: none; opacity: 1; transform: none; }
-    .hero-rise,
-    .skill-particle { animation: none; opacity: 1; transform: none; }
-    .hero-shock { animation: none; opacity: 0; }
     .blob-1, .blob-2 { animation: none; }
     .reveal { opacity: 1; transform: none; transition: none; }
   }
